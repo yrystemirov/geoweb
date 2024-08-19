@@ -16,7 +16,8 @@ public class AuthenticationFilter implements Filter {
     private AuthService authService;
 
     private final List<String> allowedUrls = List.of(
-            "auth/token"
+            "auth/token",
+            "test"
     );
 
     @Override
@@ -55,5 +56,6 @@ public class AuthenticationFilter implements Filter {
     }
 
     @Override
-    public void destroy() {}
+    public void destroy() {
+    }
 }
