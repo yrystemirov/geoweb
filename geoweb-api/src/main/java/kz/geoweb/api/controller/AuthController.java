@@ -31,7 +31,7 @@ public class AuthController {
 
     @GetMapping("/test")
     public ResponseEntity<?> test() {
-        permissionService.hasAnyRole(RoleEnum.ROLE_ADMIN);
+        permissionService.hasAnyRole(RoleEnum.ADMIN);
         return ResponseEntity.ok("good");
     }
 }

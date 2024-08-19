@@ -3,6 +3,8 @@ package kz.geoweb.api.service.impl;
 import kz.geoweb.api.entity.Role;
 import kz.geoweb.api.entity.User;
 import kz.geoweb.api.enums.RoleEnum;
+import kz.geoweb.api.exception.CustomException;
+import kz.geoweb.api.exception.ForbiddenException;
 import kz.geoweb.api.repository.UserRepository;
 import kz.geoweb.api.security.UserContext;
 import kz.geoweb.api.security.UserContextHolder;
@@ -23,7 +25,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (userContext != null) {
             String username = userContext.getUsername();
             User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("user.not_found"));
+                    .orElseThrow(() -> new CustomException("user.not_found"));
             List<RoleEnum> currentUserRoles = user.getRoles().stream().map(Role::getName).toList();
             boolean hasPermission = false;
             for (RoleEnum requestedRole : roles) {
@@ -33,7 +35,7 @@ public class PermissionServiceImpl implements PermissionService {
                 }
             }
             if (!hasPermission) {
-                throw new RuntimeException("forbidden");
+                throw new ForbiddenException("forbidden");
             }
         } else {
             throw new RuntimeException("unauthorized");

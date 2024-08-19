@@ -19,7 +19,7 @@ public class LanguageUtils {
             }
         }
         if (locale == null) {
-            locale = Locale.of(DEFAULT_LOCALE_CODE);
+            locale = new Locale(DEFAULT_LOCALE_CODE);
         }
         return locale;
     }

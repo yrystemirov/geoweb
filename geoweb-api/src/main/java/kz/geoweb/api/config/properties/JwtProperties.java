@@ -10,6 +10,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class JwtProperties {
     private String accessSecret;
     private Integer accessExpiryMinutes;
-    private String refreshToken;
+    private String refreshSecret;
     private Integer refreshExpiryDays;
 }

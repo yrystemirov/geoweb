@@ -16,8 +16,7 @@ public class AuthenticationFilter implements Filter {
     private AuthService authService;
 
     private final List<String> allowedUrls = List.of(
-            "auth/token",
-            "test"
+            "auth/token"
     );
 
     @Override
