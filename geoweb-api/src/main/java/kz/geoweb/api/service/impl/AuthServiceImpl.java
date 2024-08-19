@@ -7,6 +7,7 @@ import kz.geoweb.api.dto.RefreshTokenDto;
 import kz.geoweb.api.dto.TokenResponseDto;
 import kz.geoweb.api.entity.RefreshToken;
 import kz.geoweb.api.entity.User;
+import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.repository.RefreshTokenRepository;
 import kz.geoweb.api.repository.UserRepository;
 import kz.geoweb.api.service.AuthService;
@@ -37,9 +38,9 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public TokenResponseDto login(LoginDto loginDto) {
         User user = userRepository.findByUsername(loginDto.getUsername())
-                .orElseThrow(() -> new RuntimeException("user.not_found.error"));
+                .orElseThrow(() -> new CustomException("user.not_found"));
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
-            throw new RuntimeException("password.invalid");
+            throw new CustomException("password.invalid");
         }
         return generateTokens(user);
     }
@@ -52,10 +53,10 @@ public class AuthServiceImpl implements AuthService {
         if (refreshTokenOptional.isPresent()) {
             RefreshToken refreshToken = refreshTokenOptional.get();
             User user = userRepository.findByUsername(refreshToken.getUsername())
-                    .orElseThrow(() -> new RuntimeException("user.not_found.error"));
+                    .orElseThrow(() -> new CustomException("user.not_found"));
             return generateTokens(user);
         } else {
-            throw new RuntimeException("refresh_token.not_found_or_expired");
+            throw new CustomException("refresh_token.not_found_or_expired");
         }
     }
 
