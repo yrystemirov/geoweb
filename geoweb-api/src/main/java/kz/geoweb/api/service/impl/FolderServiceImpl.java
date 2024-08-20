@@ -24,18 +24,20 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public FolderDto getFolderById(UUID id) {
+    public FolderDto getFolder(UUID id) {
         return folderMapper.toDto(getEntityById(id));
     }
 
     @Override
-    public Set<FolderDto> getFoldersByParentId(UUID parentId) {
+    public Set<FolderDto> getFolderChildren(UUID parentId) {
         return folderMapper.toDto(folderRepository.findByParentId(parentId));
     }
 
     @Override
     public FolderDto createFolder(FolderDto folderDto) {
+        folderDto.setId(null);
         Folder folder = folderMapper.toEntity(folderDto);
+        // TODO: update history
         return folderMapper.toDto(folderRepository.save(folder));
     }
 
@@ -51,6 +53,7 @@ public class FolderServiceImpl implements FolderService {
         dbFolder.setDescriptionEn(folderDto.getDescriptionEn());
         dbFolder.setIsPublic(folderDto.getIsPublic());
         dbFolder.setOrderNumber(folderDto.getOrderNumber());
+        // TODO: update history
         return folderMapper.toDto(folderRepository.save(dbFolder));
     }
 
@@ -58,5 +61,6 @@ public class FolderServiceImpl implements FolderService {
     public void deleteFolder(UUID id) {
         getEntityById(id);
         folderRepository.deleteById(id);
+        // TODO: update history
     }
 }

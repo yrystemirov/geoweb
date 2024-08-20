@@ -6,8 +6,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface FolderService {
-    FolderDto getFolderById(UUID id);
-    Set<FolderDto> getFoldersByParentId(UUID parentId);
+    FolderDto getFolder(UUID id);
+    Set<FolderDto> getFolderChildren(UUID parentId);
     FolderDto createFolder(FolderDto folderDto);
     FolderDto updateFolder(UUID id, FolderDto folderDto);
     void deleteFolder(UUID id);

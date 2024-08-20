@@ -16,17 +16,17 @@ public class FolderController {
 
     @GetMapping("/{id}")
     public FolderDto getFolder(@PathVariable UUID id) {
-        return folderService.getFolderById(id);
+        return folderService.getFolder(id);
     }
 
     @GetMapping("/root")
     public Set<FolderDto> getRoot() {
-        return folderService.getFoldersByParentId(null);
+        return folderService.getFolderChildren(null);
     }
 
     @GetMapping("/{id}/children")
     public Set<FolderDto> getRoot(@PathVariable UUID id) {
-        return folderService.getFoldersByParentId(id);
+        return folderService.getFolderChildren(id);
     }
 
     @PostMapping
@@ -35,7 +35,8 @@ public class FolderController {
     }
 
     @PutMapping("/{id}")
-    public FolderDto updateFolder(@PathVariable UUID id, @RequestBody FolderDto folderDto) {
+    public FolderDto updateFolder(@PathVariable UUID id,
+                                  @RequestBody FolderDto folderDto) {
         return folderService.updateFolder(id, folderDto);
     }
 
