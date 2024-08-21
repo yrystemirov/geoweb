@@ -1,13 +1,16 @@
 package kz.geoweb.api.controller;
 
+import kz.geoweb.api.dto.LayerAttrDto;
 import kz.geoweb.api.dto.LayerCreateDto;
 import kz.geoweb.api.dto.LayerDto;
+import kz.geoweb.api.service.LayerAttrService;
 import kz.geoweb.api.service.LayerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -15,6 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LayerController {
     private final LayerService layerService;
+    private final LayerAttrService layerAttrService;
 
     @GetMapping("/{id}")
     public LayerDto getLayer(@PathVariable UUID id) {
@@ -40,5 +44,10 @@ public class LayerController {
     @DeleteMapping("/{id}")
     public void deleteLayer(@PathVariable UUID id) {
         layerService.deleteLayer(id);
+    }
+
+    @GetMapping("/{id}/attrs")
+    public Set<LayerAttrDto> getLayerAttrs(@PathVariable UUID id) {
+        return layerAttrService.getLayerAttrs(id);
     }
 }

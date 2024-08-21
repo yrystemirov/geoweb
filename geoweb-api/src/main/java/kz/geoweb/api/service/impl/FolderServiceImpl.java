@@ -30,7 +30,7 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public Set<FolderDto> getFolderChildren(UUID parentId) {
-        return folderMapper.toDto(folderRepository.findByParentId(parentId));
+        return folderMapper.toDto(folderRepository.findByParentIdOrderByOrderNumber(parentId));
     }
 
     @Override
@@ -43,18 +43,18 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public FolderDto updateFolder(UUID id, FolderDto folderDto) {
-        Folder dbFolder = getEntityById(id);
-        dbFolder.setNameKk(folderDto.getNameKk());
-        dbFolder.setNameRu(folderDto.getNameRu());
-        dbFolder.setNameEn(folderDto.getNameEn());
-        dbFolder.setImgUrl(folderDto.getImgUrl());
-        dbFolder.setDescriptionKk(folderDto.getDescriptionKk());
-        dbFolder.setDescriptionRu(folderDto.getDescriptionRu());
-        dbFolder.setDescriptionEn(folderDto.getDescriptionEn());
-        dbFolder.setIsPublic(folderDto.getIsPublic());
-        dbFolder.setOrderNumber(folderDto.getOrderNumber());
+        Folder folder = getEntityById(id);
+        folder.setNameKk(folderDto.getNameKk());
+        folder.setNameRu(folderDto.getNameRu());
+        folder.setNameEn(folderDto.getNameEn());
+        folder.setImgUrl(folderDto.getImgUrl());
+        folder.setDescriptionKk(folderDto.getDescriptionKk());
+        folder.setDescriptionRu(folderDto.getDescriptionRu());
+        folder.setDescriptionEn(folderDto.getDescriptionEn());
+        folder.setIsPublic(folderDto.getIsPublic());
+        folder.setOrderNumber(folderDto.getOrderNumber());
         // TODO: update history
-        return folderMapper.toDto(folderRepository.save(dbFolder));
+        return folderMapper.toDto(folderRepository.save(folder));
     }
 
     @Override
