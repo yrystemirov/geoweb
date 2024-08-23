@@ -1,6 +1,7 @@
 package kz.geoweb.api.controller;
 
 import kz.geoweb.api.dto.FolderDto;
+import kz.geoweb.api.dto.FolderTreeDto;
 import kz.geoweb.api.service.FolderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,11 @@ public class FolderController {
     @GetMapping("/{id}/children")
     public Set<FolderDto> getRoot(@PathVariable UUID id) {
         return folderService.getFolderChildren(id);
+    }
+
+    @GetMapping("/{id}/tree")
+    public FolderTreeDto getFolderTree(@PathVariable UUID id) {
+        return folderService.getFolderTree(id);
     }
 
     @PostMapping

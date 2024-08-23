@@ -1,10 +1,13 @@
 package kz.geoweb.api.service.impl;
 
 import kz.geoweb.api.dto.FolderDto;
+import kz.geoweb.api.dto.FolderTreeDto;
 import kz.geoweb.api.entity.Folder;
+import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.mapper.FolderMapper;
 import kz.geoweb.api.repository.FolderRepository;
+import kz.geoweb.api.service.EntityUpdateHistoryService;
 import kz.geoweb.api.service.FolderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import java.util.UUID;
 public class FolderServiceImpl implements FolderService {
     private final FolderRepository folderRepository;
     private final FolderMapper folderMapper;
+    private final EntityUpdateHistoryService historyService;
 
     private Folder getEntityById(UUID id) {
         return folderRepository.findById(id)
@@ -34,11 +38,17 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
+    public FolderTreeDto getFolderTree(UUID id) {
+        return folderMapper.toFolderTreeDto(getEntityById(id));
+    }
+
+    @Override
     public FolderDto createFolder(FolderDto folderDto) {
         folderDto.setId(null);
         Folder folder = folderMapper.toEntity(folderDto);
-        // TODO: update history
-        return folderMapper.toDto(folderRepository.save(folder));
+        Folder created = folderRepository.save(folder);
+        historyService.saveFolder(created.getId(), Action.CREATE);
+        return folderMapper.toDto(created);
     }
 
     @Override
@@ -53,14 +63,15 @@ public class FolderServiceImpl implements FolderService {
         folder.setDescriptionEn(folderDto.getDescriptionEn());
         folder.setIsPublic(folderDto.getIsPublic());
         folder.setOrderNumber(folderDto.getOrderNumber());
-        // TODO: update history
-        return folderMapper.toDto(folderRepository.save(folder));
+        Folder updated = folderRepository.save(folder);
+        historyService.saveFolder(updated.getId(), Action.UPDATE);
+        return folderMapper.toDto(updated);
     }
 
     @Override
     public void deleteFolder(UUID id) {
         getEntityById(id);
         folderRepository.deleteById(id);
-        // TODO: update history
+        historyService.saveFolder(id, Action.DELETE);
     }
 }

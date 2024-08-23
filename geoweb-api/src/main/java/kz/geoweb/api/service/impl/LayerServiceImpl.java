@@ -3,9 +3,11 @@ package kz.geoweb.api.service.impl;
 import kz.geoweb.api.dto.LayerCreateDto;
 import kz.geoweb.api.dto.LayerDto;
 import kz.geoweb.api.entity.Layer;
+import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.mapper.LayerMapper;
 import kz.geoweb.api.repository.LayerRepository;
+import kz.geoweb.api.service.EntityUpdateHistoryService;
 import kz.geoweb.api.service.JdbcService;
 import kz.geoweb.api.service.LayerService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class LayerServiceImpl implements LayerService {
     private final LayerRepository layerRepository;
     private final LayerMapper layerMapper;
     private final JdbcService jdbcService;
+    private final EntityUpdateHistoryService historyService;
 
     private Layer getEntityById(UUID id) {
         return layerRepository.findById(id)
@@ -67,7 +70,7 @@ public class LayerServiceImpl implements LayerService {
             jdbcService.createTable(seqNumber, created.getGeometryType());
         }
         // TODO: geoserver deploy
-        // TODO: update history
+        historyService.saveLayer(created.getId(), Action.CREATE);
         return layerMapper.toDto(created);
     }
 
@@ -91,7 +94,7 @@ public class LayerServiceImpl implements LayerService {
         layer.setIsPublic(layerDto.getIsPublic());
         layer.setDynamicIdentityColumn(layerDto.getDynamicIdentityColumn());
         Layer updated = layerRepository.save(layer);
-        // TODO: update history
+        historyService.saveLayer(updated.getId(), Action.UPDATE);
         return layerMapper.toDto(updated);
     }
 
@@ -100,6 +103,6 @@ public class LayerServiceImpl implements LayerService {
         getEntityById(id);
         layerRepository.deleteById(id);
         // TODO: geoserver delete
-        // TODO: update history
+        historyService.saveLayer(id, Action.DELETE);
     }
 }

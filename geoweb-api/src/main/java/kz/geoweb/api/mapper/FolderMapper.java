@@ -1,6 +1,7 @@
 package kz.geoweb.api.mapper;
 
 import kz.geoweb.api.dto.FolderDto;
+import kz.geoweb.api.dto.FolderTreeDto;
 import kz.geoweb.api.entity.Folder;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -16,6 +17,10 @@ public class FolderMapper {
 
     public FolderDto toDto(Folder folder) {
         return modelMapper.map(folder, FolderDto.class);
+    }
+
+    public FolderTreeDto toFolderTreeDto(Folder folder) {
+        return modelMapper.map(folder, FolderTreeDto.class);
     }
 
     public Set<FolderDto> toDto(Set<Folder> folders) {
