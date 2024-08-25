@@ -48,19 +48,8 @@ services:
       - "${POSTGRES_EXTERNAL_PORT}:${POSTGRES_INTERNAL_PORT}"
     volumes:
       - ./infrastructure/db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
-      - db-data:/var/lib/postgresql/data
+      - D:\docker-volumes\geoweb\postgres:/var/lib/postgresql/data
     restart: unless-stopped
-  pgadmin:
-    container_name: pgadmin4_container
-    image: dpage/pgadmin4:7
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - "5151:80"
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
   minio:
     container_name: ${MINIO_HOST}
     image: minio/minio
@@ -68,16 +57,11 @@ services:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - minio_storage:/data
+      - D:\docker-volumes\geoweb\minio:/data
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server --console-address ":9001" /data
-
-volumes:
-  minio_storage: {}
-  db-data:
-  pgadmin-data:
 
 networks:
   default:
