@@ -5,8 +5,8 @@ import kz.geoweb.api.enums.GeometryType;
 
 public interface JdbcService {
     Long getSeqNumber();
-    void createSequence(Long seqNumber);
+    void createSequence(String layername);
     void createSequenceImportedLayer(String tableName);
-    void createTable(Long seqNumber, GeometryType geometryType);
+    void createTable(String layername, GeometryType geometryType);
     void createAttribute(String layername, String attrname, AttrType type);
 }

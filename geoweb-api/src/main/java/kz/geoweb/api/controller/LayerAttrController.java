@@ -1,6 +1,6 @@
 package kz.geoweb.api.controller;
 
-import kz.geoweb.api.dto.LayerAttrCreateDto;
+import jakarta.validation.Valid;
 import kz.geoweb.api.dto.LayerAttrDto;
 import kz.geoweb.api.service.LayerAttrService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class LayerAttrController {
     }
 
     @PostMapping
-    public LayerAttrDto createLayerAttr(@RequestBody LayerAttrCreateDto layerAttrCreateDto) {
-        return layerAttrService.createLayerAttr(layerAttrCreateDto);
+    public LayerAttrDto createLayerAttr(@RequestBody @Valid LayerAttrDto layerAttrDto) {
+        return layerAttrService.createLayerAttr(layerAttrDto);
     }
 
     @PutMapping("/{id}")

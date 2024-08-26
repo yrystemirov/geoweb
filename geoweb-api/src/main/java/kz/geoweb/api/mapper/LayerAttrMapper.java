@@ -1,6 +1,5 @@
 package kz.geoweb.api.mapper;
 
-import kz.geoweb.api.dto.LayerAttrCreateDto;
 import kz.geoweb.api.dto.LayerAttrDto;
 import kz.geoweb.api.entity.LayerAttr;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ public class LayerAttrMapper {
         return layerAttrs.stream().map(this::toDto).collect(Collectors.toSet());
     }
 
-    public LayerAttr toEntity(LayerAttrCreateDto layerAttrCreateDto) {
-        return modelMapper.map(layerAttrCreateDto, LayerAttr.class);
+    public LayerAttr toEntity(LayerAttrDto layerAttrDto) {
+        return modelMapper.map(layerAttrDto, LayerAttr.class);
     }
 }

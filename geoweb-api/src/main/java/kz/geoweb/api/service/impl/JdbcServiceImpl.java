@@ -22,8 +22,8 @@ public class JdbcServiceImpl implements JdbcService {
     }
 
     @Override
-    public void createSequence(Long seqNumber) {
-        jdbcClient.sql("CREATE SEQUENCE layers." + LAYERNAME_PREFIX + seqNumber + LAYER_SEQUENCE_POSTFIX).update();
+    public void createSequence(String layername) {
+        jdbcClient.sql("CREATE SEQUENCE layers." + layername + LAYER_SEQUENCE_POSTFIX).update();
     }
 
     @Override
@@ -34,9 +34,9 @@ public class JdbcServiceImpl implements JdbcService {
     }
 
     @Override
-    public void createTable(Long seqNumber, GeometryType geometryType) {
-        jdbcClient.sql("CREATE TABLE layers." + LAYERNAME_PREFIX + seqNumber
-                + "(gid BIGINT PRIMARY KEY DEFAULT nextval('layers." + LAYERNAME_PREFIX + seqNumber + LAYER_SEQUENCE_POSTFIX + "'), " +
+    public void createTable(String layername, GeometryType geometryType) {
+        jdbcClient.sql("CREATE TABLE layers." + layername
+                + "(gid BIGINT PRIMARY KEY DEFAULT nextval('layers." + layername + LAYER_SEQUENCE_POSTFIX + "'), " +
                 "geom public.geometry(" + geometryType.name() + "," + SRS_3857 + "))").update();
     }
 

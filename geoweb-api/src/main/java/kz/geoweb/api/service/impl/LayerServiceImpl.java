@@ -1,6 +1,5 @@
 package kz.geoweb.api.service.impl;
 
-import kz.geoweb.api.dto.LayerCreateDto;
 import kz.geoweb.api.dto.LayerDto;
 import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.enums.Action;
@@ -14,11 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import static kz.geoweb.api.utils.CommonConstants.LAYERNAME_PREFIX;
 
 @Service
 @RequiredArgsConstructor
@@ -44,31 +42,22 @@ public class LayerServiceImpl implements LayerService {
     }
 
     @Override
-    public LayerDto createLayer(LayerCreateDto layerCreateDto) {
-        if (layerCreateDto.getIsDynamic() && layerCreateDto.getDynamicIdentityColumn() == null) {
+    @Transactional
+    public LayerDto createLayer(LayerDto layerDto) {
+        if (layerDto.getIsDynamic() && layerDto.getDynamicIdentityColumn() == null) {
             throw new CustomException("layer.dynamic.without_identity_column");
         }
-        layerCreateDto.setId(null);
-        Long seqNumber = null;
-        if (layerCreateDto.isCreateTable()) {
-            seqNumber = jdbcService.getSeqNumber();
-            layerCreateDto.setLayername(LAYERNAME_PREFIX + seqNumber);
-        } else {
-            if (layerCreateDto.getLayername() == null || layerCreateDto.getLayername().isBlank()) {
-                throw new CustomException("layer.layername.empty");
-            }
-            Optional<Layer> layerEntityOptional = layerRepository
-                    .findByLayername(layerCreateDto.getLayername().trim());
-            if (layerEntityOptional.isPresent()) {
-                throw new CustomException("layer.by_layername.already_exists", layerCreateDto.getLayername());
-            }
+        layerDto.setId(null);
+        String layername = layerDto.getLayername();
+        Optional<Layer> layerEntityOptional = layerRepository
+                .findByLayername(layername.trim());
+        if (layerEntityOptional.isPresent()) {
+            throw new CustomException("layer.by_layername.already_exists", layername);
         }
-        Layer layer = layerMapper.toEntity(layerCreateDto);
+        Layer layer = layerMapper.toEntity(layerDto);
         Layer created = layerRepository.save(layer);
-        if (layerCreateDto.isCreateTable()) {
-            jdbcService.createSequence(seqNumber);
-            jdbcService.createTable(seqNumber, created.getGeometryType());
-        }
+        jdbcService.createSequence(layername);
+        jdbcService.createTable(layername, created.getGeometryType());
         // TODO: geoserver deploy
         historyService.saveLayer(created.getId(), Action.CREATE);
         return layerMapper.toDto(created);

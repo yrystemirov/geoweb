@@ -1,5 +1,6 @@
 package kz.geoweb.api.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import kz.geoweb.api.enums.GeometryType;
 import kz.geoweb.api.enums.LayerType;
 import lombok.Data;
@@ -15,6 +16,7 @@ public class LayerDto {
     private String descriptionKk;
     private String descriptionRu;
     private String descriptionEn;
+    @NotBlank(message = "{layer.layername.empty}")
     private String layername;
     private GeometryType geometryType;
     private LayerType layerType = LayerType.SIMPLE;

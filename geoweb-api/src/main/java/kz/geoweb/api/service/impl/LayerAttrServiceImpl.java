@@ -1,6 +1,5 @@
 package kz.geoweb.api.service.impl;
 
-import kz.geoweb.api.dto.LayerAttrCreateDto;
 import kz.geoweb.api.dto.LayerAttrDto;
 import kz.geoweb.api.entity.LayerAttr;
 import kz.geoweb.api.exception.CustomException;
@@ -8,9 +7,9 @@ import kz.geoweb.api.mapper.LayerAttrMapper;
 import kz.geoweb.api.repository.LayerAttrRepository;
 import kz.geoweb.api.service.JdbcService;
 import kz.geoweb.api.service.LayerAttrService;
-import kz.geoweb.api.utils.CommonConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
@@ -39,26 +38,20 @@ public class LayerAttrServiceImpl implements LayerAttrService {
     }
 
     @Override
-    public LayerAttrDto createLayerAttr(LayerAttrCreateDto layerAttrCreateDto) {
-        layerAttrCreateDto.setId(null);
-        if (layerAttrCreateDto.isCreateColumn()) {
-            if (layerAttrCreateDto.getAttrname() == null) {
-                Long seqNumber = jdbcService.getSeqNumber();
-                layerAttrCreateDto.setAttrname(CommonConstants.ATTRNAME_PREFIX + seqNumber);
-            }
-        } else {
-            if (layerAttrCreateDto.getAttrname() == null || layerAttrCreateDto.getAttrname().isBlank()) {
-                throw new CustomException("layer_attr.attrname.empty");
-            }
-            Optional<LayerAttr> layerAttrEntityOptional = layerAttrRepository
-                    .findByAttrnameAndLayerId(layerAttrCreateDto.getAttrname(), layerAttrCreateDto.getLayer().getId());
-            if (layerAttrEntityOptional.isPresent()) {
-                throw new CustomException("layer_attr.by_attrname_and_layer_id.already_exists",
-                        layerAttrCreateDto.getAttrname(), layerAttrCreateDto.getLayer().getId().toString());
-            }
+    @Transactional
+    public LayerAttrDto createLayerAttr(LayerAttrDto layerAttrDto) {
+        layerAttrDto.setId(null);
+        String attrname = layerAttrDto.getAttrname();
+        Optional<LayerAttr> layerAttrEntityOptional = layerAttrRepository
+                .findByAttrnameAndLayerId(attrname, layerAttrDto.getLayer().getId());
+        if (layerAttrEntityOptional.isPresent()) {
+            throw new CustomException("layer_attr.by_attrname_and_layer_id.already_exists",
+                    attrname, layerAttrDto.getLayer().getId().toString());
         }
-        LayerAttr layerAttr = layerAttrMapper.toEntity(layerAttrCreateDto);
+        LayerAttr layerAttr = layerAttrMapper.toEntity(layerAttrDto);
         LayerAttr created = layerAttrRepository.save(layerAttr);
+        jdbcService.createAttribute(created.getLayer().getLayername(), created.getAttrname(), created.getAttrType());
+        // TODO: geoserver deploy
         // TODO: update history
         return layerAttrMapper.toDto(created);
     }
