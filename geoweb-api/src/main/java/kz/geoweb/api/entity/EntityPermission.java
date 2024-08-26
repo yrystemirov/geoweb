@@ -18,7 +18,7 @@ public class EntityPermission extends IdEntity {
     @Enumerated(EnumType.STRING)
     private EntityType entityType;
     private UUID entityId;
-    private UUID userId;
+    private UUID roleId;
     @Enumerated(EnumType.STRING)
     private Permission permission;
 }

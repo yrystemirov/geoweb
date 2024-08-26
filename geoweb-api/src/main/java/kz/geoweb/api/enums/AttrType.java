@@ -3,7 +3,8 @@ package kz.geoweb.api.enums;
 public enum AttrType {
     TEXT,
     BIGINT,
-    DECIMAL,
+    NUMERIC,
     TIMESTAMP,
+    BOOLEAN,
     DICTIONARY
 }

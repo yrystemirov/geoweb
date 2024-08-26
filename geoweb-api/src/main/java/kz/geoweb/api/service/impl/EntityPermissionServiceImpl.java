@@ -16,21 +16,21 @@ public class EntityPermissionServiceImpl implements EntityPermissionService {
 
     @Override
     public boolean allowFolderRead(UUID entityId, UUID userId) {
-        return entityPermissionRepository.findByEntityTypeAndEntityIdAndUserIdAndPermission(EntityType.FOLDER, entityId, userId, Permission.READ).isPresent();
+        return entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdAndPermission(EntityType.FOLDER, entityId, userId, Permission.READ).isPresent();
     }
 
     @Override
     public boolean allowFolderWrite(UUID entityId, UUID userId) {
-        return entityPermissionRepository.findByEntityTypeAndEntityIdAndUserIdAndPermission(EntityType.FOLDER, entityId, userId, Permission.WRITE).isPresent();
+        return entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdAndPermission(EntityType.FOLDER, entityId, userId, Permission.WRITE).isPresent();
     }
 
     @Override
     public boolean allowLayerRead(UUID entityId, UUID userId) {
-        return entityPermissionRepository.findByEntityTypeAndEntityIdAndUserIdAndPermission(EntityType.LAYER, entityId, userId, Permission.READ).isPresent();
+        return entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdAndPermission(EntityType.LAYER, entityId, userId, Permission.READ).isPresent();
     }
 
     @Override
     public boolean allowLayerWrite(UUID entityId, UUID userId) {
-        return entityPermissionRepository.findByEntityTypeAndEntityIdAndUserIdAndPermission(EntityType.LAYER, entityId, userId, Permission.WRITE).isPresent();
+        return entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdAndPermission(EntityType.LAYER, entityId, userId, Permission.WRITE).isPresent();
     }
 }

@@ -34,3 +34,13 @@ create table user_role
     user_id uuid not null references users (id),
     role_id uuid not null references role (id)
 );
+
+insert into users (id, username, password, created_date)
+values ('f47c4b38-8b95-4637-9a73-9f3631ad0b28', 'admin',
+        '$2a$12$54mjQy8bfpW0beaTSMaZMu3iVm4tZyV83tfCVIIsuFVS6xXShdTRi', '2024-01-01');
+
+insert into role (id, name)
+values ('001eb4b9-b0f1-463c-8598-24f7a470b793', 'ADMIN');
+
+insert into user_role(user_id, role_id)
+values ('f47c4b38-8b95-4637-9a73-9f3631ad0b28', '001eb4b9-b0f1-463c-8598-24f7a470b793');

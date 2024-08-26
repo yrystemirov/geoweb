@@ -11,5 +11,5 @@ import java.util.UUID;
 
 @Repository
 public interface EntityPermissionRepository extends JpaRepository<EntityPermission, UUID> {
-    Optional<EntityPermission> findByEntityTypeAndEntityIdAndUserIdAndPermission(EntityType entityType, UUID entityId, UUID userId, Permission permission);
+    Optional<EntityPermission> findByEntityTypeAndEntityIdAndRoleIdAndPermission(EntityType entityType, UUID entityId, UUID roleId, Permission permission);
 }
