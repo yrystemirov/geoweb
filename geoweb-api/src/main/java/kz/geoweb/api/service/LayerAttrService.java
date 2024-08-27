@@ -15,4 +15,6 @@ public interface LayerAttrService {
     LayerAttrDto updateLayerAttr(UUID id, LayerAttrDto layerAttrDto);
 
     void deleteLayerAttr(UUID id);
+
+    Set<LayerAttrDto> getLayerAttrsByLayername(String layername);
 }

@@ -1,10 +1,12 @@
 package kz.geoweb.api.service.impl;
 
 import kz.geoweb.api.dto.LayerAttrDto;
+import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.entity.LayerAttr;
 import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.mapper.LayerAttrMapper;
 import kz.geoweb.api.repository.LayerAttrRepository;
+import kz.geoweb.api.repository.LayerRepository;
 import kz.geoweb.api.service.JdbcService;
 import kz.geoweb.api.service.LayerAttrService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LayerAttrServiceImpl implements LayerAttrService {
     private final LayerAttrRepository layerAttrRepository;
+    private final LayerRepository layerRepository;
     private final LayerAttrMapper layerAttrMapper;
     private final JdbcService jdbcService;
 
@@ -76,5 +79,11 @@ public class LayerAttrServiceImpl implements LayerAttrService {
         getEntityById(id);
         layerAttrRepository.deleteById(id);
         // TODO: update history
+    }
+
+    @Override
+    public Set<LayerAttrDto> getLayerAttrsByLayername(String layername) {
+        Layer layer = layerRepository.findByLayername(layername).orElseThrow();
+        return layerAttrMapper.toDto(layerAttrRepository.findByLayerIdOrderByOrderNumber(layer.getId()));
     }
 }
