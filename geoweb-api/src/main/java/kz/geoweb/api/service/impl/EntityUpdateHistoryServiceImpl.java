@@ -8,6 +8,7 @@ import kz.geoweb.api.repository.EntityUpdateHistoryRepository;
 import kz.geoweb.api.service.EntityUpdateHistoryService;
 import kz.geoweb.api.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EntityUpdateHistoryServiceImpl implements EntityUpdateHistoryService {
     private final EntityUpdateHistoryRepository entityUpdateHistoryRepository;
     private final UserService userService;
@@ -30,13 +32,17 @@ public class EntityUpdateHistoryServiceImpl implements EntityUpdateHistoryServic
     }
 
     private void save(EntityType entityType, UUID entityId, Action action) {
-        UserDto currentUser = userService.getCurrentUser();
-        EntityUpdateHistory entityUpdateHistory = new EntityUpdateHistory();
-        entityUpdateHistory.setEntityType(entityType);
-        entityUpdateHistory.setEntityId(entityId);
-        entityUpdateHistory.setAction(action);
-        entityUpdateHistory.setUserId(currentUser.getId());
-        entityUpdateHistory.setDate(LocalDateTime.now());
-        entityUpdateHistoryRepository.save(entityUpdateHistory);
+        try {
+            UserDto currentUser = userService.getCurrentUser();
+            EntityUpdateHistory entityUpdateHistory = new EntityUpdateHistory();
+            entityUpdateHistory.setEntityType(entityType);
+            entityUpdateHistory.setEntityId(entityId);
+            entityUpdateHistory.setAction(action);
+            entityUpdateHistory.setUserId(currentUser.getId());
+            entityUpdateHistory.setDate(LocalDateTime.now());
+            entityUpdateHistoryRepository.save(entityUpdateHistory);
+        } catch (Exception e) {
+            log.error("Error saving EntityUpdateHistory: {}", e.getMessage());
+        }
     }
 }

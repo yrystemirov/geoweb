@@ -2,10 +2,16 @@ package kz.geoweb.api.service.impl;
 
 import kz.geoweb.api.dto.FeatureSaveDto;
 import kz.geoweb.api.dto.LayerAttrDto;
+import kz.geoweb.api.dto.UserDto;
+import kz.geoweb.api.entity.FeatureUpdateHistory;
+import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.enums.AttrType;
+import kz.geoweb.api.repository.FeatureUpdateHistoryRepository;
 import kz.geoweb.api.service.FeatureService;
 import kz.geoweb.api.service.LayerAttrService;
+import kz.geoweb.api.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +24,12 @@ import static kz.geoweb.api.utils.GisConstants.LAYERS_SCHEMA;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FeatureServiceImpl implements FeatureService {
     private final JdbcClient jdbcClient;
     private final LayerAttrService layerAttrService;
+    private final FeatureUpdateHistoryRepository featureUpdateHistoryRepository;
+    private final UserService userService;
 
     @Override
     public void save(String layername, List<FeatureSaveDto> featureSaveDtoList) {
@@ -31,19 +40,22 @@ public class FeatureServiceImpl implements FeatureService {
             convertStringDatesToLocalDateTime(feature.getAttributes(), layerAttrs);
             switch (feature.getAction()) {
                 case CREATE:
-                    insertFeature(tableName, feature, layerAttrs);
+                    Integer gid = insertFeature(tableName, feature, layerAttrs);
+                    saveHistory(layername, gid, Action.CREATE);
                     break;
                 case UPDATE:
                     updateFeature(tableName, feature, layerAttrs);
+                    saveHistory(layername, feature.getGid(), Action.UPDATE);
                     break;
                 case DELETE:
                     deleteFeature(tableName, feature.getGid());
+                    saveHistory(layername, feature.getGid(), Action.DELETE);
                     break;
             }
         }
     }
 
-    private void insertFeature(String tableName, FeatureSaveDto feature, Set<LayerAttrDto> layerAttrs) {
+    private Integer insertFeature(String tableName, FeatureSaveDto feature, Set<LayerAttrDto> layerAttrs) {
         StringBuilder columns = new StringBuilder("(geom");
         StringBuilder values = new StringBuilder("(ST_GeomFromText(:geom)");
 
@@ -54,11 +66,11 @@ public class FeatureServiceImpl implements FeatureService {
         columns.append(")");
         values.append(")");
 
-        String sql = "INSERT INTO " + tableName + " " + columns + " VALUES " + values;
-        jdbcClient.sql(sql)
+        String sql = "INSERT INTO " + tableName + " " + columns + " VALUES " + values + " RETURNING gid";
+        return jdbcClient.sql(sql)
                 .param("geom", feature.getWkt())
                 .params(feature.getAttributes())
-                .update();
+                .query(Integer.class).single();
     }
 
     private void updateFeature(String tableName, FeatureSaveDto feature, Set<LayerAttrDto> layerAttrs) {
@@ -97,6 +109,21 @@ public class FeatureServiceImpl implements FeatureService {
                             attributes.put(key, dateTime);
                         }
                     });
+        }
+    }
+
+    private void saveHistory(String layername, Integer gid, Action action) {
+        try {
+            UserDto currentUser = userService.getCurrentUser();
+            FeatureUpdateHistory featureUpdateHistory = new FeatureUpdateHistory();
+            featureUpdateHistory.setLayername(layername);
+            featureUpdateHistory.setGid(gid);
+            featureUpdateHistory.setAction(action);
+            featureUpdateHistory.setDate(LocalDateTime.now());
+            featureUpdateHistory.setUserId(currentUser.getId());
+            featureUpdateHistoryRepository.save(featureUpdateHistory);
+        } catch (Exception e) {
+            log.error("Error saving FeatureUpdateHistory: {}", e.getMessage());
         }
     }
 }
