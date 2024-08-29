@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Component
 @RequiredArgsConstructor
 public class RoleMapper {
@@ -17,5 +20,9 @@ public class RoleMapper {
 
     public Role toEntity(RoleDto roleDto) {
         return modelMapper.map(roleDto, Role.class);
+    }
+
+    public Set<Role> toEntity(Set<RoleDto> roleDtoSet) {
+        return roleDtoSet.stream().map(this::toEntity).collect(Collectors.toSet());
     }
 }

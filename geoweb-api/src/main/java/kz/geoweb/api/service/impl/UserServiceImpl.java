@@ -5,6 +5,7 @@ import kz.geoweb.api.dto.UserCreateDto;
 import kz.geoweb.api.dto.UserUpdateDto;
 import kz.geoweb.api.entity.User;
 import kz.geoweb.api.exception.CustomException;
+import kz.geoweb.api.mapper.RoleMapper;
 import kz.geoweb.api.mapper.UserMapper;
 import kz.geoweb.api.repository.UserRepository;
 import kz.geoweb.api.security.UserContext;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RoleMapper roleMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -56,6 +58,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserCreateDto userCreateDto) {
+        userRepository.findByUsername(userCreateDto.getUsername())
+                .ifPresent(user -> {
+                    throw new CustomException("user.username.exists", userCreateDto.getUsername());
+                });
+        userRepository.findByPhoneNumber(userCreateDto.getPhoneNumber())
+                .ifPresent(user -> {
+                    throw new CustomException("user.phone_number.exists", userCreateDto.getPhoneNumber());
+                });
         User user = userMapper.toEntity(userCreateDto);
         user.setPassword(passwordEncoder.encode(userCreateDto.getPassword()));
         user.setCreatedDate(LocalDateTime.now());
@@ -70,6 +80,7 @@ public class UserServiceImpl implements UserService {
         user.setEmail(userUpdateDto.getEmail());
         user.setPhoneNumber(userUpdateDto.getPhoneNumber());
         user.setBlocked(userUpdateDto.getBlocked());
+        user.setRoles(roleMapper.toEntity(userUpdateDto.getRoles()));
         return userMapper.toDto(userRepository.save(user));
     }
 
