@@ -24,5 +24,5 @@ public class Folder extends IdEntity {
     private Set<Folder> children;
     private Boolean isPublic;
     private String imgUrl;
-    private Integer orderNumber;
+    private Integer rank;
 }

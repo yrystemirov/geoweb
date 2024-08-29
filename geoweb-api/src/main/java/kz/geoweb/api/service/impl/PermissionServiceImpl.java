@@ -26,10 +26,10 @@ public class PermissionServiceImpl implements PermissionService {
             String username = userContext.getUsername();
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new CustomException("user.not_found"));
-            List<RoleEnum> currentUserRoles = user.getRoles().stream().map(Role::getName).toList();
+            List<String> currentUserRoles = user.getRoles().stream().map(Role::getCode).toList();
             boolean hasPermission = false;
             for (RoleEnum requestedRole : roles) {
-                if (currentUserRoles.contains(requestedRole)) {
+                if (currentUserRoles.contains(requestedRole.name())) {
                     hasPermission = true;
                     break;
                 }

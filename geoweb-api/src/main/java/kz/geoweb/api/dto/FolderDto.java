@@ -16,5 +16,5 @@ public class FolderDto {
     private FolderDto parent;
     private Boolean isPublic = false;
     private String imgUrl;
-    private Integer orderNumber;
+    private Integer rank;
 }

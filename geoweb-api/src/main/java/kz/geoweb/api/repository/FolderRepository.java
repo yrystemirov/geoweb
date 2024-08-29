@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface FolderRepository extends JpaRepository<Folder, UUID> {
-    Set<Folder> findByParentIdOrderByOrderNumber(UUID id);
+    Set<Folder> findByParentIdOrderByRank(UUID id);
 }

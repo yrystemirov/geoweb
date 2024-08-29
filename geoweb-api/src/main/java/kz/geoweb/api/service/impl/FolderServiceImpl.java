@@ -34,7 +34,7 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public Set<FolderDto> getFolderChildren(UUID parentId) {
-        return folderMapper.toDto(folderRepository.findByParentIdOrderByOrderNumber(parentId));
+        return folderMapper.toDto(folderRepository.findByParentIdOrderByRank(parentId));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class FolderServiceImpl implements FolderService {
         folder.setDescriptionRu(folderDto.getDescriptionRu());
         folder.setDescriptionEn(folderDto.getDescriptionEn());
         folder.setIsPublic(folderDto.getIsPublic());
-        folder.setOrderNumber(folderDto.getOrderNumber());
+        folder.setRank(folderDto.getRank());
         Folder updated = folderRepository.save(folder);
         historyService.saveFolder(updated.getId(), Action.UPDATE);
         return folderMapper.toDto(updated);

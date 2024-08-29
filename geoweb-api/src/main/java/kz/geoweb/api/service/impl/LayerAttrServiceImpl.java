@@ -37,7 +37,7 @@ public class LayerAttrServiceImpl implements LayerAttrService {
 
     @Override
     public Set<LayerAttrDto> getLayerAttrs(UUID layerId) {
-        return layerAttrMapper.toDto(layerAttrRepository.findByLayerIdOrderByOrderNumber(layerId));
+        return layerAttrMapper.toDto(layerAttrRepository.findByLayerIdOrderByRank(layerId));
     }
 
     @Override
@@ -68,7 +68,7 @@ public class LayerAttrServiceImpl implements LayerAttrService {
         layerAttr.setShortInfo(layerAttrDto.getShortInfo());
         layerAttr.setFullInfo(layerAttrDto.getFullInfo());
         layerAttr.setDictionaryCode(layerAttrDto.getDictionaryCode());
-        layerAttr.setOrderNumber(layerAttrDto.getOrderNumber());
+        layerAttr.setRank(layerAttrDto.getRank());
         LayerAttr updated = layerAttrRepository.save(layerAttr);
         // TODO: update history
         return layerAttrMapper.toDto(updated);
@@ -84,6 +84,6 @@ public class LayerAttrServiceImpl implements LayerAttrService {
     @Override
     public Set<LayerAttrDto> getLayerAttrsByLayername(String layername) {
         Layer layer = layerRepository.findByLayername(layername).orElseThrow();
-        return layerAttrMapper.toDto(layerAttrRepository.findByLayerIdOrderByOrderNumber(layer.getId()));
+        return layerAttrMapper.toDto(layerAttrRepository.findByLayerIdOrderByRank(layer.getId()));
     }
 }

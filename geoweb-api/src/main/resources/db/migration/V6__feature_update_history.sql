@@ -12,6 +12,3 @@ create index idx__feature_update_history__layername on feature_update_history (l
 create index idx__feature_update_history__layername__user_id on feature_update_history (layername, user_id, date desc);
 create index idx__feature_update_history__layername__gid on feature_update_history (layername, gid, date desc);
 create index idx__feature_update_history__user_id on feature_update_history (user_id, date desc);
-
-create index idx__layer__layername on layer (layername);
-create index idx__layer_attr__layer_id on layer_attr (layer_id);

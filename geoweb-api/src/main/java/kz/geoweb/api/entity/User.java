@@ -20,7 +20,7 @@ public class User extends IdEntity {
     private String name;
     private String phoneNumber;
     private LocalDateTime createdDate;
-    private LocalDateTime deletedDate;
+    private Boolean blocked;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_role",

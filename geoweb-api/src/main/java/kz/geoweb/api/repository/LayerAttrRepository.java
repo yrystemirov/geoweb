@@ -10,6 +10,6 @@ import java.util.UUID;
 
 @Repository
 public interface LayerAttrRepository extends JpaRepository<LayerAttr, UUID> {
-    Set<LayerAttr> findByLayerIdOrderByOrderNumber(UUID layerId);
+    Set<LayerAttr> findByLayerIdOrderByRank(UUID layerId);
     Optional<LayerAttr> findByAttrnameAndLayerId(String attrname, UUID layerId);
 }

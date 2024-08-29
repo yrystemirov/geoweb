@@ -24,5 +24,5 @@ public class LayerAttr extends IdEntity {
     @ManyToOne
     private Layer layer;
     private String dictionaryCode;
-    private Integer orderNumber;
+    private Integer rank;
 }

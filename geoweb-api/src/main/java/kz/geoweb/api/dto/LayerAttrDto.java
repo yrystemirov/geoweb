@@ -19,5 +19,5 @@ public class LayerAttrDto {
     private Boolean fullInfo;
     private LayerDto layer;
     private String dictionaryCode;
-    private Integer orderNumber;
+    private Integer rank;
 }
