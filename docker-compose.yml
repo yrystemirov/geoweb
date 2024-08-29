@@ -49,7 +49,7 @@ services:
       - "${POSTGRES_EXTERNAL_PORT}:${POSTGRES_INTERNAL_PORT}"
     volumes:
       - ./infrastructure/db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
-      - ./postgres-data:/var/lib/postgresql/data
+      - ./docker-data/postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
   pgadmin:
     container_name: geoweb_pgadmin4
@@ -61,7 +61,7 @@ services:
     ports:
       - "5151:80"
     volumes:
-      - ./pgadmin-data:/var/lib/pgadmin
+      - ./docker-data/pgadmin-data:/var/lib/pgadmin
   minio:
     container_name: ${MINIO_HOST}
     image: minio/minio
@@ -69,7 +69,7 @@ services:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - ./minio_storage:/data
+      - ./docker-data/minio-data:/data
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
@@ -78,7 +78,7 @@ services:
       image: kartoza/geoserver:${GS_VERSION}
       container_name: geoweb_geoserver
       volumes:
-        - ./geoserver-data:/opt/geoserver/data_dir
+        - ./docker-data/geoserver-data:/opt/geoserver/data_dir
       ports:
         - ${GEOSERVER_PORT}:8080
       restart: on-failure

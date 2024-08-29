@@ -1,5 +1,1 @@
-postgres-data/
-geoserver-data/
-minio_storage/
-pgadmin-data/
-postgres_data/
+docker-data/
