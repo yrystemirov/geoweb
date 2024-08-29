@@ -10,7 +10,7 @@ create table folder
     description_ru varchar(2000),
     is_public      boolean not null default false,
     img_url        varchar(2000),
-    rank           integer
+    rank           integer not null default 0
 );
 
 create table style
@@ -63,7 +63,7 @@ create table layer_attr
     full_info       boolean,
     layer_id        uuid         not null references layer (id),
     dictionary_code varchar(1000),
-    rank            integer
+    rank            integer      not null default 0
 );
 
 create index idx__layer_attr__layer_id on layer_attr (layer_id);
