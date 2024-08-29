@@ -22,6 +22,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserDto getUserById(@PathVariable UUID id) {
+        permissionService.hasAnyRole(RoleEnum.ADMIN);
         return userService.getUser(id);
     }
 
