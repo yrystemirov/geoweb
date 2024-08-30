@@ -35,7 +35,8 @@ create table user_role
 (
     id      uuid not null default gen_random_uuid() primary key,
     user_id uuid not null references users (id),
-    role_id uuid not null references role (id)
+    role_id uuid not null references role (id),
+    unique (user_id, role_id)
 );
 
 insert into users (id, username, password, name, created_date)
