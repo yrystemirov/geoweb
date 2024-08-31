@@ -11,5 +11,4 @@ public class DictionaryDto {
     private String nameKk;
     private String nameRu;
     private String nameEn;
-    private Boolean isTree = false;
 }

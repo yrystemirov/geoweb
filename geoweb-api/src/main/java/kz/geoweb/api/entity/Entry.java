@@ -16,8 +16,5 @@ public class Entry extends IdEntity {
     private String en;
     @ManyToOne
     private Dictionary dictionary;
-    @ManyToOne
-    private Entry parent;
-    private Boolean hasChild;
     private Integer rank;
 }

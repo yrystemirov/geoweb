@@ -12,7 +12,5 @@ public class EntryDto {
     private String ru;
     private String en;
     private DictionaryDto dictionary;
-    private EntryDto parent;
-    private Boolean hasChild;
     private Integer rank;
 }

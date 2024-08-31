@@ -13,5 +13,4 @@ public class Dictionary extends IdEntity {
     private String nameKk;
     private String nameRu;
     private String nameEn;
-    private Boolean isTree;
 }

@@ -12,6 +12,5 @@ public class EntryRequestDto {
     private String ru;
     private String en;
     private DictionaryDto dictionary;
-    private EntryDto parent;
     private Integer rank = 0;
 }

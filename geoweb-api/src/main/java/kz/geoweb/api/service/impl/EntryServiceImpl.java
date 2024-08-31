@@ -53,11 +53,6 @@ public class EntryServiceImpl implements EntryService {
     @Override
     public EntryDto createEntry(EntryRequestDto entryRequestDto) {
         Entry entry = entryMapper.toEntity(entryRequestDto);
-        Dictionary dictionary = getDictionaryEntityById(entryRequestDto.getDictionary().getId());
-        if (!dictionary.getIsTree()) {
-            entry.setHasChild(false);
-        }
-        // TODO: set parent hasChild
         Entry created = entryRepository.save(entry);
         return entryMapper.toDto(created);
     }
