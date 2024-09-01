@@ -31,6 +31,11 @@ public class EntityUpdateHistoryServiceImpl implements EntityUpdateHistoryServic
         save(EntityType.LAYER, entityId, action);
     }
 
+    @Override
+    public void saveLayerAttr(UUID entityId, Action action) {
+        save(EntityType.LAYER_ATTR, entityId, action);
+    }
+
     private void save(EntityType entityType, UUID entityId, Action action) {
         try {
             UserDto currentUser = userService.getCurrentUser();

@@ -3,15 +3,17 @@ package kz.geoweb.api.service.impl;
 import kz.geoweb.api.dto.LayerAttrDto;
 import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.entity.LayerAttr;
+import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.mapper.LayerAttrMapper;
 import kz.geoweb.api.repository.LayerAttrRepository;
 import kz.geoweb.api.repository.LayerRepository;
+import kz.geoweb.api.service.EntityUpdateHistoryService;
+import kz.geoweb.api.service.GeoserverService;
 import kz.geoweb.api.service.JdbcService;
 import kz.geoweb.api.service.LayerAttrService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
@@ -24,6 +26,8 @@ public class LayerAttrServiceImpl implements LayerAttrService {
     private final LayerRepository layerRepository;
     private final LayerAttrMapper layerAttrMapper;
     private final JdbcService jdbcService;
+    private final GeoserverService geoserverService;
+    private final EntityUpdateHistoryService historyService;
 
     private LayerAttr getEntityById(UUID id) {
         return layerAttrRepository.findById(id)
@@ -41,10 +45,10 @@ public class LayerAttrServiceImpl implements LayerAttrService {
     }
 
     @Override
-    @Transactional
     public LayerAttrDto createLayerAttr(LayerAttrDto layerAttrDto) {
         layerAttrDto.setId(null);
         String attrname = layerAttrDto.getAttrname();
+        String layername = layerAttrDto.getLayer().getLayername();
         Optional<LayerAttr> layerAttrEntityOptional = layerAttrRepository
                 .findByAttrnameAndLayerId(attrname, layerAttrDto.getLayer().getId());
         if (layerAttrEntityOptional.isPresent()) {
@@ -54,8 +58,8 @@ public class LayerAttrServiceImpl implements LayerAttrService {
         LayerAttr layerAttr = layerAttrMapper.toEntity(layerAttrDto);
         LayerAttr created = layerAttrRepository.save(layerAttr);
         jdbcService.createAttribute(created.getLayer().getLayername(), created.getAttrname(), created.getAttrType());
-        // TODO: geoserver deploy
-        // TODO: update history
+        geoserverService.reload();
+        historyService.saveLayerAttr(created.getId(), Action.CREATE);
         return layerAttrMapper.toDto(created);
     }
 
@@ -70,15 +74,17 @@ public class LayerAttrServiceImpl implements LayerAttrService {
         layerAttr.setDictionaryCode(layerAttrDto.getDictionaryCode());
         layerAttr.setRank(layerAttrDto.getRank());
         LayerAttr updated = layerAttrRepository.save(layerAttr);
-        // TODO: update history
+        historyService.saveLayerAttr(updated.getId(), Action.UPDATE);
         return layerAttrMapper.toDto(updated);
     }
 
     @Override
     public void deleteLayerAttr(UUID id) {
-        getEntityById(id);
+        LayerAttr layerAttr = getEntityById(id);
         layerAttrRepository.deleteById(id);
-        // TODO: update history
+        jdbcService.deleteAttribute(layerAttr.getLayer().getLayername(), layerAttr.getAttrname());
+        geoserverService.reload();
+        historyService.saveLayerAttr(id, Action.DELETE);
     }
 
     @Override

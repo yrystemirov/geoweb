@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
-import static kz.geoweb.api.utils.CommonConstants.*;
 import static kz.geoweb.api.utils.GisConstants.*;
 
 @Service
@@ -16,34 +15,29 @@ public class JdbcServiceImpl implements JdbcService {
     private final JdbcClient jdbcClient;
 
     @Override
-    public Long getSeqNumber() {
-        return jdbcClient.sql("SELECT nextval('generate_seq_number')")
-                .query(Long.class).single();
-    }
-
-    @Override
-    public void createSequence(String layername) {
-        jdbcClient.sql("CREATE SEQUENCE layers." + layername + LAYER_SEQUENCE_POSTFIX).update();
-    }
-
-    @Override
-    public void createSequenceImportedLayer(String tableName) {
-        Long maxGid = jdbcClient.sql("select coalesce(max(gid), 0) from layers." + tableName)
-                        .query(Long.class).single();
-        jdbcClient.sql("CREATE SEQUENCE IF NOT EXISTS layers." + tableName + LAYER_SEQUENCE_POSTFIX + " start " + (maxGid + 1)).update();
-    }
-
-    @Override
     public void createTable(String layername, GeometryType geometryType) {
-        jdbcClient.sql("CREATE TABLE layers." + layername
-                + "(gid BIGINT PRIMARY KEY DEFAULT nextval('layers." + layername + LAYER_SEQUENCE_POSTFIX + "'), " +
+        jdbcClient.sql("CREATE SEQUENCE " + LAYERS_SCHEMA + "." + layername + LAYER_SEQUENCE_POSTFIX).update();
+        jdbcClient.sql("CREATE TABLE " + LAYERS_SCHEMA + "." + layername
+                + "(gid BIGINT PRIMARY KEY DEFAULT nextval('" + LAYERS_SCHEMA + "." + layername + LAYER_SEQUENCE_POSTFIX + "'), " +
                 "geom public.geometry(" + geometryType.name() + "," + SRS_3857 + "))").update();
+    }
+
+    @Override
+    public void deleteTable(String layername) {
+        jdbcClient.sql("DROP TABLE " + LAYERS_SCHEMA + "." + layername).update();
+        jdbcClient.sql("DROP SEQUENCE " + LAYERS_SCHEMA + "." + layername + LAYER_SEQUENCE_POSTFIX).update();
     }
 
     @Override
     public void createAttribute(String layername, String attrname, AttrType type) {
         if (type.equals(AttrType.DICTIONARY)) type = AttrType.TEXT;
-        jdbcClient.sql("ALTER TABLE layers." + layername + " ADD COLUMN "
+        jdbcClient.sql("ALTER TABLE " + LAYERS_SCHEMA + "." + layername + " ADD COLUMN "
                 + attrname + " " + type.name()).update();
+    }
+
+    @Override
+    public void deleteAttribute(String layername, String attrname) {
+        jdbcClient.sql("ALTER TABLE " + LAYERS_SCHEMA + "." + layername + " DROP COLUMN "
+                + attrname).update();
     }
 }

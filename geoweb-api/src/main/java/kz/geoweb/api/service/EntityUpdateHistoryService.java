@@ -7,4 +7,5 @@ import java.util.UUID;
 public interface EntityUpdateHistoryService {
     void saveFolder(UUID entityId, Action action);
     void saveLayer(UUID entityId, Action action);
+    void saveLayerAttr(UUID entityId, Action action);
 }

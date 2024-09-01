@@ -5,15 +5,16 @@ import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.mapper.LayerMapper;
+import kz.geoweb.api.repository.LayerAttrRepository;
 import kz.geoweb.api.repository.LayerRepository;
 import kz.geoweb.api.service.EntityUpdateHistoryService;
+import kz.geoweb.api.service.GeoserverService;
 import kz.geoweb.api.service.JdbcService;
 import kz.geoweb.api.service.LayerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -22,8 +23,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LayerServiceImpl implements LayerService {
     private final LayerRepository layerRepository;
+    private final LayerAttrRepository layerAttrRepository;
     private final LayerMapper layerMapper;
     private final JdbcService jdbcService;
+    private final GeoserverService geoserverService;
     private final EntityUpdateHistoryService historyService;
 
     private Layer getEntityById(UUID id) {
@@ -42,7 +45,6 @@ public class LayerServiceImpl implements LayerService {
     }
 
     @Override
-    @Transactional
     public LayerDto createLayer(LayerDto layerDto) {
         if (layerDto.getIsDynamic() && layerDto.getDynamicIdentityColumn() == null) {
             throw new CustomException("layer.dynamic.without_identity_column");
@@ -56,9 +58,8 @@ public class LayerServiceImpl implements LayerService {
         }
         Layer layer = layerMapper.toEntity(layerDto);
         Layer created = layerRepository.save(layer);
-        jdbcService.createSequence(layername);
         jdbcService.createTable(layername, created.getGeometryType());
-        // TODO: geoserver deploy
+        geoserverService.deployLayer(created.getLayername());
         historyService.saveLayer(created.getId(), Action.CREATE);
         return layerMapper.toDto(created);
     }
@@ -89,9 +90,12 @@ public class LayerServiceImpl implements LayerService {
 
     @Override
     public void deleteLayer(UUID id) {
-        getEntityById(id);
+        Layer layer = getEntityById(id);
+        layerAttrRepository.deleteByLayerId(id);
         layerRepository.deleteById(id);
-        // TODO: geoserver delete
+        geoserverService.deleteLayer(layer.getLayername());
+        geoserverService.reload();
+        jdbcService.deleteTable(layer.getLayername());
         historyService.saveLayer(id, Action.DELETE);
     }
 }
