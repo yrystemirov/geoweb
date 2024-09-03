@@ -1,5 +1,3 @@
-import Image from "next/image";
-import MapComponent from "../components/public/map";
 import { NextPageWithLayout } from "../components/common/layouts/types";
 import LandingLayout from "../components/common/layouts/Landing.layout";
 import { Box } from "@mui/material";
@@ -9,7 +7,7 @@ import { Box } from "@mui/material";
 
 //import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-const Home: NextPageWithLayout = () => {
+const Documentation: NextPageWithLayout = () => {
     return <>
            <Box
               width="100%"
@@ -21,16 +19,16 @@ const Home: NextPageWithLayout = () => {
               position="relative"
               p={0}
             >
-              <MapComponent />
+              <p>Mina jerde Documentation degen aqparat bolui kerek</p>
           </Box>
     </>;
 };
 
-Home.getLayout = (page: any) => {
+Documentation.getLayout = (page: any) => {
     return <LandingLayout>{page}</LandingLayout>;
 };
 
-export default Home;
+export default Documentation;
 
 // export const getStaticProps = async ({ locale = process.env.DEFAULT_LOCALE || 'ru' }) => ({
 //     props: {
