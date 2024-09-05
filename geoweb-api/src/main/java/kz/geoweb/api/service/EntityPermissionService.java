@@ -1,10 +1,11 @@
 package kz.geoweb.api.service;
 
+import java.util.Set;
 import java.util.UUID;
 
 public interface EntityPermissionService {
-    boolean allowFolderRead(UUID entityId, UUID userId);
-    boolean allowFolderWrite(UUID entityId, UUID userId);
-    boolean allowLayerRead(UUID entityId, UUID userId);
-    boolean allowLayerWrite(UUID entityId, UUID userId);
+    void checkFolderRead(UUID entityId, Set<UUID> roleIds);
+    void checkFolderWrite(UUID entityId, Set<UUID> roleIds);
+    void checkLayerRead(UUID entityId, Set<UUID> roleIds);
+    void checkLayerWrite(UUID entityId, Set<UUID> roleIds);
 }

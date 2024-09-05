@@ -2,11 +2,13 @@ package kz.geoweb.api.service.impl;
 
 import kz.geoweb.api.enums.EntityType;
 import kz.geoweb.api.enums.Permission;
+import kz.geoweb.api.exception.ForbiddenException;
 import kz.geoweb.api.repository.EntityPermissionRepository;
 import kz.geoweb.api.service.EntityPermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -15,22 +17,26 @@ public class EntityPermissionServiceImpl implements EntityPermissionService {
     private final EntityPermissionRepository entityPermissionRepository;
 
     @Override
-    public boolean allowFolderRead(UUID entityId, UUID userId) {
-        return entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdAndPermission(EntityType.FOLDER, entityId, userId, Permission.READ).isPresent();
+    public void checkFolderRead(UUID entityId, Set<UUID> roleIds) {
+        entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdInAndPermission(EntityType.FOLDER, entityId, roleIds, Permission.READ)
+                .orElseThrow(() -> new ForbiddenException("folder.read.forbidden"));
     }
 
     @Override
-    public boolean allowFolderWrite(UUID entityId, UUID userId) {
-        return entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdAndPermission(EntityType.FOLDER, entityId, userId, Permission.WRITE).isPresent();
+    public void checkFolderWrite(UUID entityId, Set<UUID> roleIds) {
+        entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdInAndPermission(EntityType.FOLDER, entityId, roleIds, Permission.WRITE)
+                .orElseThrow(() -> new ForbiddenException("folder.write.forbidden"));
     }
 
     @Override
-    public boolean allowLayerRead(UUID entityId, UUID userId) {
-        return entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdAndPermission(EntityType.LAYER, entityId, userId, Permission.READ).isPresent();
+    public void checkLayerRead(UUID entityId, Set<UUID> roleIds) {
+        entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdInAndPermission(EntityType.LAYER, entityId, roleIds, Permission.READ)
+                .orElseThrow(() -> new ForbiddenException("layer.read.forbidden"));
     }
 
     @Override
-    public boolean allowLayerWrite(UUID entityId, UUID userId) {
-        return entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdAndPermission(EntityType.LAYER, entityId, userId, Permission.WRITE).isPresent();
+    public void checkLayerWrite(UUID entityId, Set<UUID> roleIds) {
+        entityPermissionRepository.findByEntityTypeAndEntityIdAndRoleIdInAndPermission(EntityType.LAYER, entityId, roleIds, Permission.WRITE)
+                .orElseThrow(() -> new ForbiddenException("layer.write.forbidden"));
     }
 }

@@ -18,7 +18,8 @@ public class AuthenticationFilter implements Filter {
     private final List<String> allowedUrls = List.of(
             "api-docs",
             "swagger-ui",
-            "auth/token"
+            "auth/token",
+            "open-api"
     );
 
     @Override

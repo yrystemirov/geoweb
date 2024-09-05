@@ -7,9 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
 public interface EntityPermissionRepository extends JpaRepository<EntityPermission, UUID> {
-    Optional<EntityPermission> findByEntityTypeAndEntityIdAndRoleIdAndPermission(EntityType entityType, UUID entityId, UUID roleId, Permission permission);
+    Optional<EntityPermission> findByEntityTypeAndEntityIdAndRoleIdInAndPermission(EntityType entityType, UUID entityId, Set<UUID> roleIds, Permission permission);
 }
