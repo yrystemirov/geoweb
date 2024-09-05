@@ -12,13 +12,19 @@ import kz.geoweb.api.service.LayerAttrService;
 import kz.geoweb.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static kz.geoweb.api.utils.GisConstants.LAYERS_SCHEMA;
 
@@ -30,6 +36,42 @@ public class FeatureServiceImpl implements FeatureService {
     private final LayerAttrService layerAttrService;
     private final FeatureUpdateHistoryRepository featureUpdateHistoryRepository;
     private final UserService userService;
+
+    @Override
+    public Page<Map<String, Object>> getFeatures(String layername, Pageable pageable) {
+        String tableName = LAYERS_SCHEMA + "." + layername;
+        Set<LayerAttrDto> layerAttrs = layerAttrService.getLayerAttrsByLayername(layername);
+        String fields = layerAttrs.stream()
+                .map(LayerAttrDto::getAttrname)
+                .collect(Collectors.joining(", "));
+
+        String sql = "SELECT gid,ST_AsText(geom) AS geom," + fields + " FROM " + tableName +
+                " ORDER BY gid LIMIT :limit OFFSET :offset";
+
+        int limit = pageable.getPageSize();
+        int offset = pageable.getPageNumber() * pageable.getPageSize();
+
+        List<Map<String, Object>> results = jdbcClient.sql(sql)
+                .param("limit", limit)
+                .param("offset", offset)
+                .query(mapRowMapper())
+                .list();
+
+        String countSql = "SELECT COUNT(*) FROM " + tableName;
+        int total = jdbcClient.sql(countSql).query(Integer.class).single();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
+    private RowMapper<Map<String, Object>> mapRowMapper() {
+        return (rs, rowNum) -> {
+            Map<String, Object> row = new HashMap<>();
+            for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                row.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
+            }
+            return row;
+        };
+    }
 
     @Override
     public void save(String layername, List<FeatureSaveDto> featureSaveDtoList) {
