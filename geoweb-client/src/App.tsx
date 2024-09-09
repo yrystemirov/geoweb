@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +11,6 @@ import About from './pages/About';
 import Contacts from './pages/Contacts';
 import Documentation from './pages/Documentation';
 import PrivateRoute from './components/PrivateRoute';
-import Container from '@mui/material/Container';
 import LoadingBar from './components/common/loadingBar';
 import { LoadingProvider, useLoading } from './components/common/loadingBar/loadingContext';
 import Box from '@mui/material/Box';
@@ -48,17 +46,15 @@ const App: React.FC = () => {
                 }}
             >
                  {/* Main Content */}
-              <Container maxWidth={false} style={{padding:0}}>
-                <main>
+              <Box display="flex" flexDirection="column" flexGrow={1} p={0}>
                   <Routes>
-                  
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/contacts" element={<Contacts />} />
                     <Route path="/documentation" element={<Documentation />} />
                     <Route
-                      path="/dashboard"
+                      path="/dashboard*"
                       element={
                         <PrivateRoute path="/dashboard">
                           <Dashboard />
@@ -66,8 +62,7 @@ const App: React.FC = () => {
                       }
                     />
                   </Routes>
-                </main>
-              </Container>
+              </Box>
             </Box>
       
        

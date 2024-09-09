@@ -31,6 +31,7 @@ const Header: React.FC = () => {
     // { title: 'Главная', url: '/' },
     { title: 'About', url: '/about', label: 'About' },
     { title: 'Docs', url: '/documentation', label: 'Documentation' },
+    { title: t('signIn'), url: '/login', label: 'Sign In' },
   ];
 
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -236,7 +237,6 @@ const Header: React.FC = () => {
                                 ))}
                             </Menu>
                         </Box>
-                        {/* <SignInButton /> */}
                     </Box>
                 </Toolbar>
             </Container>
