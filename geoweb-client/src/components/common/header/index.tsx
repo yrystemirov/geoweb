@@ -123,9 +123,27 @@ const Header: React.FC = () => {
                                         color: '#5dbb67',
                                     },
                                     cursor: 'pointer',
+                                    color: i18n.language ==='kk'?'#5dbb67':'black',
                                 }}
                                 onClick={() => changeLanguage('kk')}
                             >Қаз
+                            </Typography>
+                            <Typography
+                                sx={{
+                                    paddingRight: '10px',
+                                    lineHeight: 0.9,
+                                    // TODO: translate
+                                    //color: router.locale === 'kk' ? 'white' : 'black',
+                                    marginLeft:'10px',    
+                                    borderRight: '1px solid black',
+                                    ':hover': {
+                                        color: '#5dbb67',
+                                    },
+                                    cursor: 'pointer',
+                                    color: i18n.language ==='ru'?'#5dbb67':'black',
+                                }}
+                                onClick={() => changeLanguage('ru')}
+                            >Рус
                             </Typography>
                         </Box>
                     </Box>

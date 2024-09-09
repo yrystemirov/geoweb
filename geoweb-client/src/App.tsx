@@ -17,6 +17,9 @@ import LoadingBar from './components/common/loadingBar';
 import { LoadingProvider, useLoading } from './components/common/loadingBar/loadingContext';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
+import './App.css';
+
+
 export enum FooterType{
   BIG,
   MINI
@@ -45,7 +48,7 @@ const App: React.FC = () => {
                 }}
             >
                  {/* Main Content */}
-              <Container maxWidth={false}>
+              <Container maxWidth={false} style={{padding:0}}>
                 <main>
                   <Routes>
                   
