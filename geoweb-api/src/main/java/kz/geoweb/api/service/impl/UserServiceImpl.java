@@ -1,7 +1,8 @@
 package kz.geoweb.api.service.impl;
 
-import kz.geoweb.api.dto.UserDto;
+import kz.geoweb.api.dto.RoleDto;
 import kz.geoweb.api.dto.UserCreateDto;
+import kz.geoweb.api.dto.UserDto;
 import kz.geoweb.api.dto.UserUpdateDto;
 import kz.geoweb.api.entity.User;
 import kz.geoweb.api.exception.CustomException;
@@ -18,7 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +41,12 @@ public class UserServiceImpl implements UserService {
             return userMapper.toDto(user);
         }
         throw new CustomException("user.not_found");
+    }
+
+    @Override
+    public Set<UUID> getCurrentUserRoleIds() {
+        UserDto getCurrentUser = getCurrentUser();
+        return getCurrentUser.getRoles().stream().map(RoleDto::getId).collect(Collectors.toSet());
     }
 
     private User getEntityById(UUID id) {

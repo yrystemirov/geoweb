@@ -7,16 +7,14 @@ import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.mapper.LayerMapper;
 import kz.geoweb.api.repository.LayerAttrRepository;
 import kz.geoweb.api.repository.LayerRepository;
-import kz.geoweb.api.service.EntityUpdateHistoryService;
-import kz.geoweb.api.service.GeoserverService;
-import kz.geoweb.api.service.JdbcService;
-import kz.geoweb.api.service.LayerService;
+import kz.geoweb.api.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -28,6 +26,8 @@ public class LayerServiceImpl implements LayerService {
     private final JdbcService jdbcService;
     private final GeoserverService geoserverService;
     private final EntityUpdateHistoryService historyService;
+    private final UserService userService;
+    private final EntityPermissionService entityPermissionService;
 
     private Layer getEntityById(UUID id) {
         return layerRepository.findById(id)
@@ -36,6 +36,8 @@ public class LayerServiceImpl implements LayerService {
 
     @Override
     public LayerDto getLayer(UUID id) {
+        Set<UUID> roleIds = userService.getCurrentUserRoleIds();
+        entityPermissionService.checkLayerRead(id, roleIds);
         return layerMapper.toDto(getEntityById(id));
     }
 
@@ -66,6 +68,8 @@ public class LayerServiceImpl implements LayerService {
 
     @Override
     public LayerDto updateLayer(UUID id, LayerDto layerDto) {
+        Set<UUID> roleIds = userService.getCurrentUserRoleIds();
+        entityPermissionService.checkLayerWrite(id, roleIds);
         if (layerDto.getIsDynamic() && layerDto.getDynamicIdentityColumn() == null) {
             throw new CustomException("layer.dynamic.without_identity_column");
         }
@@ -90,6 +94,8 @@ public class LayerServiceImpl implements LayerService {
 
     @Override
     public void deleteLayer(UUID id) {
+        Set<UUID> roleIds = userService.getCurrentUserRoleIds();
+        entityPermissionService.checkLayerWrite(id, roleIds);
         Layer layer = getEntityById(id);
         layerAttrRepository.deleteByLayerId(id);
         layerRepository.deleteById(id);

@@ -6,10 +6,12 @@ import kz.geoweb.api.dto.UserUpdateDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Set;
 import java.util.UUID;
 
 public interface UserService {
     UserDto getCurrentUser();
+    Set<UUID> getCurrentUserRoleIds();
     UserDto getUser(UUID id);
     Page<UserDto> getUsers(Pageable pageable);
     UserDto createUser(UserCreateDto userCreateDto);

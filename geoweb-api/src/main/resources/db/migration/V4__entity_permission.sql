@@ -7,6 +7,6 @@ create table entity_permission
     permission  varchar(20) not null
 );
 
-create unique index uidx__entity_perm__entity_type__entity_id__role_id on entity_permission (entity_type, entity_id, role_id);
+create unique index uidx__entity_perm__entity_type__entity_id__role_id__perm on entity_permission (entity_type, entity_id, role_id, permission);
 create index idx__data_entity_perm__entity_type__entity_id__role_id on entity_permission (entity_type, entity_id, role_id);
 create index idx__data_entity_perm__entity_type__entity_id__role_id__perm on entity_permission (entity_type, entity_id, role_id, permission);
