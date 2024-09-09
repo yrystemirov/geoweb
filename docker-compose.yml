@@ -37,6 +37,9 @@ services:
       JWT_ACCESS_EXPIRY_MINUTES: ${JWT_ACCESS_EXPIRY_MINUTES}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_REFRESH_EXPIRY_DAYS: ${JWT_REFRESH_EXPIRY_DAYS}
+      GEOSERVER_URL: http://geoweb_geoserver:8080/geoserver/
+      GEOSERVER_WORKSPACE: ${GEOSERVER_WORKSPACE}
+      GEOSERVER_DATASTORE: ${GEOSERVER_DATASTORE}
   db:
     container_name: ${POSTGRES_HOST}
     image: 'postgis/postgis:latest'
