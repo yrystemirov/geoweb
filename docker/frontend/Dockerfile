@@ -2,7 +2,7 @@ FROM node:alpine
 
 # Set working directory
 WORKDIR /usr/app
-COPY geoweb-front /usr/app
+COPY geoweb-client /usr/app
 
 
 # Install PM2 globally

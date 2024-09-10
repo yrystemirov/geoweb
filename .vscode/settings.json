@@ -1,0 +1,10 @@
+{
+  "editor.formatOnSave": false,
+  "editor.defaultFormatter": "funkyremi.vscode-google-translate",
+  "prettier.singleQuote": true,
+  "prettier.jsxSingleQuote": false,
+  "prettier.singleAttributePerLine": true,
+  "editor.formatOnPaste": true,
+  "prettier.bracketSameLine": false,
+  "prettier.printWidth": 150
+}
