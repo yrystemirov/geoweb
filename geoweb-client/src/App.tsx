@@ -16,6 +16,9 @@ import { LoadingProvider, useLoading } from './components/common/loadingBar/load
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import './App.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 
 export enum FooterType{
@@ -90,9 +93,11 @@ const App: React.FC = () => {
 
 export default function AppWrapper() {
   return (
+  <QueryClientProvider client={queryClient}>
     <LoadingProvider>
       <App />
     </LoadingProvider>
+    </QueryClientProvider>
   );
 }
 
