@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
-import { Link, Route, Routes} from 'react-router-dom';
+import { Link, Route, Routes } from 'react-router-dom';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Dashboard as DashboardIcon, Map as MapIcon, Settings as SettingsIcon, Group as GrouprIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '../common/loadingBar/loadingContext';
+import { Dictionaries } from './Dictionaries';
+import { DictionaryEntries } from './Dictionaries/Entries';
 
 const parentUrl = '/dashboard';
 
@@ -21,7 +23,6 @@ const Dashboard: React.FC = () => {
 
   // Menu items configuration
   const menuItems = [
-    { text: t('dictionaries'), path: '/dictionaries', icon: <DashboardIcon />, component: <>{t('dictionaries')}</> },
     { text: t('users'), path: '/users', icon: <GrouprIcon />, component: <>{t('users')}</> },
     { text: t('mapSettings'), path: '/mapSettings', icon: <MapIcon />, component: <>{t('mapSettings')}</> },
     {
@@ -32,6 +33,7 @@ const Dashboard: React.FC = () => {
       children: [{ text: t('styleEditor'), path: '/edit', icon: <SettingsIcon />, component: <>{t('styleEditor')}</> }],
     },
     { text: t('layerAttributes'), path: '/layerAttributes', icon: <SettingsIcon />, component: <>{t('layerAttributes')}</> },
+    { text: t('dictionaries'), path: '/dictionaries', icon: <DashboardIcon />, component: <Dictionaries /> },
   ];
 
   const getRecursiveChildrenRoutes = (item: any) => {
@@ -104,6 +106,7 @@ const Dashboard: React.FC = () => {
       <Box
         flex={1}
         p={2}
+        width={'calc(100% - 332px)'}
       >
         <Routes>
           {menuItems.map((item) => (
@@ -116,6 +119,10 @@ const Dashboard: React.FC = () => {
               {getRecursiveChildrenRoutes(item)}
             </>
           ))}
+          <Route
+            path="/dictionaries/:id"
+            element={<DictionaryEntries />}
+          />
         </Routes>
       </Box>
     </Box>

@@ -1,9 +1,8 @@
 // src/components/Header.tsx
-import React, { useState } from 'react';
-import { Link, useNavigate,useLocation } from 'react-router-dom';
+import { MouseEvent, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Logo from '../logo';
-
 import MenuIcon from '@mui/icons-material/Menu';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -14,15 +13,12 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { getStoredToken } from '../../../utils/auth/tokenStorage';
 import { Person as UserIcon } from '@mui/icons-material';
-//import Cookies from 'js-cookie';
-//import { useRouter } from 'next/router';
-
+import { useAuth } from '../../../hooks/useAuth';
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isAuthorized = Boolean(getStoredToken())
+  const { isAuthorized, logout } = useAuth();
 
   const { i18n, t } = useTranslation();
 
@@ -31,41 +27,34 @@ const Header: React.FC = () => {
   };
 
   const pages = [
-    // { title: 'Главная', url: '/' },
     { title: 'About', url: '/about', label: 'About' },
     { title: 'Docs', url: '/documentation', label: 'Documentation' },
-    isAuthorized
-      ? { title: 'Alrady Authorized', disabled: true, url: '#', label: <UserIcon /> }
-      : { title: t('signIn'), url: '/login', label: 'Sign In' },
   ];
 
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
-    
-    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElNav(event.currentTarget);
-    };
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
-    const handleCloseNavMenu = () => {
-        setAnchorElNav(null);
-    };
+  const handleOpenNavMenu = (event: MouseEvent<HTMLElement>) => {
+    setAnchorElNav(event.currentTarget);
+  };
 
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
 
-  // return (
-  //   <header style={{ padding: '1rem', backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
-  //     <nav>
-  //       <Link to="/" style={{ marginRight: '1rem' }}>{t('welcome')}</Link>
-  //       <Link to="/dashboard" style={{ marginRight: '1rem' }}>{t('dashboard')}</Link>
-  //       <Link to="/login">{t('login')}</Link>
+  const handleOpenUserMenu = (event: MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
 
-  //       {/* Language Dropdown */}
-  //       <select onChange={(e) => changeLanguage(e.target.value)} style={{ marginLeft: '1rem' }}>
-  //         <option value="en">English</option>
-  //         <option value="fr">Français</option>
-  //         <option value="es">Español</option>
-  //       </select>
-  //     </nav>
-  //   </header>
-  // );
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const loginBtn = isAuthorized ? (
+    <MenuItem onClick={() => logout()}>{t('signOut')}</MenuItem>
+  ) : (
+    <MenuItem onClick={() => navigate('/login')}>{t('signIn')}</MenuItem>
+  );
 
   return (
     <Box
@@ -164,11 +153,11 @@ const Header: React.FC = () => {
               <Box
                 sx={{
                   display: { xs: 'none', md: 'flex' },
+                  alignItems: 'center',
                 }}
               >
                 {pages.map((page, index) => (
                   <Link
-                    aria-disabled={page.disabled}
                     key={index}
                     to={page.url}
                     {...(page.url.includes('http')
@@ -179,7 +168,6 @@ const Header: React.FC = () => {
                       : {})}
                   >
                     <Button
-                      disabled={page.disabled}
                       onClick={handleCloseNavMenu}
                       sx={{
                         color: 'black',
@@ -199,6 +187,56 @@ const Header: React.FC = () => {
                     </Button>
                   </Link>
                 ))}
+                {isAuthorized ? (
+                  <>
+                    <IconButton onClick={handleOpenUserMenu}>
+                      <UserIcon />
+                    </IconButton>
+                    <Menu
+                      id="user-menu"
+                      anchorEl={anchorElUser}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                      }}
+                      keepMounted
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                      }}
+                      open={Boolean(anchorElUser)}
+                    >
+                      <MenuItem
+                        onClick={() => {
+                          handleCloseUserMenu();
+                          logout();
+                        }}
+                      >
+                        {t('signOut')}
+                      </MenuItem>
+                    </Menu>
+                  </>
+                ) : (
+                  <Link to="/login">
+                    <Button
+                      sx={{
+                        color: 'black',
+                        display: 'block',
+                        textTransform: 'none',
+                        padding: '0',
+                        minWidth: 'none',
+                        marginLeft: '24px',
+                        fontWeight: location.pathname === '/login' ? 'bold' : 'normal',
+                        ':hover': {
+                          fontWeight: 'bold',
+                          backgroundColor: 'inherit',
+                        },
+                      }}
+                    >
+                      {t('signIn')}
+                    </Button>
+                  </Link>
+                )}
               </Box>
               <Box
                 sx={{
@@ -232,7 +270,6 @@ const Header: React.FC = () => {
                 >
                   {pages.map((page, index) => (
                     <Link
-                      aria-disabled={page.disabled}
                       key={index}
                       to={page.url}
                       {...(page.url.includes('http')
@@ -243,7 +280,6 @@ const Header: React.FC = () => {
                         : {})}
                     >
                       <MenuItem
-                        disabled={page.disabled}
                         key={index}
                         onClick={handleCloseNavMenu}
                       >
@@ -251,6 +287,7 @@ const Header: React.FC = () => {
                       </MenuItem>
                     </Link>
                   ))}
+                  {loginBtn}
                 </Menu>
               </Box>
             </Box>
