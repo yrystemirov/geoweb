@@ -11,6 +11,5 @@ public class EntryDto {
     private String kk;
     private String ru;
     private String en;
-    private DictionaryDto dictionary;
     private Integer rank;
 }

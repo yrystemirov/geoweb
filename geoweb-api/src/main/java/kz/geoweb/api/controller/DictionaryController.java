@@ -22,8 +22,9 @@ public class DictionaryController {
     private final EntryService entryService;
 
     @GetMapping
-    public Page<DictionaryDto> getDictionaries(Pageable pageable) {
-        return dictionaryService.getDictionaries(pageable);
+    public Page<DictionaryDto> getDictionaries(@RequestParam(required = false) String search,
+                                               Pageable pageable) {
+        return dictionaryService.getDictionaries(search, pageable);
     }
 
     @GetMapping("/{id}")
@@ -48,13 +49,15 @@ public class DictionaryController {
     }
 
     @GetMapping("/{id}/entries")
-    public List<EntryDto> getEntries(@PathVariable UUID id) {
-        return entryService.getEntries(id);
+    public List<EntryDto> getEntries(@PathVariable UUID id,
+                                     @RequestParam(required = false) String search) {
+        return entryService.getEntries(id, search);
     }
 
     @GetMapping("/{id}/entries/page")
     public Page<EntryDto> getEntries(@PathVariable UUID id,
+                                     @RequestParam(required = false) String search,
                                      Pageable pageable) {
-        return entryService.getEntries(id, pageable);
+        return entryService.getEntries(id, search, pageable);
     }
 }

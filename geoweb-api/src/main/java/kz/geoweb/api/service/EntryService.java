@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface EntryService {
-    List<EntryDto> getEntries(UUID dictionaryId);
+    List<EntryDto> getEntries(UUID dictionaryId, String search);
 
-    Page<EntryDto> getEntries(UUID dictionaryId, Pageable pageable);
+    Page<EntryDto> getEntries(UUID dictionaryId, String search, Pageable pageable);
 
     EntryDto getEntry(UUID id);
 

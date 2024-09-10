@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface DictionaryService {
-    Page<DictionaryDto> getDictionaries(Pageable pageable);
+    Page<DictionaryDto> getDictionaries(String search, Pageable pageable);
 
     DictionaryDto getDictionary(UUID id);
 

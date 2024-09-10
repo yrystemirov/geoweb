@@ -26,8 +26,14 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    public Page<DictionaryDto> getDictionaries(Pageable pageable) {
-        return dictionaryRepository.findAll(pageable).map(dictionaryMapper::toDto);
+    public Page<DictionaryDto> getDictionaries(String search, Pageable pageable) {
+        Page<Dictionary> dictionaryPage;
+        if (search != null && !search.isBlank()) {
+            dictionaryPage = dictionaryRepository.findAllByCodeContainingIgnoreCaseOrNameKkContainingIgnoreCaseOrNameRuContainingIgnoreCaseOrNameEnContainingIgnoreCase(search, search, search, search, pageable);
+        } else {
+            dictionaryPage = dictionaryRepository.findAll(pageable);
+        }
+        return dictionaryPage.map(dictionaryMapper::toDto);
     }
 
     @Override
@@ -46,6 +52,10 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public DictionaryDto updateDictionary(UUID id, DictionaryRequestDto dictionaryRequestDto) {
         Dictionary dictionary = getEntityById(id);
+        boolean isCodeChanged = !dictionary.getCode().equals(dictionaryRequestDto.getCode());
+        if (isCodeChanged) {
+            checkUniqueCode(dictionaryRequestDto.getCode());
+        }
         dictionary.setCode(dictionaryRequestDto.getCode());
         dictionary.setNameKk(dictionaryRequestDto.getNameKk());
         dictionary.setNameRu(dictionaryRequestDto.getNameRu());
