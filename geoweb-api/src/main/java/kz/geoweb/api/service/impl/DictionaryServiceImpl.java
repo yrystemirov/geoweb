@@ -46,7 +46,6 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public DictionaryDto updateDictionary(UUID id, DictionaryRequestDto dictionaryRequestDto) {
         Dictionary dictionary = getEntityById(id);
-        checkUniqueCode(dictionaryRequestDto.getCode());
         dictionary.setCode(dictionaryRequestDto.getCode());
         dictionary.setNameKk(dictionaryRequestDto.getNameKk());
         dictionary.setNameRu(dictionaryRequestDto.getNameRu());

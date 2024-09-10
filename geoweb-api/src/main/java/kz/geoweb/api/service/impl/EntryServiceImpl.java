@@ -64,7 +64,6 @@ public class EntryServiceImpl implements EntryService {
     @Override
     public EntryDto updateEntry(UUID id, EntryUpdateDto entryUpdateDto) {
         Entry entry = getEntityById(id);
-        checkUniqueCode(entry.getDictionary().getId(), entryUpdateDto.getCode());
         entry.setCode(entryUpdateDto.getCode());
         entry.setKk(entryUpdateDto.getKk());
         entry.setRu(entryUpdateDto.getRu());
