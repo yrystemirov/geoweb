@@ -14,12 +14,15 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { getStoredToken } from '../../../utils/auth/tokenStorage';
+import { Person as UserIcon } from '@mui/icons-material';
 //import Cookies from 'js-cookie';
 //import { useRouter } from 'next/router';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const isAuthorized = Boolean(getStoredToken())
 
   const { i18n, t } = useTranslation();
 
@@ -31,7 +34,9 @@ const Header: React.FC = () => {
     // { title: 'Главная', url: '/' },
     { title: 'About', url: '/about', label: 'About' },
     { title: 'Docs', url: '/documentation', label: 'Documentation' },
-    { title: t('signIn'), url: '/login', label: 'Sign In' },
+    isAuthorized
+      ? { title: 'Alrady Authorized', disabled: true, url: '#', label: <UserIcon /> }
+      : { title: t('signIn'), url: '/login', label: 'Sign In' },
   ];
 
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -64,185 +69,196 @@ const Header: React.FC = () => {
 
   return (
     <Box
-        sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            fontSize: '16px',
-        }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        fontSize: '16px',
+      }}
     >
-        <AppBar
+      <AppBar
+        sx={{
+          backgroundColor: '#fff',
+          boxShadow: 'none',
+        }}
+        position="static"
+      >
+        <Container maxWidth={false}>
+          <Toolbar
             sx={{
-                backgroundColor: '#fff',
-                boxShadow: 'none',
+              display: 'flex',
+              justifyContent: 'space-between',
+              // alignItems: 'center',
+              minHeight: 'min-content',
+              paddingY: '10px',
             }}
-            position="static"
-        >
-            <Container maxWidth={false}>
-                <Toolbar
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        // alignItems: 'center',
-                        minHeight: 'min-content',
-                        paddingY: '10px',
-                    }}
-                    disableGutters
+            disableGutters
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                // alignItems: 'center',
+              }}
+            >
+              <Logo
+                iconStyles={{
+                  display: { xs: 'none', md: 'flex' },
+                  mr: 1,
+                }}
+                textDisplayStyles={{ xs: 'none', md: 'flex' }}
+                textVariant="h6"
+                textFlexGrow={0}
+                isFooter={false}
+              />
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: 'black',
+                }}
+              >
+                <Typography
+                  sx={{
+                    paddingRight: '10px',
+                    lineHeight: 0.9,
+                    // TODO: translate
+                    //color: router.locale === 'kk' ? 'white' : 'black',
+                    marginLeft: '10px',
+                    borderRight: '1px solid black',
+                    ':hover': {
+                      color: '#5dbb67',
+                    },
+                    cursor: 'pointer',
+                    color: i18n.language === 'kk' ? '#5dbb67' : 'black',
+                  }}
+                  onClick={() => changeLanguage('kk')}
                 >
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            // alignItems: 'center',
-                        }}
+                  Қаз
+                </Typography>
+                <Typography
+                  sx={{
+                    paddingRight: '10px',
+                    lineHeight: 0.9,
+                    // TODO: translate
+                    //color: router.locale === 'kk' ? 'white' : 'black',
+                    marginLeft: '10px',
+                    borderRight: '1px solid black',
+                    ':hover': {
+                      color: '#5dbb67',
+                    },
+                    cursor: 'pointer',
+                    color: i18n.language === 'ru' ? '#5dbb67' : 'black',
+                  }}
+                  onClick={() => changeLanguage('ru')}
+                >
+                  Рус
+                </Typography>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <Box
+                sx={{
+                  display: { xs: 'none', md: 'flex' },
+                }}
+              >
+                {pages.map((page, index) => (
+                  <Link
+                    aria-disabled={page.disabled}
+                    key={index}
+                    to={page.url}
+                    {...(page.url.includes('http')
+                      ? {
+                          target: '_blank',
+                          rel: 'noopener noreferrer',
+                        }
+                      : {})}
+                  >
+                    <Button
+                      disabled={page.disabled}
+                      onClick={handleCloseNavMenu}
+                      sx={{
+                        color: 'black',
+                        display: 'block',
+                        textTransform: 'none',
+                        padding: '0',
+                        minWidth: 'none',
+                        marginLeft: '24px',
+                        fontWeight: location.pathname === page.url ? 'bold' : 'normal',
+                        ':hover': {
+                          fontWeight: 'bold',
+                          backgroundColor: 'inherit',
+                        },
+                      }}
                     >
-                        <Logo
-                            iconStyles={{
-                                display: { xs: 'none', md: 'flex' },
-                                mr: 1,
-                            }}
-                            textDisplayStyles={{ xs: 'none', md: 'flex' }}
-                            textVariant="h6"
-                            textFlexGrow={0}
-                            isFooter={false}
-                        />
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                color: 'black',
-                            }}
-                        >
-                            <Typography
-                                sx={{
-                                    paddingRight: '10px',
-                                    lineHeight: 0.9,
-                                    // TODO: translate
-                                    //color: router.locale === 'kk' ? 'white' : 'black',
-                                    marginLeft:'10px',    
-                                    borderRight: '1px solid black',
-                                    ':hover': {
-                                        color: '#5dbb67',
-                                    },
-                                    cursor: 'pointer',
-                                    color: i18n.language ==='kk'?'#5dbb67':'black',
-                                }}
-                                onClick={() => changeLanguage('kk')}
-                            >Қаз
-                            </Typography>
-                            <Typography
-                                sx={{
-                                    paddingRight: '10px',
-                                    lineHeight: 0.9,
-                                    // TODO: translate
-                                    //color: router.locale === 'kk' ? 'white' : 'black',
-                                    marginLeft:'10px',    
-                                    borderRight: '1px solid black',
-                                    ':hover': {
-                                        color: '#5dbb67',
-                                    },
-                                    cursor: 'pointer',
-                                    color: i18n.language ==='ru'?'#5dbb67':'black',
-                                }}
-                                onClick={() => changeLanguage('ru')}
-                            >Рус
-                            </Typography>
-                        </Box>
-                    </Box>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}
+                      {page.label}
+                    </Button>
+                  </Link>
+                ))}
+              </Box>
+              <Box
+                sx={{
+                  display: { xs: 'flex', md: 'none' },
+                }}
+              >
+                <IconButton
+                  onClick={handleOpenNavMenu}
+                  color="inherit"
+                  sx={{ background: 'rgb(90 78 78)' }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorElNav}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                  open={Boolean(anchorElNav)}
+                  onClose={handleCloseNavMenu}
+                  sx={{
+                    display: { xs: 'block', md: 'none' },
+                  }}
+                >
+                  {pages.map((page, index) => (
+                    <Link
+                      aria-disabled={page.disabled}
+                      key={index}
+                      to={page.url}
+                      {...(page.url.includes('http')
+                        ? {
+                            target: '_blank',
+                            rel: 'noopener noreferrer',
+                          }
+                        : {})}
                     >
-                        <Box
-                            sx={{
-                                display: { xs: 'none', md: 'flex' },
-                            }}
-                        >
-                            {pages.map((page, index) => (
-                                <Link
-                                    key={index}
-                                    to={page.url}
-                                    {...(page.url.includes('http')
-                                        ? {
-                                              target: '_blank',
-                                              rel: 'noopener noreferrer',
-                                          }
-                                        : {})}
-                                    
-                                >
-                                    <Button
-                                        onClick={handleCloseNavMenu}
-                                        sx={{
-                                            color: 'black',
-                                            display: 'block',
-                                            textTransform: 'none',
-                                            padding: '0',
-                                            minWidth: 'none',
-                                            marginLeft: '24px',
-                                            fontWeight: location.pathname === page.url ? 'bold' : 'normal',
-                                            ':hover': {
-                                                fontWeight: 'bold',
-                                                backgroundColor: 'inherit',
-                                            },
-                                        }}
-                                    >
-                                        {page.label}
-                                    </Button>
-                                </Link>
-                            ))}
-                        </Box>
-                        <Box
-                            sx={{
-                                display: { xs: 'flex', md: 'none' },
-                            }}
-                        >
-                            <IconButton onClick={handleOpenNavMenu} color="inherit" sx={{background:'rgb(90 78 78)'}}>
-                                <MenuIcon />
-                            </IconButton>
-                            <Menu
-                                id="menu-appbar"
-                                anchorEl={anchorElNav}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'left',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'left',
-                                }}
-                                open={Boolean(anchorElNav)}
-                                onClose={handleCloseNavMenu}
-                                sx={{
-                                    display: { xs: 'block', md: 'none' },
-                                }}
-                            >
-                                {pages.map((page, index) => (
-                                    <Link
-                                        key={index}
-                                        to={page.url}
-                                        {...(page.url.includes('http')
-                                            ? {
-                                                  target: '_blank',
-                                                  rel: 'noopener noreferrer',
-                                              }
-                                            : {})}
-                                        
-                                    >
-                                        <MenuItem key={index} onClick={handleCloseNavMenu}>
-                                            <Typography textAlign="center">{page.label}</Typography>
-                                        </MenuItem>
-                                    </Link>
-                                ))}
-                            </Menu>
-                        </Box>
-                    </Box>
-                </Toolbar>
-            </Container>
-        </AppBar>
+                      <MenuItem
+                        disabled={page.disabled}
+                        key={index}
+                        onClick={handleCloseNavMenu}
+                      >
+                        <Typography textAlign="center">{page.label}</Typography>
+                      </MenuItem>
+                    </Link>
+                  ))}
+                </Menu>
+              </Box>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
     </Box>
-);
+  );
 };
 
 export default Header;

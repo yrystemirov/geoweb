@@ -1,42 +1,21 @@
-import React, { useContext, useEffect } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
-import { useLoading } from '../components/common/loadingBar/loadingContext';
+import React, { useEffect } from 'react';
+import { Link, Route, Routes} from 'react-router-dom';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Dashboard as DashboardIcon, Map as MapIcon, Settings as SettingsIcon, Group as GrouprIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '../common/loadingBar/loadingContext';
 
 const parentUrl = '/dashboard';
 
 const Dashboard: React.FC = () => {
-  const authContext = useContext(AuthContext);
-  const navigate = useNavigate();
   const { t } = useTranslation();
-
-  if (!authContext) {
-    // Handle the case where context is not available (this should not happen if used correctly)
-    throw new Error('AuthContext must be used within an AuthProvider');
-  }
-
-  const { logout } = authContext;
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-  const { setLoading } = useLoading(); // Access the loading context
+  const { setLoading } = useLoading();
 
   useEffect(() => {
-    // Start loading when the component mounts
     setLoading(true);
-
-    // Simulate an async operation like fetching data
     const timer = setTimeout(() => {
-      setLoading(false); // Stop loading after 3 seconds
+      setLoading(false);
     }, 3000);
-
-    // Cleanup function to stop loading if the component unmounts
     return () => clearTimeout(timer);
   }, []);
 
@@ -59,13 +38,17 @@ const Dashboard: React.FC = () => {
     if (item.children) {
       return item.children.map((child: any) => (
         <>
-          <Route key={child.text} path={child.path} element={child.element} />
+          <Route
+            key={child.text}
+            path={child.path}
+            element={child.element}
+          />
           {getRecursiveChildrenRoutes(child)}
         </>
       ));
     }
     return null;
-  }
+  };
 
   return (
     <Box

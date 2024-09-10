@@ -6,7 +6,7 @@ import Footer from './components/common/footer';
 ///import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './components/Dashboard';
 import About from './pages/About';
 import Contacts from './pages/Contacts';
 import Documentation from './pages/Documentation';

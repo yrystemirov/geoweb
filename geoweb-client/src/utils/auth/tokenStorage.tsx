@@ -11,3 +11,7 @@ export function setStoredToken(token: string): void {
 export function clearStoredToken(): void {
   localStorage.removeItem(localStorageKeys.token);
 }
+
+export const isAuthenticated = (): boolean => {
+  return Boolean(getStoredToken());
+}

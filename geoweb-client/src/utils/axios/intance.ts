@@ -2,7 +2,7 @@ import axios from "axios";
 import { getStoredToken } from "../auth/tokenStorage";
 
 const instance = axios.create({
-  baseURL: 'http://localhost:8787/geoweb/api',
+  baseURL: '/geoweb/api',
   withCredentials: true,
   headers: {
     'Access-Control-Allow-Origin': '*',
