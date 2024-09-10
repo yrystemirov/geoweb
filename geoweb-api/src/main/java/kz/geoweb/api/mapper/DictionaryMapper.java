@@ -1,6 +1,7 @@
 package kz.geoweb.api.mapper;
 
 import kz.geoweb.api.dto.DictionaryDto;
+import kz.geoweb.api.dto.DictionaryRequestDto;
 import kz.geoweb.api.entity.Dictionary;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -15,7 +16,7 @@ public class DictionaryMapper {
         return modelMapper.map(dictionary, DictionaryDto.class);
     }
 
-    public Dictionary toEntity(DictionaryDto dictionaryDto) {
-        return modelMapper.map(dictionaryDto, Dictionary.class);
+    public Dictionary toEntity(DictionaryRequestDto dictionaryRequestDto) {
+        return modelMapper.map(dictionaryRequestDto, Dictionary.class);
     }
 }

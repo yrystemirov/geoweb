@@ -1,16 +1,19 @@
 package kz.geoweb.api.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.UUID;
 
 @Data
-public class EntryRequestDto {
-    private UUID id;
+public class EntryCreateDto {
+    @NotBlank
     private String code;
     private String kk;
     private String ru;
     private String en;
-    private DictionaryDto dictionary;
+    @NotNull
+    private UUID dictionaryId;
     private Integer rank = 0;
 }

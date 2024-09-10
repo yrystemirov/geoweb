@@ -1,7 +1,8 @@
 package kz.geoweb.api.service;
 
 import kz.geoweb.api.dto.EntryDto;
-import kz.geoweb.api.dto.EntryRequestDto;
+import kz.geoweb.api.dto.EntryCreateDto;
+import kz.geoweb.api.dto.EntryUpdateDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,9 +16,9 @@ public interface EntryService {
 
     EntryDto getEntry(UUID id);
 
-    EntryDto createEntry(EntryRequestDto entryRequestDto);
+    EntryDto createEntry(EntryCreateDto entryCreateDto);
 
-    EntryDto updateEntry(UUID id, EntryRequestDto entryRequestDto);
+    EntryDto updateEntry(UUID id, EntryUpdateDto entryUpdateDto);
 
     void deleteEntry(UUID id);
 }

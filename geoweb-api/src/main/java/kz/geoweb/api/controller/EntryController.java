@@ -1,7 +1,9 @@
 package kz.geoweb.api.controller;
 
+import jakarta.validation.Valid;
 import kz.geoweb.api.dto.EntryDto;
-import kz.geoweb.api.dto.EntryRequestDto;
+import kz.geoweb.api.dto.EntryCreateDto;
+import kz.geoweb.api.dto.EntryUpdateDto;
 import kz.geoweb.api.service.EntryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +22,14 @@ public class EntryController {
     }
 
     @PostMapping
-    public EntryDto createEntry(@RequestBody EntryRequestDto entryRequestDto) {
-        return entryService.createEntry(entryRequestDto);
+    public EntryDto createEntry(@RequestBody @Valid EntryCreateDto entryCreateDto) {
+        return entryService.createEntry(entryCreateDto);
     }
 
     @PutMapping("/{id}")
     public EntryDto updateEntry(@PathVariable UUID id,
-                                @RequestBody EntryRequestDto entryRequestDto) {
-        return entryService.updateEntry(id, entryRequestDto);
+                                @RequestBody @Valid EntryUpdateDto entryUpdateDto) {
+        return entryService.updateEntry(id, entryUpdateDto);
     }
 
     @DeleteMapping("/{id}")

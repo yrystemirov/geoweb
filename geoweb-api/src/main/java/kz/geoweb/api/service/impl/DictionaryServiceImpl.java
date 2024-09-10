@@ -1,6 +1,7 @@
 package kz.geoweb.api.service.impl;
 
 import kz.geoweb.api.dto.DictionaryDto;
+import kz.geoweb.api.dto.DictionaryRequestDto;
 import kz.geoweb.api.entity.Dictionary;
 import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.mapper.DictionaryMapper;
@@ -35,19 +36,21 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    public DictionaryDto createDictionary(DictionaryDto dictionaryDto) {
-        Dictionary dictionary = dictionaryMapper.toEntity(dictionaryDto);
+    public DictionaryDto createDictionary(DictionaryRequestDto dictionaryRequestDto) {
+        checkUniqueCode(dictionaryRequestDto.getCode());
+        Dictionary dictionary = dictionaryMapper.toEntity(dictionaryRequestDto);
         Dictionary created = dictionaryRepository.save(dictionary);
         return dictionaryMapper.toDto(created);
     }
 
     @Override
-    public DictionaryDto updateDictionary(UUID id, DictionaryDto dictionaryDto) {
+    public DictionaryDto updateDictionary(UUID id, DictionaryRequestDto dictionaryRequestDto) {
         Dictionary dictionary = getEntityById(id);
-        dictionary.setCode(dictionaryDto.getCode());
-        dictionary.setNameKk(dictionaryDto.getNameKk());
-        dictionary.setNameRu(dictionaryDto.getNameRu());
-        dictionary.setNameEn(dictionaryDto.getNameEn());
+        checkUniqueCode(dictionaryRequestDto.getCode());
+        dictionary.setCode(dictionaryRequestDto.getCode());
+        dictionary.setNameKk(dictionaryRequestDto.getNameKk());
+        dictionary.setNameRu(dictionaryRequestDto.getNameRu());
+        dictionary.setNameEn(dictionaryRequestDto.getNameEn());
         Dictionary updated = dictionaryRepository.save(dictionary);
         return dictionaryMapper.toDto(updated);
     }
@@ -56,5 +59,12 @@ public class DictionaryServiceImpl implements DictionaryService {
     public void deleteDictionary(UUID id) {
         getEntityById(id);
         dictionaryRepository.deleteById(id);
+    }
+
+    private void checkUniqueCode(String code) {
+        dictionaryRepository.findFirstByCode(code)
+                .ifPresent(dictionary -> {
+                    throw new CustomException("dictionary.by_code.already_exists", code);
+                });
     }
 }

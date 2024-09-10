@@ -1,7 +1,8 @@
 package kz.geoweb.api.service.impl;
 
+import kz.geoweb.api.dto.EntryCreateDto;
 import kz.geoweb.api.dto.EntryDto;
-import kz.geoweb.api.dto.EntryRequestDto;
+import kz.geoweb.api.dto.EntryUpdateDto;
 import kz.geoweb.api.entity.Dictionary;
 import kz.geoweb.api.entity.Entry;
 import kz.geoweb.api.exception.CustomException;
@@ -51,20 +52,24 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
-    public EntryDto createEntry(EntryRequestDto entryRequestDto) {
-        Entry entry = entryMapper.toEntity(entryRequestDto);
+    public EntryDto createEntry(EntryCreateDto entryCreateDto) {
+        checkUniqueCode(entryCreateDto.getDictionaryId(), entryCreateDto.getCode());
+        Entry entry = entryMapper.toEntity(entryCreateDto);
+        Dictionary dictionary = getDictionaryEntityById(entryCreateDto.getDictionaryId());
+        entry.setDictionary(dictionary);
         Entry created = entryRepository.save(entry);
         return entryMapper.toDto(created);
     }
 
     @Override
-    public EntryDto updateEntry(UUID id, EntryRequestDto entryRequestDto) {
+    public EntryDto updateEntry(UUID id, EntryUpdateDto entryUpdateDto) {
         Entry entry = getEntityById(id);
-        entry.setCode(entryRequestDto.getCode());
-        entry.setKk(entryRequestDto.getKk());
-        entry.setRu(entryRequestDto.getRu());
-        entry.setEn(entryRequestDto.getEn());
-        entry.setRank(entryRequestDto.getRank());
+        checkUniqueCode(entry.getDictionary().getId(), entryUpdateDto.getCode());
+        entry.setCode(entryUpdateDto.getCode());
+        entry.setKk(entryUpdateDto.getKk());
+        entry.setRu(entryUpdateDto.getRu());
+        entry.setEn(entryUpdateDto.getEn());
+        entry.setRank(entryUpdateDto.getRank());
         Entry updated = entryRepository.save(entry);
         return entryMapper.toDto(updated);
     }
@@ -73,5 +78,12 @@ public class EntryServiceImpl implements EntryService {
     public void deleteEntry(UUID id) {
         getEntityById(id);
         entryRepository.deleteById(id);
+    }
+
+    private void checkUniqueCode(UUID dictionaryId, String code) {
+        entryRepository.findFirstByDictionaryIdAndCode(dictionaryId, code)
+                .ifPresent(entry -> {
+                    throw new CustomException("entry.by_code.already_exists", code);
+                });
     }
 }

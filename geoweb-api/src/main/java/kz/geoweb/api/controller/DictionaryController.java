@@ -1,6 +1,8 @@
 package kz.geoweb.api.controller;
 
+import jakarta.validation.Valid;
 import kz.geoweb.api.dto.DictionaryDto;
+import kz.geoweb.api.dto.DictionaryRequestDto;
 import kz.geoweb.api.dto.EntryDto;
 import kz.geoweb.api.service.DictionaryService;
 import kz.geoweb.api.service.EntryService;
@@ -30,14 +32,14 @@ public class DictionaryController {
     }
 
     @PostMapping
-    public DictionaryDto createDictionary(@RequestBody DictionaryDto dictionaryDto) {
-        return dictionaryService.createDictionary(dictionaryDto);
+    public DictionaryDto createDictionary(@RequestBody @Valid DictionaryRequestDto dictionaryRequestDto) {
+        return dictionaryService.createDictionary(dictionaryRequestDto);
     }
 
     @PutMapping("/{id}")
     public DictionaryDto updateDictionary(@PathVariable UUID id,
-                                          @RequestBody DictionaryDto dictionaryDto) {
-        return dictionaryService.updateDictionary(id, dictionaryDto);
+                                          @RequestBody @Valid DictionaryRequestDto dictionaryRequestDto) {
+        return dictionaryService.updateDictionary(id, dictionaryRequestDto);
     }
 
     @DeleteMapping("/{id}")

@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
@@ -44,9 +45,10 @@ public class FeatureServiceImpl implements FeatureService {
         String fields = layerAttrs.stream()
                 .map(LayerAttrDto::getAttrname)
                 .collect(Collectors.joining(", "));
+        String sortClause = getSortClause(pageable.getSort());
 
         String sql = "SELECT gid,ST_AsText(geom) AS geom," + fields + " FROM " + tableName +
-                " ORDER BY gid LIMIT :limit OFFSET :offset";
+                sortClause + " LIMIT :limit OFFSET :offset";
 
         int limit = pageable.getPageSize();
         int offset = pageable.getPageNumber() * pageable.getPageSize();
@@ -73,6 +75,16 @@ public class FeatureServiceImpl implements FeatureService {
         };
     }
 
+    private String getSortClause(Sort sort) {
+        if (sort.isUnsorted()) {
+            return "";
+        }
+        String orderBy = sort.stream()
+                .map(order -> order.getProperty() + " " + order.getDirection().name())
+                .collect(Collectors.joining(", "));
+        return " ORDER BY " + orderBy;
+    }
+
     @Override
     public void save(String layername, List<FeatureSaveDto> featureSaveDtoList) {
         String tableName = LAYERS_SCHEMA + "." + layername;
@@ -82,11 +94,11 @@ public class FeatureServiceImpl implements FeatureService {
             convertStringDatesToLocalDateTime(feature.getAttributes(), layerAttrs);
             switch (feature.getAction()) {
                 case CREATE:
-                    Integer gid = insertFeature(tableName, feature, layerAttrs);
+                    Integer gid = insertFeature(tableName, feature);
                     saveHistory(layername, gid, Action.CREATE);
                     break;
                 case UPDATE:
-                    updateFeature(tableName, feature, layerAttrs);
+                    updateFeature(tableName, feature);
                     saveHistory(layername, feature.getGid(), Action.UPDATE);
                     break;
                 case DELETE:
@@ -97,7 +109,7 @@ public class FeatureServiceImpl implements FeatureService {
         }
     }
 
-    private Integer insertFeature(String tableName, FeatureSaveDto feature, Set<LayerAttrDto> layerAttrs) {
+    private Integer insertFeature(String tableName, FeatureSaveDto feature) {
         StringBuilder columns = new StringBuilder("(geom");
         StringBuilder values = new StringBuilder("(ST_GeomFromText(:geom)");
 
@@ -115,7 +127,7 @@ public class FeatureServiceImpl implements FeatureService {
                 .query(Integer.class).single();
     }
 
-    private void updateFeature(String tableName, FeatureSaveDto feature, Set<LayerAttrDto> layerAttrs) {
+    private void updateFeature(String tableName, FeatureSaveDto feature) {
         StringBuilder setClause = new StringBuilder("geom = ST_GeomFromText(:geom)");
 
         for (String key : feature.getAttributes().keySet()) {

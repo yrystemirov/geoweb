@@ -1,6 +1,7 @@
 package kz.geoweb.api.service;
 
 import kz.geoweb.api.dto.DictionaryDto;
+import kz.geoweb.api.dto.DictionaryRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,9 +12,9 @@ public interface DictionaryService {
 
     DictionaryDto getDictionary(UUID id);
 
-    DictionaryDto createDictionary(DictionaryDto dictionaryDto);
+    DictionaryDto createDictionary(DictionaryRequestDto dictionaryRequestDto);
 
-    DictionaryDto updateDictionary(UUID id, DictionaryDto dictionaryDto);
+    DictionaryDto updateDictionary(UUID id, DictionaryRequestDto dictionaryRequestDto);
 
     void deleteDictionary(UUID id);
 }

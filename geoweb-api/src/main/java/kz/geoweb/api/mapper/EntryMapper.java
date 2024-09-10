@@ -1,7 +1,7 @@
 package kz.geoweb.api.mapper;
 
 import kz.geoweb.api.dto.EntryDto;
-import kz.geoweb.api.dto.EntryRequestDto;
+import kz.geoweb.api.dto.EntryCreateDto;
 import kz.geoweb.api.entity.Entry;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -22,7 +22,7 @@ public class EntryMapper {
         return entries.stream().map(this::toDto).toList();
     }
 
-    public Entry toEntity(EntryRequestDto entryRequestDto) {
-        return modelMapper.map(entryRequestDto, Entry.class);
+    public Entry toEntity(EntryCreateDto entryCreateDto) {
+        return modelMapper.map(entryCreateDto, Entry.class);
     }
 }
