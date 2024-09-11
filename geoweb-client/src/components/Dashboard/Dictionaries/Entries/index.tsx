@@ -22,6 +22,7 @@ import { dictionariesAPI } from '../../../../api/dictioanries';
 import { useTranslation } from 'react-i18next';
 import { EntryDto, EntryRequestDto } from '../../../../api/types/dictioanries';
 import CustomNoRowsOverlay from '../../../common/nodata/DataGrid';
+import { fieldIsRequiredProps } from './utils';
 
 export type EntryDtoRow = EntryDto & { isNew?: boolean };
 
@@ -35,10 +36,7 @@ export const DictionaryEntries = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['dictionaryEntries', dictionaryId],
-    queryFn: () =>
-      dictionariesAPI
-        .getEntries(dictionaryId, { page: pagination.page, size: pagination.pageSize })
-        .then((res) => res.data),
+    queryFn: () => dictionariesAPI.getEntries(dictionaryId, { page: pagination.page, size: pagination.pageSize }).then((res) => res.data),
     enabled: !!dictionaryId,
   });
 
@@ -78,6 +76,7 @@ export const DictionaryEntries = () => {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
+    // TODO: add confirmation
     deleteMutation.mutate(id as string);
     setRows(rows.filter((row) => row.id !== id));
   };
@@ -114,6 +113,11 @@ export const DictionaryEntries = () => {
   };
 
   const handleAddClick = () => {
+    const shouldPreventAdding = rows.some((row) => row.isNew);
+    if (shouldPreventAdding) {
+      return;
+    }
+
     const id = Date.now().toString(); // временный идентификатор
     setRows((oldRows) => [...oldRows, { id, ru: '', kk: '', en: '', code: '', isNew: true } as EntryDtoRow]);
     setRowModesModel((oldModel) => ({
@@ -122,49 +126,54 @@ export const DictionaryEntries = () => {
     }));
   };
 
-  const columns: GridColDef[] = [
-    { field: 'rank', headerName: '№', width: 100 },
-    { field: 'ru', headerName: t('nameRu'), width: 300, editable: true },
-    { field: 'kk', headerName: t('nameKk'), width: 300, editable: true },
-    { field: 'en', headerName: t('nameEn'), width: 300, editable: true },
-    { field: 'code', headerName: t('code'), width: 300, editable: true },
-    {
-      field: 'actions',
-      headerName: t('actions'),
-      type: 'actions',
-      width: 100,
-      getActions: ({ id }) => {
-        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+  const actionsColumn: GridColDef<EntryDtoRow> = {
+    field: 'actions',
+    headerName: t('actions'),
+    type: 'actions',
+    width: 100,
+    getActions: ({ id }) => {
+      const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
 
-        if (isInEditMode) {
-          return [
-            <GridActionsCellItem
-              icon={<SaveIcon />}
-              label="Save"
-              onClick={handleSaveClick(id)}
-            />,
-            <GridActionsCellItem
-              icon={<CancelIcon />}
-              label="Cancel"
-              onClick={handleCancelClick(id)}
-            />,
-          ];
-        }
-
+      if (isInEditMode) {
         return [
           <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            onClick={handleEditClick(id)}
+            icon={<SaveIcon />}
+            label="Save"
+            sx={{
+              color: 'primary.main',
+            }}
+            onClick={handleSaveClick(id)}
           />,
           <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={handleDeleteClick(id)}
+            icon={<CancelIcon />}
+            label="Cancel"
+            onClick={handleCancelClick(id)}
           />,
         ];
-      },
+      }
+
+      return [
+        <GridActionsCellItem
+          icon={<EditIcon />}
+          label="Edit"
+          onClick={handleEditClick(id)}
+        />,
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={handleDeleteClick(id)}
+        />,
+      ];
     },
+  };
+
+  const columns: GridColDef<EntryDtoRow>[] = [
+    { field: 'rank', headerName: '№', width: 100, editable: true },
+    { field: 'code', headerName: t('code'), width: 150, editable: true, ...fieldIsRequiredProps(t('requiredField')) },
+    { field: 'ru', headerName: t('nameRu'), width: 300, editable: true, ...fieldIsRequiredProps(t('requiredField')) },
+    { field: 'kk', headerName: t('nameKk'), width: 300, editable: true },
+    { field: 'en', headerName: t('nameEn'), width: 300, editable: true },
+    actionsColumn,
   ];
 
   useEffect(() => {
@@ -197,11 +206,21 @@ export const DictionaryEntries = () => {
           loadingOverlay: () => <LinearProgress />,
           toolbar: () => (
             <GridToolbarContainer>
-              <Button color="primary" startIcon={<AddIcon />} onClick={handleAddClick}>
+              <Button
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={handleAddClick}
+              >
                 {t('addRecord')}
               </Button>
             </GridToolbarContainer>
           ),
+        }}
+        sx={{
+          '& .Mui-error': {
+            backgroundColor: 'rgb(126,10,15, 0.1)',
+            color: '#750f0f',
+          },
         }}
       />
     </div>

@@ -31,6 +31,9 @@ const resources = {
       nameKk: 'Атауы (kz)',
       nameEn: 'Атауы (en)',
       code: 'Код',
+      addRecord: 'Жазба қосу',
+      actions: 'Әрекеттер',
+      requiredField: 'Міндетті толтыру керек',
     },
   },
   ru: {
@@ -61,6 +64,9 @@ const resources = {
       nameKk: 'Наименование (kz)',
       nameEn: 'Наименование (en)',
       code: 'Код',
+      addRecord: 'Добавить запись',
+      actions: 'Действия',
+      requiredField: 'Поле обязательно для заполнения',
     },
   },
 };
