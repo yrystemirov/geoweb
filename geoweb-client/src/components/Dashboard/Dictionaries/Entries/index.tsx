@@ -79,9 +79,11 @@ export const DictionaryEntries = () => {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => dictionariesAPI.deleteEntry(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['dictionaryEntries', dictionaryId] });
+      setRows(rows.filter((row) => row.id !== id));
     },
+    onError: handleError,
   });
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
@@ -101,7 +103,6 @@ export const DictionaryEntries = () => {
   const handleDeleteClick = (id: GridRowId) => () => {
     // TODO: add confirmation
     deleteMutation.mutate(id as string);
-    setRows(rows.filter((row) => row.id !== id));
   };
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -199,11 +200,12 @@ export const DictionaryEntries = () => {
     }
   }, [data]);
 
-  const dicName = dictionary ? `"${dictionary[('name' + t('uLng')) as keyof DictionaryDto]}"` : '';
+  const dicName = dictionary?.[('name' + t('uLng')) as keyof DictionaryDto];
+  const dicNameWithQuotes = `"${dicName || dictionary?.nameRu || ''}"`;
 
   return (
     <>
-      <CardHeader title={t('dictionaryEntries', { dicName })} />
+      <CardHeader title={t('dictionaryEntries', { dicName: dicNameWithQuotes })} />
       <Box>
         <DataGrid
           rows={rows}

@@ -78,9 +78,11 @@ export const Dictionaries: FC = () => {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => dictionariesAPI.deleteDictionary(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['dictionaries', pagination] });
+      setRows(rows.filter((row) => row.id !== id));
     },
+    onError: onEditError,
   });
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
@@ -100,7 +102,6 @@ export const Dictionaries: FC = () => {
   const handleDeleteClick = (id: GridRowId) => () => {
     // TODO: add confirmation dialog
     deleteMutation.mutate(id as string);
-    setRows(rows.filter((row) => row.id !== id));
   };
 
   const handleCancelClick = (id: GridRowId) => () => {
