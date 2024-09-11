@@ -205,6 +205,7 @@ const Header: React.FC = () => {
                         horizontal: 'left',
                       }}
                       open={Boolean(anchorElUser)}
+                      onClose={handleCloseUserMenu}
                     >
                       <MenuItem
                         onClick={() => {

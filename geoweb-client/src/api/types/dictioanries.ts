@@ -12,6 +12,9 @@ export type EntryDto = {
   kk: string;
   ru: string;
   en: string;
-  dictionary: DictionaryDto;
   rank: number;
+};
+
+export type EntryRequestDto = Partial<Pick<EntryDto, 'id' | 'kk' | 'ru' | 'en' | 'rank'>> & Omit<EntryDto, 'code'> & {
+    dictionaryId: string;
 };
