@@ -10,7 +10,6 @@ import kz.geoweb.api.repository.FolderRepository;
 import kz.geoweb.api.service.EntityPermissionService;
 import kz.geoweb.api.service.EntityUpdateHistoryService;
 import kz.geoweb.api.service.FolderService;
-import kz.geoweb.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,6 @@ public class FolderServiceImpl implements FolderService {
     private final FolderRepository folderRepository;
     private final FolderMapper folderMapper;
     private final EntityUpdateHistoryService historyService;
-    private final UserService userService;
     private final EntityPermissionService entityPermissionService;
 
     private Folder getEntityById(UUID id) {
@@ -33,22 +31,19 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public FolderDto getFolder(UUID id) {
-        Set<UUID> roleIds = userService.getCurrentUserRoleIds();
-        entityPermissionService.checkFolderRead(id, roleIds);
+        entityPermissionService.checkFolderRead(id);
         return folderMapper.toDto(getEntityById(id));
     }
 
     @Override
     public Set<FolderDto> getFolderChildren(UUID parentId) {
-        Set<UUID> roleIds = userService.getCurrentUserRoleIds();
-        entityPermissionService.checkFolderRead(parentId, roleIds);
+        entityPermissionService.checkFolderRead(parentId);
         return folderMapper.toDto(folderRepository.findByParentIdOrderByRank(parentId));
     }
 
     @Override
     public FolderTreeDto getFolderTree(UUID id) {
-        Set<UUID> roleIds = userService.getCurrentUserRoleIds();
-        entityPermissionService.checkFolderRead(id, roleIds);
+        entityPermissionService.checkFolderRead(id);
         return folderMapper.toFolderTreeDto(getEntityById(id));
     }
 
@@ -63,8 +58,7 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public FolderDto updateFolder(UUID id, FolderDto folderDto) {
-        Set<UUID> roleIds = userService.getCurrentUserRoleIds();
-        entityPermissionService.checkFolderWrite(id, roleIds);
+        entityPermissionService.checkFolderWrite(id);
         Folder folder = getEntityById(id);
         folder.setNameKk(folderDto.getNameKk());
         folder.setNameRu(folderDto.getNameRu());
@@ -82,8 +76,7 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public void deleteFolder(UUID id) {
-        Set<UUID> roleIds = userService.getCurrentUserRoleIds();
-        entityPermissionService.checkFolderWrite(id, roleIds);
+        entityPermissionService.checkFolderWrite(id);
         getEntityById(id);
         folderRepository.deleteById(id);
         historyService.saveFolder(id, Action.DELETE);

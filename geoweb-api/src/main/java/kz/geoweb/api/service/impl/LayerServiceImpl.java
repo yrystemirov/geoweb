@@ -1,6 +1,7 @@
 package kz.geoweb.api.service.impl;
 
 import kz.geoweb.api.dto.LayerDto;
+import kz.geoweb.api.dto.LayerRequestDto;
 import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.exception.CustomException;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -26,7 +26,6 @@ public class LayerServiceImpl implements LayerService {
     private final JdbcService jdbcService;
     private final GeoserverService geoserverService;
     private final EntityUpdateHistoryService historyService;
-    private final UserService userService;
     private final EntityPermissionService entityPermissionService;
 
     private Layer getEntityById(UUID id) {
@@ -36,29 +35,34 @@ public class LayerServiceImpl implements LayerService {
 
     @Override
     public LayerDto getLayer(UUID id) {
-        Set<UUID> roleIds = userService.getCurrentUserRoleIds();
-        entityPermissionService.checkLayerRead(id, roleIds);
+        entityPermissionService.checkLayerRead(id);
         return layerMapper.toDto(getEntityById(id));
     }
 
     @Override
-    public Page<LayerDto> getLayers(Pageable pageable) {
-        return layerRepository.findAll(pageable).map(layerMapper::toDto);
+    public Page<LayerDto> getLayers(String search, Pageable pageable) {
+        Page<Layer> layerPage;
+        if (search != null && !search.isBlank()) {
+            layerPage = layerRepository.findByLayernameContainingIgnoreCaseOrNameKkContainingIgnoreCaseOrNameRuContainingIgnoreCaseOrNameEnContainingIgnoreCase(
+                    search, search, search, search, pageable);
+        } else {
+            layerPage = layerRepository.findAll(pageable);
+        }
+        return layerPage.map(layerMapper::toDto);
     }
 
     @Override
-    public LayerDto createLayer(LayerDto layerDto) {
-        if (layerDto.getIsDynamic() && layerDto.getDynamicIdentityColumn() == null) {
+    public LayerDto createLayer(LayerRequestDto layerRequestDto) {
+        if (layerRequestDto.getIsDynamic() && layerRequestDto.getDynamicIdentityColumn() == null) {
             throw new CustomException("layer.dynamic.without_identity_column");
         }
-        layerDto.setId(null);
-        String layername = layerDto.getLayername();
+        String layername = layerRequestDto.getLayername();
         Optional<Layer> layerEntityOptional = layerRepository
                 .findByLayername(layername.trim());
         if (layerEntityOptional.isPresent()) {
             throw new CustomException("layer.by_layername.already_exists", layername);
         }
-        Layer layer = layerMapper.toEntity(layerDto);
+        Layer layer = layerMapper.toEntity(layerRequestDto);
         Layer created = layerRepository.save(layer);
         jdbcService.createTable(layername, created.getGeometryType());
         geoserverService.deployLayer(created.getLayername());
@@ -67,26 +71,25 @@ public class LayerServiceImpl implements LayerService {
     }
 
     @Override
-    public LayerDto updateLayer(UUID id, LayerDto layerDto) {
-        Set<UUID> roleIds = userService.getCurrentUserRoleIds();
-        entityPermissionService.checkLayerWrite(id, roleIds);
-        if (layerDto.getIsDynamic() && layerDto.getDynamicIdentityColumn() == null) {
+    public LayerDto updateLayer(UUID id, LayerRequestDto layerRequestDto) {
+        entityPermissionService.checkLayerWrite(id);
+        if (layerRequestDto.getIsDynamic() && layerRequestDto.getDynamicIdentityColumn() == null) {
             throw new CustomException("layer.dynamic.without_identity_column");
         }
         Layer layer = getEntityById(id);
-        layer.setNameKk(layerDto.getNameKk());
-        layer.setNameRu(layerDto.getNameRu());
-        layer.setNameEn(layerDto.getNameEn());
-        layer.setDescriptionKk(layerDto.getDescriptionKk());
-        layer.setDescriptionRu(layerDto.getDescriptionRu());
-        layer.setDescriptionEn(layerDto.getDescriptionEn());
-        layer.setUrl(layerDto.getUrl());
-        layer.setBaseLayer(layerDto.getBaseLayer());
-        layer.setCheckIntersection(layerDto.getCheckIntersection());
-        layer.setIsBlockLayer(layerDto.getIsBlockLayer());
-        layer.setIsDynamic(layerDto.getIsDynamic());
-        layer.setIsPublic(layerDto.getIsPublic());
-        layer.setDynamicIdentityColumn(layerDto.getDynamicIdentityColumn());
+        layer.setNameKk(layerRequestDto.getNameKk());
+        layer.setNameRu(layerRequestDto.getNameRu());
+        layer.setNameEn(layerRequestDto.getNameEn());
+        layer.setDescriptionKk(layerRequestDto.getDescriptionKk());
+        layer.setDescriptionRu(layerRequestDto.getDescriptionRu());
+        layer.setDescriptionEn(layerRequestDto.getDescriptionEn());
+        layer.setUrl(layerRequestDto.getUrl());
+        layer.setBaseLayer(layerRequestDto.getBaseLayer());
+        layer.setCheckIntersection(layerRequestDto.getCheckIntersection());
+        layer.setIsBlockLayer(layerRequestDto.getIsBlockLayer());
+        layer.setIsDynamic(layerRequestDto.getIsDynamic());
+        layer.setIsPublic(layerRequestDto.getIsPublic());
+        layer.setDynamicIdentityColumn(layerRequestDto.getDynamicIdentityColumn());
         Layer updated = layerRepository.save(layer);
         historyService.saveLayer(updated.getId(), Action.UPDATE);
         return layerMapper.toDto(updated);
@@ -94,8 +97,7 @@ public class LayerServiceImpl implements LayerService {
 
     @Override
     public void deleteLayer(UUID id) {
-        Set<UUID> roleIds = userService.getCurrentUserRoleIds();
-        entityPermissionService.checkLayerWrite(id, roleIds);
+        entityPermissionService.checkLayerWrite(id);
         Layer layer = getEntityById(id);
         layerAttrRepository.deleteByLayerId(id);
         layerRepository.deleteById(id);

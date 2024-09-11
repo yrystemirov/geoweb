@@ -1,5 +1,6 @@
 package kz.geoweb.api.service;
 
+import kz.geoweb.api.dto.RoleDto;
 import kz.geoweb.api.dto.UserDto;
 import kz.geoweb.api.dto.UserCreateDto;
 import kz.geoweb.api.dto.UserUpdateDto;
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 public interface UserService {
     UserDto getCurrentUser();
-    Set<UUID> getCurrentUserRoleIds();
+    Set<RoleDto> getCurrentUserRoles();
     UserDto getUser(UUID id);
     Page<UserDto> getUsers(Pageable pageable);
     UserDto createUser(UserCreateDto userCreateDto);

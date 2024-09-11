@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,9 +43,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<UUID> getCurrentUserRoleIds() {
+    public Set<RoleDto> getCurrentUserRoles() {
         UserDto getCurrentUser = getCurrentUser();
-        return getCurrentUser.getRoles().stream().map(RoleDto::getId).collect(Collectors.toSet());
+        return getCurrentUser.getRoles();
     }
 
     private User getEntityById(UUID id) {

@@ -3,6 +3,7 @@ package kz.geoweb.api.controller;
 import jakarta.validation.Valid;
 import kz.geoweb.api.dto.LayerAttrDto;
 import kz.geoweb.api.dto.LayerDto;
+import kz.geoweb.api.dto.LayerRequestDto;
 import kz.geoweb.api.service.LayerAttrService;
 import kz.geoweb.api.service.LayerService;
 import lombok.RequiredArgsConstructor;
@@ -26,19 +27,20 @@ public class LayerController {
     }
 
     @GetMapping
-    public Page<LayerDto> getLayers(Pageable pageable) {
-        return layerService.getLayers(pageable);
+    public Page<LayerDto> getLayers(@RequestParam(required = false) String search,
+                                    Pageable pageable) {
+        return layerService.getLayers(search, pageable);
     }
 
     @PostMapping
-    public LayerDto createLayer(@RequestBody @Valid LayerDto layerDto) {
-        return layerService.createLayer(layerDto);
+    public LayerDto createLayer(@RequestBody @Valid LayerRequestDto layerRequestDto) {
+        return layerService.createLayer(layerRequestDto);
     }
 
     @PutMapping("/{id}")
     public LayerDto updateLayer(@PathVariable UUID id,
-                                @RequestBody LayerDto layerDto) {
-        return layerService.updateLayer(id, layerDto);
+                                @RequestBody @Valid LayerRequestDto layerRequestDto) {
+        return layerService.updateLayer(id, layerRequestDto);
     }
 
     @DeleteMapping("/{id}")

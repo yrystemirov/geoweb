@@ -1,6 +1,7 @@
 package kz.geoweb.api.mapper;
 
 import kz.geoweb.api.dto.LayerDto;
+import kz.geoweb.api.dto.LayerRequestDto;
 import kz.geoweb.api.entity.Layer;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -15,7 +16,7 @@ public class LayerMapper {
         return modelMapper.map(layer, LayerDto.class);
     }
 
-    public Layer toEntity(LayerDto layerDto) {
-        return modelMapper.map(layerDto, Layer.class);
+    public Layer toEntity(LayerRequestDto layerRequestDto) {
+        return modelMapper.map(layerRequestDto, Layer.class);
     }
 }
