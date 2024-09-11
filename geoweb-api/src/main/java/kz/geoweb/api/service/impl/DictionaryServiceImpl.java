@@ -42,6 +42,12 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
+    public DictionaryDto getDictionaryByCode(String code) {
+        return dictionaryMapper.toDto(dictionaryRepository.findFirstByCode(code)
+                .orElseThrow(() -> new CustomException("dictionary.by_code.not_found", code)));
+    }
+
+    @Override
     public DictionaryDto createDictionary(DictionaryRequestDto dictionaryRequestDto) {
         checkUniqueCode(dictionaryRequestDto.getCode());
         Dictionary dictionary = dictionaryMapper.toEntity(dictionaryRequestDto);

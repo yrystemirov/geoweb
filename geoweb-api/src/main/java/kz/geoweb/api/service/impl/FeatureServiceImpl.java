@@ -1,15 +1,11 @@
 package kz.geoweb.api.service.impl;
 
-import kz.geoweb.api.dto.FeatureSaveDto;
-import kz.geoweb.api.dto.LayerAttrDto;
-import kz.geoweb.api.dto.UserDto;
+import kz.geoweb.api.dto.*;
 import kz.geoweb.api.entity.FeatureUpdateHistory;
 import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.enums.AttrType;
 import kz.geoweb.api.repository.FeatureUpdateHistoryRepository;
-import kz.geoweb.api.service.FeatureService;
-import kz.geoweb.api.service.LayerAttrService;
-import kz.geoweb.api.service.UserService;
+import kz.geoweb.api.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,10 +17,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static kz.geoweb.api.utils.GisConstants.LAYERS_SCHEMA;
@@ -37,6 +30,8 @@ public class FeatureServiceImpl implements FeatureService {
     private final LayerAttrService layerAttrService;
     private final FeatureUpdateHistoryRepository featureUpdateHistoryRepository;
     private final UserService userService;
+    private final DictionaryService dictionaryService;
+    private final EntryService entryService;
 
     @Override
     public Page<Map<String, Object>> getFeatures(String layername, Pageable pageable) {
@@ -61,7 +56,7 @@ public class FeatureServiceImpl implements FeatureService {
 
         String countSql = "SELECT COUNT(*) FROM " + tableName;
         int total = jdbcClient.sql(countSql).query(Integer.class).single();
-
+        fillDictionaryValues(results, layerAttrs);
         return new PageImpl<>(results, pageable, total);
     }
 
@@ -83,6 +78,36 @@ public class FeatureServiceImpl implements FeatureService {
                 .map(order -> order.getProperty() + " " + order.getDirection().name())
                 .collect(Collectors.joining(", "));
         return " ORDER BY " + orderBy;
+    }
+
+    private void fillDictionaryValues(List<Map<String, Object>> features, Set<LayerAttrDto> layerAttrs) {
+        if (features.isEmpty()) return;
+        List<LayerAttrDto> dictionaryLayerAttrs = layerAttrs.stream().filter(attr -> attr.getAttrType() == AttrType.DICTIONARY).toList();
+        if (dictionaryLayerAttrs.isEmpty()) return;
+        for (Map<String, Object> feature : features) {
+            for (LayerAttrDto attr : dictionaryLayerAttrs) {
+                try {
+                    String attrname = attr.getAttrname();
+                    Object value = feature.get(attrname);
+                    if (value != null) {
+                        String valueString = value.toString();
+                        String[] idValues = valueString.split(",");
+                        DictionaryDto dictionaryDto = dictionaryService.getDictionaryByCode(attr.getDictionaryCode());
+                        List<EntryDto> entries = entryService.getEntries(dictionaryDto.getId(), null);
+                        List<String> values = new ArrayList<>();
+                        for (String idValue : idValues) {
+                            Optional<EntryDto> entry = entries.stream().filter(e -> e.getId().equals(UUID.fromString(idValue))).findFirst();
+                            entry.ifPresent(e -> values.add(e.getRu()));
+                        }
+                        if (!values.isEmpty()) {
+                            feature.put(attrname, String.join(", ", values));
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("Error filling dictionary values: {}", e.getMessage());
+                }
+            }
+        }
     }
 
     @Override

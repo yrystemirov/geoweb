@@ -12,6 +12,8 @@ public interface DictionaryService {
 
     DictionaryDto getDictionary(UUID id);
 
+    DictionaryDto getDictionaryByCode(String code);
+
     DictionaryDto createDictionary(DictionaryRequestDto dictionaryRequestDto);
 
     DictionaryDto updateDictionary(UUID id, DictionaryRequestDto dictionaryRequestDto);
