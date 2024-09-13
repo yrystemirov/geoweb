@@ -7,6 +7,7 @@ COPY geoweb-client /usr/app
 
 # Install PM2 globally
 RUN npm install --global pm2
+#RUN mkdir /usr/app/node_modules/.cache && chmod -R 777 /usr/app/node_modules/.cache
 
 # Copy "package.json" and "package-lock.json" before other files
 # Utilise Docker cache to save re-installing dependencies if unchanged
@@ -17,7 +18,7 @@ RUN npm install --production
 
 # Copy all files
 COPY ./ ./
-
+RUN chown -R node /usr/app/node_modules
 # Build app
 RUN npm run build
 

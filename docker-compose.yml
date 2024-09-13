@@ -14,7 +14,7 @@ services:
       context: .
       dockerfile: ./docker/nginx/Dockerfile
     ports:
-      - 81:80
+      - 80:80
   client-backend:
     container_name: geoweb_api
     image: geoweb-backend:0.0.1
