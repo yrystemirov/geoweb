@@ -1,5 +1,8 @@
 package kz.geoweb.api.service;
 
+import kz.geoweb.api.dto.WmsRequestDto;
+import kz.geoweb.api.dto.WmsResponseDto;
+
 public interface GeoserverService {
     void reload();
 
@@ -19,5 +22,5 @@ public interface GeoserverService {
 
     void setStyleToLayer(String layername, String styleName);
 
-//    Object wmsRequest(WmsRequestDto wmsRequestDto);
+    WmsResponseDto wmsRequest(WmsRequestDto wmsRequestDto);
 }

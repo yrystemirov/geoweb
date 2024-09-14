@@ -10,6 +10,8 @@ import java.util.UUID;
 public interface LayerService {
     LayerDto getLayer(UUID id);
 
+    LayerDto getLayerByLayername(String layername);
+
     Page<LayerDto> getLayers(String search, Pageable pageable);
 
     LayerDto createLayer(LayerRequestDto layerRequestDto);

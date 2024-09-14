@@ -20,18 +20,34 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static kz.geoweb.api.utils.GisConstants.LAYERS_SCHEMA;
+import static kz.geoweb.api.utils.GisConstants.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class FeatureServiceImpl implements FeatureService {
     private final JdbcClient jdbcClient;
+    private final LayerService layerService;
     private final LayerAttrService layerAttrService;
     private final FeatureUpdateHistoryRepository featureUpdateHistoryRepository;
     private final UserService userService;
     private final DictionaryService dictionaryService;
     private final EntryService entryService;
+    private final GeoserverService geoserverService;
+
+    private Map<String, Object> getFeatureByGid(String layername, Integer gid) {
+        String tableName = LAYERS_SCHEMA + "." + layername;
+        Set<LayerAttrDto> layerAttrs = layerAttrService.getLayerAttrsByLayername(layername);
+        String fields = layerAttrs.stream()
+                .map(LayerAttrDto::getAttrname)
+                .collect(Collectors.joining(", "));
+
+        String sql = "SELECT gid,ST_AsText(geom) AS geom," + fields + " FROM " + tableName + " WHERE gid = :gid";
+        return jdbcClient.sql(sql)
+                .param(GID, gid)
+                .query(mapRowMapper())
+                .single();
+    }
 
     @Override
     public Page<Map<String, Object>> getFeatures(String layername, Pageable pageable) {
@@ -86,27 +102,31 @@ public class FeatureServiceImpl implements FeatureService {
         if (dictionaryLayerAttrs.isEmpty()) return;
         for (Map<String, Object> feature : features) {
             for (LayerAttrDto attr : dictionaryLayerAttrs) {
-                try {
-                    String attrname = attr.getAttrname();
-                    Object value = feature.get(attrname);
-                    if (value != null) {
-                        String valueString = value.toString();
-                        String[] idValues = valueString.split(",");
-                        DictionaryDto dictionaryDto = dictionaryService.getDictionaryByCode(attr.getDictionaryCode());
-                        List<EntryDto> entries = entryService.getEntries(dictionaryDto.getId(), null);
-                        List<String> values = new ArrayList<>();
-                        for (String idValue : idValues) {
-                            Optional<EntryDto> entry = entries.stream().filter(e -> e.getId().equals(UUID.fromString(idValue))).findFirst();
-                            entry.ifPresent(e -> values.add(e.getRu()));
-                        }
-                        if (!values.isEmpty()) {
-                            feature.put(attrname, String.join(", ", values));
-                        }
-                    }
-                } catch (Exception e) {
-                    log.error("Error filling dictionary values: {}", e.getMessage());
+                fillDictionaryValue(feature, attr);
+            }
+        }
+    }
+
+    private void fillDictionaryValue(Map<String, Object> feature, LayerAttrDto attr) {
+        try {
+            String attrname = attr.getAttrname();
+            Object value = feature.get(attrname);
+            if (value != null) {
+                String valueString = value.toString();
+                String[] idValues = valueString.split(",");
+                DictionaryDto dictionaryDto = dictionaryService.getDictionaryByCode(attr.getDictionaryCode());
+                List<EntryDto> entries = entryService.getEntries(dictionaryDto.getId(), null);
+                List<String> values = new ArrayList<>();
+                for (String idValue : idValues) {
+                    Optional<EntryDto> entry = entries.stream().filter(e -> e.getId().equals(UUID.fromString(idValue))).findFirst();
+                    entry.ifPresent(e -> values.add(e.getRu()));
+                }
+                if (!values.isEmpty()) {
+                    feature.put(attrname, String.join(", ", values));
                 }
             }
+        } catch (Exception e) {
+            log.error("Error filling dictionary values: {}", e.getMessage());
         }
     }
 
@@ -147,7 +167,7 @@ public class FeatureServiceImpl implements FeatureService {
 
         String sql = "INSERT INTO " + tableName + " " + columns + " VALUES " + values + " RETURNING gid";
         return jdbcClient.sql(sql)
-                .param("geom", feature.getWkt())
+                .param(GEOM, feature.getWkt())
                 .params(feature.getAttributes())
                 .query(Integer.class).single();
     }
@@ -161,16 +181,16 @@ public class FeatureServiceImpl implements FeatureService {
 
         String sql = "UPDATE " + tableName + " SET " + setClause + " WHERE gid = :gid";
         jdbcClient.sql(sql)
-                .param("geom", feature.getWkt())
+                .param(GEOM, feature.getWkt())
                 .params(feature.getAttributes())
-                .param("gid", feature.getGid())
+                .param(GID, feature.getGid())
                 .update();
     }
 
     private void deleteFeature(String tableName, Integer gid) {
         String sql = "DELETE FROM " + tableName + " WHERE gid = :gid";
         jdbcClient.sql(sql)
-                .param("gid", gid)
+                .param(GID, gid)
                 .update();
     }
 
@@ -204,5 +224,58 @@ public class FeatureServiceImpl implements FeatureService {
         } catch (Exception e) {
             log.error("Error saving FeatureUpdateHistory: {}", e.getMessage());
         }
+    }
+
+    @Override
+    public List<IdentifyResponseDto> identify(WmsRequestDto wmsRequestDto) {
+        WmsResponseDto wmsResponseDto = geoserverService.wmsRequest(wmsRequestDto);
+        List<IdentifyResponseDto> identifyResponseDtoList = new ArrayList<>();
+        List<LayerLayerAttrsDto> layerAttrsList = new ArrayList<>();
+        for (GeoserverFeatureDto geoserverFeature : wmsResponseDto.getFeatures()) {
+            try {
+                String[] layerGid = geoserverFeature.getId().split("\\.");
+                if (layerGid.length != 2) continue;
+                String layername = layerGid[0];
+                LayerDto layer = layerService.getLayerByLayername(layername);
+                Integer gid = Integer.parseInt(layerGid[1]);
+                Map<String, Object> feature = getFeatureByGid(layername, gid);
+                Set<LayerAttrDto> layerAttrs = layerAttrsList.stream().filter(la -> la.getLayername().equals(layername))
+                        .findFirst().map(LayerLayerAttrsDto::getLayerAttrs).orElse(null);
+                if (layerAttrs == null) {
+                    layerAttrs = layerAttrService.getLayerAttrsByLayername(layername);
+                    layerAttrsList.add(new LayerLayerAttrsDto(layername, layer, layerAttrs));
+                }
+                IdentifyResponseDto identifyResponseDto = new IdentifyResponseDto();
+                Set<IdentifyFeatureDto> identifyFeatureDtoSet = new HashSet<>();
+                for (Map.Entry<String, Object> entry : feature.entrySet()) {
+                    String key = entry.getKey();
+                    if (key.equals(GID) || key.equals(GEOM)) continue;
+                    Object value = entry.getValue();
+                    layerAttrs.stream()
+                            .filter(attr -> attr.getAttrname().equals(key))
+                            .findFirst()
+                            .ifPresent(layerAttr -> {
+                                IdentifyFeatureDto identifyFeatureDto = new IdentifyFeatureDto();
+                                identifyFeatureDto.setAttr(layerAttr);
+                                if (layerAttr.getAttrType() == AttrType.DICTIONARY) {
+                                    fillDictionaryValue(feature, layerAttr);
+                                    identifyFeatureDto.setValue(feature.get(key));
+                                } else {
+                                    identifyFeatureDto.setValue(value);
+                                }
+                                identifyFeatureDtoSet.add(identifyFeatureDto);
+                            });
+                }
+                String geom = feature.get(GEOM).toString();
+                identifyResponseDto.setGid(gid);
+                identifyResponseDto.setGeom(geom);
+                identifyResponseDto.setLayer(layer);
+                identifyResponseDto.setFeatures(identifyFeatureDtoSet);
+                identifyResponseDtoList.add(identifyResponseDto);
+            } catch (Exception e) {
+                log.error("Error identifying feature: {}", e.getMessage());
+            }
+        }
+        return identifyResponseDtoList;
     }
 }

@@ -3,6 +3,8 @@ package kz.geoweb.api.service.impl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kz.geoweb.api.config.properties.GeoserverProperties;
+import kz.geoweb.api.dto.WmsRequestDto;
+import kz.geoweb.api.dto.WmsResponseDto;
 import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.service.GeoserverService;
 import lombok.extern.slf4j.Slf4j;
@@ -176,5 +178,20 @@ public class GeoserverServiceImpl implements GeoserverService {
         layerNested.put("defaultStyle", defaultStyle);
         layer.put("layer", layerNested);
         updateLayer(layername, layer);
+    }
+
+    @Override
+    public WmsResponseDto wmsRequest(WmsRequestDto wmsRequestDto) {
+        String url = geoserverProperties.getUrl() + workspace + "/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&FORMAT=image/png&TRANSPARENT=true&" +
+                "QUERY_LAYERS=" + wmsRequestDto.getLayers() + "&LAYERS=" + wmsRequestDto.getLayers() + "&TILED=true&" +
+                "updatedTime=" + wmsRequestDto.getUpdatedTime() + "&INFO_FORMAT=application/json&FEATURE_COUNT=5&propertyName=geom&" +
+                "I=" + wmsRequestDto.getI() + "&J=" + wmsRequestDto.getJ() + "&WIDTH=256&HEIGHT=256&CRS=EPSG:3857&STYLES=&" +
+                "BBOX=" + wmsRequestDto.getBbox();
+        HttpEntity httpEntity = new HttpEntity(getHeaders());
+        ResponseEntity<WmsResponseDto> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity, WmsResponseDto.class);
+        if (!response.getStatusCode().equals(HttpStatus.OK)) {
+            throw new CustomException("layer.geoserver.common.error");
+        }
+        return response.getBody();
     }
 }

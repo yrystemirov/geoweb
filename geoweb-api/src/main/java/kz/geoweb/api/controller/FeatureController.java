@@ -1,6 +1,8 @@
 package kz.geoweb.api.controller;
 
 import kz.geoweb.api.dto.FeatureSaveDto;
+import kz.geoweb.api.dto.IdentifyResponseDto;
+import kz.geoweb.api.dto.WmsRequestDto;
 import kz.geoweb.api.service.FeatureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,5 +27,10 @@ public class FeatureController {
     @GetMapping
     public Page<Map<String, Object>> getFeatures(@RequestParam String layername, Pageable pageable) {
         return featureService.getFeatures(layername, pageable);
+    }
+
+    @PostMapping("/identify")
+    public List<IdentifyResponseDto> identify(@RequestBody WmsRequestDto wmsRequestDto) {
+        return featureService.identify(wmsRequestDto);
     }
 }

@@ -10,4 +10,6 @@ public class GisConstants {
     public final static String LAYER_SEQUENCE_POSTFIX = "_gid_seq";
     public final static String GEOSERVER_SLD_CONTENT_TYPE = "application/vnd.ogc.sld+xml;charset=UTF-8";
     public final static String LAYERS_SCHEMA = "layers";
+    public final static String GID = "gid";
+    public final static String GEOM = "geom";
 }

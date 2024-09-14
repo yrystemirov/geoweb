@@ -40,6 +40,12 @@ public class LayerServiceImpl implements LayerService {
     }
 
     @Override
+    public LayerDto getLayerByLayername(String layername) {
+        return layerMapper.toDto(layerRepository.findByLayername(layername)
+                .orElseThrow(() -> new CustomException("layer.by_layername.not_found", layername)));
+    }
+
+    @Override
     public Page<LayerDto> getLayers(String search, Pageable pageable) {
         Page<Layer> layerPage;
         if (search != null && !search.isBlank()) {
