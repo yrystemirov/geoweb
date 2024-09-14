@@ -25,6 +25,7 @@ import { fieldIsRequiredProps } from './Entries/utils';
 import { useNotifications } from '@toolpad/core';
 import i18n from '../../../i18n';
 import { constants } from '../../../constants';
+import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
 
 export type DictionaryRow = {
   id: string;
@@ -41,6 +42,7 @@ export const Dictionaries: FC = () => {
   const [rows, setRows] = useState<DictionaryRow[]>([]);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const queryClient = useQueryClient();
+  const { dataGridLocale } = useMuiLocalization();
   const { t } = useTranslation();
 
   const { data, isLoading } = useQuery({
@@ -201,7 +203,7 @@ export const Dictionaries: FC = () => {
 
   return (
     <>
-      <CardHeader title={t('dictionaries')} />
+      <CardHeader title={t('dictionaries')} sx={{ textAlign: 'center' }} />
       <Box>
         <DataGrid
           rows={rows}
@@ -216,6 +218,7 @@ export const Dictionaries: FC = () => {
           disableColumnMenu
           disableColumnSorting
           editMode="row"
+          localeText={dataGridLocale}
           rowModesModel={rowModesModel}
           onRowModesModelChange={handleRowModesModelChange}
           onRowEditStop={handleRowEditStop}

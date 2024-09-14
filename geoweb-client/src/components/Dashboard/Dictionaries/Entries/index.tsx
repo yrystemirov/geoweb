@@ -10,7 +10,7 @@ import {
   GridActionsCellItem,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { LinearProgress, Button, CardHeader, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -26,6 +26,8 @@ import { fieldIsRequiredProps } from './utils';
 import { useNotifications } from '@toolpad/core/useNotifications';
 import i18n from '../../../../i18n';
 import { constants } from '../../../../constants';
+import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
+import { ChevronLeft } from '@mui/icons-material';
 
 export type EntryDtoRow = EntryDto & { isNew?: boolean };
 
@@ -37,6 +39,8 @@ export const DictionaryEntries = () => {
   const [rows, setRows] = useState<EntryDtoRow[]>([]);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const queryClient = useQueryClient();
+  const { dataGridLocale } = useMuiLocalization();
+  const navigate = useNavigate();
 
   const { data: dictionary } = useQuery({
     queryKey: ['dictionary', dictionaryId],
@@ -205,7 +209,25 @@ export const DictionaryEntries = () => {
 
   return (
     <>
-      <CardHeader title={t('dictionaryEntries', { dicName: dicNameWithQuotes })} />
+      <Box
+        display={'flex'}
+        justifyContent={'space-between'}
+        alignItems={'center'}
+        flexWrap={'wrap'}
+      >
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={() => navigate('/dashboard/dictionaries')}
+        >
+          <ChevronLeft />
+          {t('backToList')}
+        </Button>
+        <CardHeader
+          title={t('dictionaryEntries', { dicName: dicNameWithQuotes })}
+          sx={{ textAlign: 'center', flex: 1 }}
+        />
+      </Box>
       <Box>
         <DataGrid
           rows={rows}
@@ -220,6 +242,7 @@ export const DictionaryEntries = () => {
           disableColumnMenu
           disableColumnSorting
           editMode="row"
+          localeText={dataGridLocale}
           rowModesModel={rowModesModel}
           onRowModesModelChange={handleRowModesModelChange}
           onRowEditStop={handleRowEditStop}

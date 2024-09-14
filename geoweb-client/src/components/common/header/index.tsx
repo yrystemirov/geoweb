@@ -207,6 +207,11 @@ const Header: React.FC = () => {
                       open={Boolean(anchorElUser)}
                       onClose={handleCloseUserMenu}
                     >
+                      <MenuItem>
+                        <Link to="/dashboard">
+                          <Typography textAlign="center">{t('dashboard')}</Typography>
+                        </Link>
+                      </MenuItem>
                       <MenuItem
                         onClick={() => {
                           handleCloseUserMenu();
