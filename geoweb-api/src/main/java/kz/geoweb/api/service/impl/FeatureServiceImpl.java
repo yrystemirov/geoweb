@@ -1,9 +1,14 @@
 package kz.geoweb.api.service.impl;
 
+import kz.geoweb.api.config.properties.MinioProperties;
 import kz.geoweb.api.dto.*;
+import kz.geoweb.api.entity.FeatureFile;
 import kz.geoweb.api.entity.FeatureUpdateHistory;
 import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.enums.AttrType;
+import kz.geoweb.api.exception.CustomException;
+import kz.geoweb.api.mapper.FeatureFileMapper;
+import kz.geoweb.api.repository.FeatureFileRepository;
 import kz.geoweb.api.repository.FeatureUpdateHistoryRepository;
 import kz.geoweb.api.service.*;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +20,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,10 +37,14 @@ public class FeatureServiceImpl implements FeatureService {
     private final LayerService layerService;
     private final LayerAttrService layerAttrService;
     private final FeatureUpdateHistoryRepository featureUpdateHistoryRepository;
+    private final FeatureFileRepository featureFileRepository;
+    private final FeatureFileMapper featureFileMapper;
     private final UserService userService;
     private final DictionaryService dictionaryService;
     private final EntryService entryService;
     private final GeoserverService geoserverService;
+    private final MinioService minioService;
+    private final MinioProperties minioProperties;
 
     private Map<String, Object> getFeatureByGid(String layername, Integer gid) {
         String tableName = LAYERS_SCHEMA + "." + layername;
@@ -277,5 +288,43 @@ public class FeatureServiceImpl implements FeatureService {
             }
         }
         return identifyResponseDtoList;
+    }
+
+    @Override
+    public List<FeatureFileDto> getFeatureFiles(String layername, Integer gid) {
+        List<FeatureFile> featureFiles = featureFileRepository.findByLayernameAndGid(layername, gid);
+        return featureFileMapper.toDto(featureFiles);
+    }
+
+    @Override
+    @Transactional
+    public FeatureFileDto uploadFeatureFile(byte[] file, String filename, String bucket, String layername, Integer gid) {
+        String contentType = URLConnection.guessContentTypeFromName(filename);
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        String minioObject = UUID.randomUUID().toString();
+        FeatureFile featureFile = new FeatureFile();
+        featureFile.setLayername(layername);
+        featureFile.setGid(gid);
+        featureFile.setFilename(filename);
+        featureFile.setContentType(contentType);
+        featureFile.setSize(file.length);
+        if (bucket == null) bucket = minioProperties.getBucket();
+        featureFile.setMinioBucket(bucket);
+        featureFile.setMinioObject(minioObject);
+        FeatureFile created = featureFileRepository.save(featureFile);
+        minioService.upload(file, filename, bucket, minioObject);
+        return featureFileMapper.toDto(created);
+    }
+
+    @Override
+    public FeatureFileResponseDto downloadFeatureFile(UUID id) {
+        FeatureFile featureFile = featureFileRepository.findById(id)
+                .orElseThrow(() -> new CustomException("feature_files.by_id.not_found", id.toString()));
+        FeatureFileResponseDto featureFileResponseDto = featureFileMapper.toFeatureFileResponseDto(featureFile);
+        byte[] file = minioService.download(featureFile.getMinioObject(), featureFile.getMinioBucket());
+        featureFileResponseDto.setFile(file);
+        return featureFileResponseDto;
     }
 }

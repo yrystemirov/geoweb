@@ -40,6 +40,11 @@ services:
       GEOSERVER_URL: http://geoweb_geoserver:8080/geoserver/
       GEOSERVER_WORKSPACE: ${GEOSERVER_WORKSPACE}
       GEOSERVER_DATASTORE: ${GEOSERVER_DATASTORE}
+      APP_MINIO_HOST: ${MINIO_HOST}
+      APP_MINIO_PORT: ${MINIO_PORT}
+      APP_MINIO_BUCKET: ${MINIO_BUCKET}
+      APP_MINIO_USER: ${MINIO_ROOT_USER}
+      APP_MINIO_PASSWORD: ${MINIO_ROOT_PASSWORD}
   db:
     container_name: ${POSTGRES_HOST}
     image: 'postgis/postgis:latest'
