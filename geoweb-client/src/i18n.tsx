@@ -37,6 +37,8 @@ const resources = {
       actions: 'Әрекеттер',
       requiredField: 'Міндетті толтыру керек',
       errorOccurred: 'Қате пайда болды',
+      backToList: 'Тізімге қайту',
+      // error messages from backend
       'entry.by_code.already_exists': 'Осы кодпен жазба бар',
       'dictionary.by_code.already_exists': 'Осы кодпен сөздік бар',
     },
@@ -75,6 +77,7 @@ const resources = {
       actions: 'Действия',
       requiredField: 'Поле обязательно для заполнения',
       errorOccurred: 'Произошла ошибка',
+      backToList: 'Вернуться к списку',
       'entry.by_code.already_exists': 'Запись с таким кодом уже существует',
       'dictionary.by_code.already_exists': 'Справочник с таким кодом уже существует',
     },

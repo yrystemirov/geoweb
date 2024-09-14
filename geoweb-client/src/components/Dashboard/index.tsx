@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link, Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes, useLocation} from 'react-router-dom';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Dashboard as DashboardIcon, Map as MapIcon, Settings as SettingsIcon, Group as GrouprIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import { DictionaryEntries } from './Dictionaries/Entries';
 const parentUrl = '/dashboard';
 
 const Dashboard: React.FC = () => {
+  const location = useLocation();
   const { t } = useTranslation();
   const { setLoading } = useLoading();
 
@@ -75,7 +76,7 @@ const Dashboard: React.FC = () => {
                 <ListItemButton
                   component={Link}
                   to={`${parentUrl}${item.path}`}
-                  selected={window.location.pathname === `${parentUrl}${item.path}`}
+                  selected={location.pathname === `${parentUrl}${item.path}`}
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.text} />
