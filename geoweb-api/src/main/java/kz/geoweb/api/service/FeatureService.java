@@ -17,7 +17,7 @@ public interface FeatureService {
 
     List<FeatureFileDto> getFeatureFiles(String layername, Integer gid);
 
-    FeatureFileDto uploadFeatureFile(byte[] file, String filename, String bucket, String layername, Integer gid);
+    FeatureFileDto uploadFeatureFile(byte[] file, String filename, String layername, Integer gid);
 
     FeatureFileResponseDto downloadFeatureFile(UUID id);
 }

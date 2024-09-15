@@ -31,9 +31,6 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public MinioFileDto upload(byte[] bytes, String filename, String bucket, String object) {
-        if (bucket == null) {
-            bucket = minioProperties.getBucket();
-        }
         try {
             ByteArrayInputStream is = new ByteArrayInputStream(bytes);
             ObjectWriteResponse response = minioClient.putObject(PutObjectArgs
@@ -51,10 +48,6 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public byte[] download(String object, String bucket) {
-        if (bucket == null) {
-            bucket = minioProperties.getBucket();
-        }
-
         try (InputStream inputStream = minioClient.getObject(GetObjectArgs
                 .builder()
                 .bucket(bucket)

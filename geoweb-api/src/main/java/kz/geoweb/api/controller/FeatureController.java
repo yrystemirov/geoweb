@@ -50,10 +50,9 @@ public class FeatureController {
 
     @PostMapping("/files/upload")
     public FeatureFileDto createFeatureFile(@RequestParam MultipartFile file,
-                                            @RequestParam(required = false) String bucket,
                                             @RequestParam String layername,
                                             @RequestParam Integer gid) throws IOException {
-        return featureService.uploadFeatureFile(file.getBytes(), file.getOriginalFilename(), bucket, layername, gid);
+        return featureService.uploadFeatureFile(file.getBytes(), file.getOriginalFilename(), layername, gid);
     }
 
     @GetMapping("/files/download")

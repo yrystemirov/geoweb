@@ -10,7 +10,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class MinioProperties {
     private String host;
     private String port;
-    private String bucket;
     private String user;
     private String password;
 }

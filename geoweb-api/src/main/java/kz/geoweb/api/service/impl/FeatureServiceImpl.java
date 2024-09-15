@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static kz.geoweb.api.utils.CommonConstants.MINIO_BUCKET_FEATURE_FILES;
 import static kz.geoweb.api.utils.GisConstants.*;
 
 @Service
@@ -298,7 +299,7 @@ public class FeatureServiceImpl implements FeatureService {
 
     @Override
     @Transactional
-    public FeatureFileDto uploadFeatureFile(byte[] file, String filename, String bucket, String layername, Integer gid) {
+    public FeatureFileDto uploadFeatureFile(byte[] file, String filename, String layername, Integer gid) {
         String contentType = URLConnection.guessContentTypeFromName(filename);
         if (contentType == null) {
             contentType = "application/octet-stream";
@@ -310,11 +311,10 @@ public class FeatureServiceImpl implements FeatureService {
         featureFile.setFilename(filename);
         featureFile.setContentType(contentType);
         featureFile.setSize(file.length);
-        if (bucket == null) bucket = minioProperties.getBucket();
-        featureFile.setMinioBucket(bucket);
+        featureFile.setMinioBucket(MINIO_BUCKET_FEATURE_FILES);
         featureFile.setMinioObject(minioObject);
         FeatureFile created = featureFileRepository.save(featureFile);
-        minioService.upload(file, filename, bucket, minioObject);
+        minioService.upload(file, filename, MINIO_BUCKET_FEATURE_FILES, minioObject);
         return featureFileMapper.toDto(created);
     }
 
