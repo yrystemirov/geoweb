@@ -22,12 +22,7 @@ public class FolderController {
 
     @GetMapping("/root")
     public Set<FolderDto> getRoot() {
-        return folderService.getFolderChildren(null);
-    }
-
-    @GetMapping("/{id}/children")
-    public Set<FolderDto> getRoot(@PathVariable UUID id) {
-        return folderService.getFolderChildren(id);
+        return folderService.getRootFolders();
     }
 
     @GetMapping("/{id}/tree")

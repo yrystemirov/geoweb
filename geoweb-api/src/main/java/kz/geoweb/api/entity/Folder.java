@@ -22,6 +22,13 @@ public class Folder extends IdEntity {
     @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
     @OrderBy("nameRu ASC")
     private Set<Folder> children;
+    @ManyToMany
+    @JoinTable(
+            name = "folder_layer",
+            joinColumns = @JoinColumn(name = "folder_id"),
+            inverseJoinColumns = @JoinColumn(name = "layer_id"))
+    @OrderBy("nameRu ASC")
+    private Set<Layer> layers;
     private Boolean isPublic;
     private String imgUrl;
     private Integer rank;

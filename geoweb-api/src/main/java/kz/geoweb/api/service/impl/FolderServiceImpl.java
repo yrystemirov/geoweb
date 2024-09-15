@@ -3,8 +3,10 @@ package kz.geoweb.api.service.impl;
 import kz.geoweb.api.dto.FolderDto;
 import kz.geoweb.api.dto.FolderTreeDto;
 import kz.geoweb.api.entity.Folder;
+import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.exception.CustomException;
+import kz.geoweb.api.exception.ForbiddenException;
 import kz.geoweb.api.mapper.FolderMapper;
 import kz.geoweb.api.repository.FolderRepository;
 import kz.geoweb.api.service.EntityPermissionService;
@@ -13,6 +15,7 @@ import kz.geoweb.api.service.FolderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,15 +39,49 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public Set<FolderDto> getFolderChildren(UUID parentId) {
-        entityPermissionService.checkFolderRead(parentId);
-        return folderMapper.toDto(folderRepository.findByParentIdOrderByRank(parentId));
+    public Set<FolderDto> getRootFolders() {
+        Set<Folder> folders = folderRepository.findByParentIdIsNullOrderByRank();
+        Set<Folder> foldersToRemove = new HashSet<>();
+        for (Folder folder : folders) {
+            try {
+                entityPermissionService.checkFolderRead(folder.getId());
+            } catch (ForbiddenException e) {
+                foldersToRemove.add(folder);
+            }
+        }
+        folders.removeAll(foldersToRemove);
+        return folderMapper.toDto(folders);
     }
 
     @Override
     public FolderTreeDto getFolderTree(UUID id) {
         entityPermissionService.checkFolderRead(id);
-        return folderMapper.toFolderTreeDto(getEntityById(id));
+        Folder folder = getEntityById(id);
+        removeForbidden(folder);
+        return folderMapper.toFolderTreeDto(folder);
+    }
+
+    private void removeForbidden(Folder folder) {
+        Set<Folder> children = folder.getChildren();
+        Set<Folder> childrenToRemove = new HashSet<>();
+        for (Folder child : children) {
+            try {
+                entityPermissionService.checkFolderRead(child.getId());
+                removeForbidden(child);
+                Set<Layer> layersToRemove = new HashSet<>();
+                for (Layer layer : child.getLayers()) {
+                    try {
+                        entityPermissionService.checkLayerRead(layer.getId());
+                    } catch (ForbiddenException e) {
+                        layersToRemove.add(layer);
+                    }
+                }
+                child.getLayers().removeAll(layersToRemove);
+            } catch (ForbiddenException e) {
+                childrenToRemove.add(child);
+            }
+        }
+        children.removeAll(childrenToRemove);
     }
 
     @Override
