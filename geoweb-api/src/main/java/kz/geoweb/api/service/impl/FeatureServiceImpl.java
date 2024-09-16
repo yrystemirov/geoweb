@@ -135,12 +135,12 @@ public class FeatureServiceImpl implements FeatureService {
             Object value = feature.get(attrname);
             if (value != null) {
                 String valueString = value.toString();
-                String[] idValues = valueString.split(",");
+                String[] entryValues = valueString.split("\\|");
                 DictionaryDto dictionaryDto = dictionaryService.getDictionaryByCode(attr.getDictionaryCode());
                 List<EntryDto> entries = entryService.getEntries(dictionaryDto.getId(), null);
                 List<String> values = new ArrayList<>();
-                for (String idValue : idValues) {
-                    Optional<EntryDto> entry = entries.stream().filter(e -> e.getId().equals(UUID.fromString(idValue))).findFirst();
+                for (String entryValue : entryValues) {
+                    Optional<EntryDto> entry = entries.stream().filter(e -> e.getCode().equals(entryValue.trim())).findFirst();
                     entry.ifPresent(e -> values.add(e.getRu()));
                 }
                 if (!values.isEmpty()) {
