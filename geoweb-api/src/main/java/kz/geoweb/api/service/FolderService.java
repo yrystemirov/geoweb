@@ -9,7 +9,9 @@ import java.util.UUID;
 public interface FolderService {
     FolderDto getFolder(UUID id);
     Set<FolderDto> getRootFolders();
+    Set<FolderDto> getPublicRootFolders();
     FolderTreeDto getFolderTree(UUID id);
+    FolderTreeDto getPublicFolderTree(UUID id);
     FolderDto createFolder(FolderDto folderDto);
     FolderDto updateFolder(UUID id, FolderDto folderDto);
     void deleteFolder(UUID id);

@@ -10,6 +10,8 @@ public interface LayerAttrService {
 
     Set<LayerAttrDto> getLayerAttrs(UUID layerId);
 
+    Set<LayerAttrDto> getLayerAttrsPublic(UUID layerId);
+
     LayerAttrDto createLayerAttr(LayerAttrDto layerAttrDto);
 
     LayerAttrDto updateLayerAttr(UUID id, LayerAttrDto layerAttrDto);

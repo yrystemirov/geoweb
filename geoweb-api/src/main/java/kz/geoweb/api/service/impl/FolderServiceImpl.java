@@ -54,6 +54,12 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
+    public Set<FolderDto> getPublicRootFolders() {
+        Set<Folder> folders = folderRepository.findByIsPublicIsTrueAndParentIdIsNullOrderByRank();
+        return folderMapper.toDto(folders);
+    }
+
+    @Override
     public FolderTreeDto getFolderTree(UUID id) {
         entityPermissionService.checkFolderRead(id);
         Folder folder = getEntityById(id);
@@ -79,6 +85,36 @@ public class FolderServiceImpl implements FolderService {
                 child.getLayers().removeAll(layersToRemove);
             } catch (ForbiddenException e) {
                 childrenToRemove.add(child);
+            }
+        }
+        children.removeAll(childrenToRemove);
+    }
+
+    @Override
+    public FolderTreeDto getPublicFolderTree(UUID id) {
+        Folder folder = getEntityById(id);
+        if (!folder.getIsPublic()) {
+            throw new ForbiddenException("folder.is_not_public");
+        }
+        removeNotPublic(folder);
+        return folderMapper.toFolderTreeDto(folder);
+    }
+
+    private void removeNotPublic(Folder folder) {
+        Set<Folder> children = folder.getChildren();
+        Set<Folder> childrenToRemove = new HashSet<>();
+        for (Folder child : children) {
+            if (!child.getIsPublic()) {
+                childrenToRemove.add(child);
+            } else {
+                removeNotPublic(child);
+                Set<Layer> layersToRemove = new HashSet<>();
+                for (Layer layer : child.getLayers()) {
+                    if (!layer.getIsPublic()) {
+                        layersToRemove.add(layer);
+                    }
+                }
+                child.getLayers().removeAll(layersToRemove);
             }
         }
         children.removeAll(childrenToRemove);

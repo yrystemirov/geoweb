@@ -21,7 +21,7 @@ public class FolderController {
     }
 
     @GetMapping("/root")
-    public Set<FolderDto> getRoot() {
+    public Set<FolderDto> getRootFolders() {
         return folderService.getRootFolders();
     }
 

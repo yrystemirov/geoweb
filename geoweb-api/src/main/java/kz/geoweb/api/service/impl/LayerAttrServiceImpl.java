@@ -5,6 +5,7 @@ import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.entity.LayerAttr;
 import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.exception.CustomException;
+import kz.geoweb.api.exception.ForbiddenException;
 import kz.geoweb.api.mapper.LayerAttrMapper;
 import kz.geoweb.api.repository.LayerAttrRepository;
 import kz.geoweb.api.repository.LayerRepository;
@@ -34,6 +35,11 @@ public class LayerAttrServiceImpl implements LayerAttrService {
                 .orElseThrow(() -> new CustomException("layer_attr.by_id.not_found", id.toString()));
     }
 
+    private Layer getLayerEntityById(UUID id) {
+        return layerRepository.findById(id)
+                .orElseThrow(() -> new CustomException("layer.by_id.not_found", id.toString()));
+    }
+
     @Override
     public LayerAttrDto getLayerAttr(UUID id) {
         return layerAttrMapper.toDto(getEntityById(id));
@@ -45,10 +51,18 @@ public class LayerAttrServiceImpl implements LayerAttrService {
     }
 
     @Override
+    public Set<LayerAttrDto> getLayerAttrsPublic(UUID layerId) {
+        Layer layer = getLayerEntityById(layerId);
+        if (!layer.getIsPublic()) {
+            throw new ForbiddenException("layer.is_not_public", layer.getLayername());
+        }
+        return getLayerAttrs(layerId);
+    }
+
+    @Override
     public LayerAttrDto createLayerAttr(LayerAttrDto layerAttrDto) {
         layerAttrDto.setId(null);
         String attrname = layerAttrDto.getAttrname();
-        String layername = layerAttrDto.getLayer().getLayername();
         Optional<LayerAttr> layerAttrEntityOptional = layerAttrRepository
                 .findByAttrnameAndLayerId(attrname, layerAttrDto.getLayer().getId());
         if (layerAttrEntityOptional.isPresent()) {

@@ -7,6 +7,7 @@ import kz.geoweb.api.entity.FeatureUpdateHistory;
 import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.enums.AttrType;
 import kz.geoweb.api.exception.CustomException;
+import kz.geoweb.api.exception.ForbiddenException;
 import kz.geoweb.api.mapper.FeatureFileMapper;
 import kz.geoweb.api.repository.FeatureFileRepository;
 import kz.geoweb.api.repository.FeatureUpdateHistoryRepository;
@@ -86,6 +87,15 @@ public class FeatureServiceImpl implements FeatureService {
         int total = jdbcClient.sql(countSql).query(Integer.class).single();
         fillDictionaryValues(results, layerAttrs);
         return new PageImpl<>(results, pageable, total);
+    }
+
+    @Override
+    public Page<Map<String, Object>> getFeaturesPublic(String layername, Pageable pageable) {
+        LayerDto layerDto = layerService.getLayerByLayername(layername);
+        if (!layerDto.getIsPublic()) {
+            throw new ForbiddenException("layer.is_not_public", layername);
+        }
+        return getFeatures(layername, pageable);
     }
 
     private RowMapper<Map<String, Object>> mapRowMapper() {
@@ -292,9 +302,37 @@ public class FeatureServiceImpl implements FeatureService {
     }
 
     @Override
+    public List<IdentifyResponseDto> identifyPublic(WmsRequestDto wmsRequestDto) {
+        String[] layers = wmsRequestDto.getLayers().split(",");
+        List<String> publicLayers = new ArrayList<>();
+        for (String layer : layers) {
+            LayerDto layerDto = layerService.getLayerByLayername(layer);
+            if (layerDto.getIsPublic()) {
+                publicLayers.add(layer);
+            }
+        }
+        wmsRequestDto.setLayers(String.join(",", publicLayers));
+        return identify(wmsRequestDto);
+    }
+
+    private FeatureFile getFeatureFileEntityById(UUID id) {
+        return featureFileRepository.findById(id)
+                .orElseThrow(() -> new CustomException("feature_files.by_id.not_found", id.toString()));
+    }
+
+    @Override
     public List<FeatureFileDto> getFeatureFiles(String layername, Integer gid) {
         List<FeatureFile> featureFiles = featureFileRepository.findByLayernameAndGid(layername, gid);
         return featureFileMapper.toDto(featureFiles);
+    }
+
+    @Override
+    public List<FeatureFileDto> getFeatureFilesPublic(String layername, Integer gid) {
+        LayerDto layerDto = layerService.getLayerByLayername(layername);
+        if (!layerDto.getIsPublic()) {
+            throw new ForbiddenException("layer.is_not_public", layername);
+        }
+        return getFeatureFiles(layername, gid);
     }
 
     @Override
@@ -304,7 +342,7 @@ public class FeatureServiceImpl implements FeatureService {
         if (contentType == null) {
             contentType = "application/octet-stream";
         }
-        String minioObject = UUID.randomUUID().toString();
+        String minioObject = UUID.randomUUID().toString() + ".pdf";
         FeatureFile featureFile = new FeatureFile();
         featureFile.setLayername(layername);
         featureFile.setGid(gid);
@@ -320,11 +358,20 @@ public class FeatureServiceImpl implements FeatureService {
 
     @Override
     public FeatureFileResponseDto downloadFeatureFile(UUID id) {
-        FeatureFile featureFile = featureFileRepository.findById(id)
-                .orElseThrow(() -> new CustomException("feature_files.by_id.not_found", id.toString()));
+        FeatureFile featureFile = getFeatureFileEntityById(id);
         FeatureFileResponseDto featureFileResponseDto = featureFileMapper.toFeatureFileResponseDto(featureFile);
         byte[] file = minioService.download(featureFile.getMinioObject(), featureFile.getMinioBucket());
         featureFileResponseDto.setFile(file);
         return featureFileResponseDto;
+    }
+
+    @Override
+    public FeatureFileResponseDto downloadFeatureFilePublic(UUID id) {
+        FeatureFile featureFile = getFeatureFileEntityById(id);
+        LayerDto layerDto = layerService.getLayerByLayername(featureFile.getLayername());
+        if (!layerDto.getIsPublic()) {
+            throw new ForbiddenException("layer.is_not_public", layerDto.getLayername());
+        }
+        return downloadFeatureFile(id);
     }
 }
