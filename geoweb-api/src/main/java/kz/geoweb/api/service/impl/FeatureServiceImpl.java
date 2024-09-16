@@ -342,7 +342,7 @@ public class FeatureServiceImpl implements FeatureService {
         if (contentType == null) {
             contentType = "application/octet-stream";
         }
-        String minioObject = UUID.randomUUID().toString() + ".pdf";
+        String minioObject = generateMinioObject(filename);
         FeatureFile featureFile = new FeatureFile();
         featureFile.setLayername(layername);
         featureFile.setGid(gid);
@@ -354,6 +354,15 @@ public class FeatureServiceImpl implements FeatureService {
         FeatureFile created = featureFileRepository.save(featureFile);
         minioService.upload(file, filename, MINIO_BUCKET_FEATURE_FILES, minioObject);
         return featureFileMapper.toDto(created);
+    }
+
+    private String generateMinioObject(String fileName) {
+        String uuid = UUID.randomUUID().toString();
+        if (fileName == null || fileName.lastIndexOf(".") == -1) {
+            return uuid;
+        } else {
+            return uuid + "." + fileName.substring(fileName.lastIndexOf(".") + 1);
+        }
     }
 
     @Override
