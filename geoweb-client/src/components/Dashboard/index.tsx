@@ -1,11 +1,18 @@
-import React, { useEffect } from 'react';
-import { Link, Route, Routes, useLocation} from 'react-router-dom';
+import React, { Fragment, useEffect } from 'react';
+import { Link, Route, Routes, useLocation } from 'react-router-dom';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { Dashboard as DashboardIcon, Map as MapIcon, Settings as SettingsIcon, Group as GrouprIcon } from '@mui/icons-material';
+import {
+  Dashboard as DashboardIcon,
+  Map as MapIcon,
+  Settings as SettingsIcon,
+  Group as GrouprIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '../common/loadingBar/loadingContext';
 import { Dictionaries } from './Dictionaries';
 import { DictionaryEntries } from './Dictionaries/Entries';
+import { MapFolders } from './MapFolders';
+import { MapFolderCreate } from './MapFolders/MapFolderCreate';
 
 const parentUrl = '/dashboard';
 
@@ -22,30 +29,49 @@ const Dashboard: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Menu items configuration
-  const menuItems = [
-    { text: t('users'), path: '/users', icon: <GrouprIcon />, component: <>{t('users')}</> },
-    { text: t('mapSettings'), path: '/mapSettings', icon: <MapIcon />, component: <>{t('mapSettings')}</> },
+  const routes = [
+    { text: t('users'), path: '/users', icon: <GrouprIcon />, component: <>{t('users')}</>, isMenuItem: true },
+    { text: t('maps.title'), path: '/maps', icon: <MapIcon />, component: <MapFolders />, isMenuItem: true },
+    { path: '/maps/add', component: <MapFolderCreate /> },
     {
       text: t('layers'),
       path: '/layers',
       icon: <MapIcon />,
       component: <>{t('layers')}</>,
-      children: [{ text: t('styleEditor'), path: '/edit', icon: <SettingsIcon />, component: <>{t('styleEditor')}</> }],
+      isMenuItem: true,
+      children: [
+        {
+          text: t('styleEditor'),
+          path: '/edit',
+          icon: <SettingsIcon />,
+          component: <>{t('styleEditor')}</>,
+          isMenuItem: true,
+        },
+      ],
     },
-    { text: t('layerAttributes'), path: '/layerAttributes', icon: <SettingsIcon />, component: <>{t('layerAttributes')}</> },
-    { text: t('dictionaries'), path: '/dictionaries', icon: <DashboardIcon />, component: <Dictionaries /> },
+    {
+      text: t('layerAttributes'),
+      path: '/layerAttributes',
+      icon: <SettingsIcon />,
+      component: <>{t('layerAttributes')}</>,
+      isMenuItem: true,
+    },
+    {
+      text: t('dictionaries'),
+      path: '/dictionaries',
+      icon: <DashboardIcon />,
+      component: <Dictionaries />,
+      isMenuItem: true,
+    },
   ];
+
+  const menuItems = routes.filter((item) => item.isMenuItem);
 
   const getRecursiveChildrenRoutes = (item: any) => {
     if (item.children) {
       return item.children.map((child: any) => (
         <>
-          <Route
-            key={child.text}
-            path={child.path}
-            element={child.element}
-          />
+          <Route key={child.text} path={child.path} element={child.element} />
           {getRecursiveChildrenRoutes(child)}
         </>
       ));
@@ -54,25 +80,13 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="row"
-      height="100%"
-      flex={1}
-      border={'1px solid #ddd'}
-    >
+    <Box display="flex" flexDirection="row" height="100%" flex={1} border={'1px solid #ddd'}>
       {/* Sidebar */}
-      <Box
-        borderRight={'1px solid #ddd'}
-        width={300}
-      >
+      <Box borderRight={'1px solid #ddd'} width={300}>
         <List>
           {menuItems.map((item) => (
             <>
-              <ListItem
-                key={item.text}
-                disablePadding
-              >
+              <ListItem key={item.text} disablePadding>
                 <ListItemButton
                   component={Link}
                   to={`${parentUrl}${item.path}`}
@@ -84,11 +98,7 @@ const Dashboard: React.FC = () => {
               </ListItem>
               {item.children &&
                 item.children.map((child) => (
-                  <ListItem
-                    key={child.text}
-                    disablePadding
-                    sx={{ pl: 4 }}
-                  >
+                  <ListItem key={child.text} disablePadding sx={{ pl: 4 }}>
                     <ListItemButton
                       component={Link}
                       to={`${parentUrl}${child.path}`}
@@ -104,26 +114,15 @@ const Dashboard: React.FC = () => {
         </List>
       </Box>
 
-      <Box
-        flex={1}
-        p={2}
-        width={'calc(100% - 332px)'}
-      >
+      <Box flex={1} p={2} width={'calc(100% - 332px)'}>
         <Routes>
-          {menuItems.map((item) => (
-            <>
-              <Route
-                key={item.text}
-                path={item.path}
-                element={item.component}
-              />
+          {routes.map((item, idx) => (
+            <Fragment key={idx}>
+              <Route path={item.path} element={item.component} />
               {getRecursiveChildrenRoutes(item)}
-            </>
+            </Fragment>
           ))}
-          <Route
-            path="/dictionaries/:id"
-            element={<DictionaryEntries />}
-          />
+          <Route path="/dictionaries/:id" element={<DictionaryEntries />} />
         </Routes>
       </Box>
     </Box>

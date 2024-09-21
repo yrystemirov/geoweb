@@ -156,11 +156,13 @@ export const Dictionaries: FC = () => {
             label="Save"
             sx={{ color: 'primary.main' }}
             onClick={handleSaveClick(id)}
+            disabled={addMutation.isPending || updateMutation.isPending}
           />,
           <GridActionsCellItem
             icon={<CancelIcon />}
             label="Cancel"
             onClick={handleCancelClick(id)}
+            disabled={addMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
           />,
         ];
       }
@@ -175,6 +177,7 @@ export const Dictionaries: FC = () => {
           icon={<DeleteIcon />}
           label="Delete"
           onClick={handleDeleteClick(id)}
+          disabled={deleteMutation.isPending}
         />,
       ];
     },
