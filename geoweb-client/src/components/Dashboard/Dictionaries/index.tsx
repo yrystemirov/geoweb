@@ -26,6 +26,7 @@ import { useNotifications } from '@toolpad/core';
 import i18n from '../../../i18n';
 import { constants } from '../../../constants';
 import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
+import ConfirmDialog from '../../common/confirm';
 
 export type DictionaryRow = {
   id: string;
@@ -44,6 +45,7 @@ export const Dictionaries: FC = () => {
   const queryClient = useQueryClient();
   const { dataGridLocale } = useMuiLocalization();
   const { t } = useTranslation();
+  const [deleteOpen, setDeleteOpen] = useState<{ id: string | null; open: boolean }>({ id: null, open: false });
 
   const { data, isLoading } = useQuery({
     queryKey: ['dictionaries', pagination],
@@ -104,8 +106,7 @@ export const Dictionaries: FC = () => {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
-    // TODO: add confirmation dialog
-    deleteMutation.mutate(id as string);
+    setDeleteOpen({ id: id as string, open: true });
   };
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -192,7 +193,9 @@ export const Dictionaries: FC = () => {
       width: 300,
       renderCell: (params) => (
         <Link to={`/dashboard/dictionaries/${params.row.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-          <Typography color="primary" component='span' variant='body2'>{params.value}</Typography>
+          <Typography color="primary" component="span" variant="body2">
+            {params.value}
+          </Typography>
         </Link>
       ),
       editable: true,
@@ -258,6 +261,15 @@ export const Dictionaries: FC = () => {
           }}
         />
       </Box>
+      <ConfirmDialog
+        open={deleteOpen.open}
+        onClose={() => setDeleteOpen({ id: null, open: false })}
+        onSubmit={() => deleteMutation.mutate(deleteOpen.id as string)}
+        isLoading={deleteMutation.isPending}
+        title={t('deleteConfirm')}
+      >
+        {t('deleteConfirmDescription')}
+      </ConfirmDialog>
     </>
   );
 };

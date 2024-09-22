@@ -8,7 +8,7 @@ import {
   GridEventListener,
   GridRowId,
   GridActionsCellItem,
-  GridToolbarContainer
+  GridToolbarContainer,
 } from '@mui/x-data-grid';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -28,6 +28,7 @@ import i18n from '../../../../i18n';
 import { constants } from '../../../../constants';
 import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
 import { GoBackButton } from '../../../common/goBackButton';
+import ConfirmDialog from '../../../common/confirm';
 
 export type EntryDtoRow = EntryDto & { isNew?: boolean };
 
@@ -37,6 +38,7 @@ export const DictionaryEntries = () => {
   const { id: dictionaryId } = useParams() as { id: string };
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
   const [rows, setRows] = useState<EntryDtoRow[]>([]);
+  const [deleteOpen, setDeleteOpen] = useState<{ id: string | null; open: boolean }>({ id: null, open: false });
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const queryClient = useQueryClient();
   const { dataGridLocale } = useMuiLocalization();
@@ -109,8 +111,7 @@ export const DictionaryEntries = () => {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
-    // TODO: add confirmation
-    deleteMutation.mutate(id as string);
+    setDeleteOpen({ id: id as string, open: true });
   };
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -253,6 +254,18 @@ export const DictionaryEntries = () => {
             },
           }}
         />
+        <ConfirmDialog
+          open={deleteOpen.open}
+          onClose={() => setDeleteOpen({ id: null, open: false })}
+          onSubmit={() => {
+            deleteMutation.mutate(deleteOpen.id as string);
+            setDeleteOpen({ id: null, open: false });
+          }}
+          isLoading={deleteMutation.isPending}
+          title={t('deleteConfirm')}
+        >
+          {t('deleteConfirmDescription')}
+        </ConfirmDialog>
       </Box>
     </>
   );
