@@ -160,6 +160,7 @@ const Header: React.FC = () => {
                   <Link
                     key={index}
                     to={page.url}
+                    style={{ color: 'inherit', textDecoration: 'none' }}
                     {...(page.url.includes('http')
                       ? {
                           target: '_blank',
@@ -208,7 +209,7 @@ const Header: React.FC = () => {
                       onClose={handleCloseUserMenu}
                     >
                       <MenuItem>
-                        <Link to="/dashboard">
+                        <Link to="/dashboard/maps" style={{ color: 'inherit', textDecoration: 'none' }}>
                           <Typography textAlign="center">{t('dashboard')}</Typography>
                         </Link>
                       </MenuItem>
@@ -223,7 +224,7 @@ const Header: React.FC = () => {
                     </Menu>
                   </>
                 ) : (
-                  <Link to="/login">
+                  <Link to="/login" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button
                       sx={{
                         color: 'black',
@@ -249,11 +250,7 @@ const Header: React.FC = () => {
                   display: { xs: 'flex', md: 'none' },
                 }}
               >
-                <IconButton
-                  onClick={handleOpenNavMenu}
-                  color="inherit"
-                  sx={{ background: 'rgb(90 78 78)' }}
-                >
+                <IconButton onClick={handleOpenNavMenu} color="inherit" sx={{ background: 'rgb(90 78 78)' }}>
                   <MenuIcon />
                 </IconButton>
                 <Menu
@@ -285,10 +282,7 @@ const Header: React.FC = () => {
                           }
                         : {})}
                     >
-                      <MenuItem
-                        key={index}
-                        onClick={handleCloseNavMenu}
-                      >
+                      <MenuItem key={index} onClick={handleCloseNavMenu}>
                         <Typography textAlign="center">{page.label}</Typography>
                       </MenuItem>
                     </Link>

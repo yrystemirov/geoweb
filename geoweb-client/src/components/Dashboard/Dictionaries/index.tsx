@@ -11,7 +11,7 @@ import {
   GridActionsCellItem,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
-import { LinearProgress, Button, CardHeader, Box } from '@mui/material';
+import { LinearProgress, Button, CardHeader, Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
@@ -26,6 +26,7 @@ import { useNotifications } from '@toolpad/core';
 import i18n from '../../../i18n';
 import { constants } from '../../../constants';
 import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
+import ConfirmDialog from '../../common/confirm';
 
 export type DictionaryRow = {
   id: string;
@@ -44,10 +45,12 @@ export const Dictionaries: FC = () => {
   const queryClient = useQueryClient();
   const { dataGridLocale } = useMuiLocalization();
   const { t } = useTranslation();
+  const [deleteOpen, setDeleteOpen] = useState<{ id: string | null; open: boolean }>({ id: null, open: false });
 
   const { data, isLoading } = useQuery({
     queryKey: ['dictionaries', pagination],
-    queryFn: () => dictionariesAPI.getDictionaries({ page: pagination.page, size: pagination.pageSize }).then((res) => res.data),
+    queryFn: () =>
+      dictionariesAPI.getDictionaries({ page: pagination.page, size: pagination.pageSize }).then((res) => res.data),
   });
 
   const onEditError = (error: any) => {
@@ -57,7 +60,8 @@ export const Dictionaries: FC = () => {
   };
 
   const addMutation = useMutation({
-    mutationFn: async (newDictionary: DictionaryRow) => dictionariesAPI.addDictionary(newDictionary).then((res) => res.data),
+    mutationFn: async (newDictionary: DictionaryRow) =>
+      dictionariesAPI.addDictionary(newDictionary).then((res) => res.data),
     onSuccess: (newRow) => {
       queryClient.invalidateQueries({ queryKey: ['dictionaries', pagination] });
       setRows(rows.map((row) => (row.id === newRow.id ? newRow : row)));
@@ -102,8 +106,7 @@ export const Dictionaries: FC = () => {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
-    // TODO: add confirmation dialog
-    deleteMutation.mutate(id as string);
+    setDeleteOpen({ id: id as string, open: true });
   };
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -134,7 +137,10 @@ export const Dictionaries: FC = () => {
 
   const handleAddClick = () => {
     const id = Date.now().toString(); // временный идентификатор
-    setRows((oldRows) => [...oldRows, { id, nameRu: '', nameKk: '', nameEn: '', code: '', isNew: true } as DictionaryRow]);
+    setRows((oldRows) => [
+      ...oldRows,
+      { id, nameRu: '', nameKk: '', nameEn: '', code: '', isNew: true } as DictionaryRow,
+    ]);
     setRowModesModel((oldModel) => ({
       ...oldModel,
       [id]: { mode: GridRowModes.Edit, fieldToFocus: 'code' },
@@ -156,25 +162,24 @@ export const Dictionaries: FC = () => {
             label="Save"
             sx={{ color: 'primary.main' }}
             onClick={handleSaveClick(id)}
+            disabled={addMutation.isPending || updateMutation.isPending}
           />,
           <GridActionsCellItem
             icon={<CancelIcon />}
             label="Cancel"
             onClick={handleCancelClick(id)}
+            disabled={addMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
           />,
         ];
       }
 
       return [
-        <GridActionsCellItem
-          icon={<EditIcon />}
-          label="Edit"
-          onClick={handleEditClick(id)}
-        />,
+        <GridActionsCellItem icon={<EditIcon />} label="Edit" onClick={handleEditClick(id)} />,
         <GridActionsCellItem
           icon={<DeleteIcon />}
           label="Delete"
           onClick={handleDeleteClick(id)}
+          disabled={deleteMutation.isPending}
         />,
       ];
     },
@@ -186,7 +191,13 @@ export const Dictionaries: FC = () => {
       field: 'nameRu',
       headerName: t('nameRu'),
       width: 300,
-      renderCell: (params) => <Link to={`/dashboard/dictionaries/${params.row.id}`}>{params.value}</Link>,
+      renderCell: (params) => (
+        <Link to={`/dashboard/dictionaries/${params.row.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+          <Typography color="primary" component="span" variant="body2">
+            {params.value}
+          </Typography>
+        </Link>
+      ),
       editable: true,
       ...fieldIsRequiredProps(t('requiredField')),
     },
@@ -250,6 +261,15 @@ export const Dictionaries: FC = () => {
           }}
         />
       </Box>
+      <ConfirmDialog
+        open={deleteOpen.open}
+        onClose={() => setDeleteOpen({ id: null, open: false })}
+        onSubmit={() => deleteMutation.mutate(deleteOpen.id as string)}
+        isLoading={deleteMutation.isPending}
+        title={t('deleteConfirm')}
+      >
+        {t('deleteConfirmDescription')}
+      </ConfirmDialog>
     </>
   );
 };
