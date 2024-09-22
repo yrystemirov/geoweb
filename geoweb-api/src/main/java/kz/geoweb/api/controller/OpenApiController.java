@@ -27,7 +27,7 @@ public class OpenApiController {
     private final LayerAttrService layerAttrService;
 
     @GetMapping("/folders/root")
-    public Set<FolderDto> getPublicRootFolders() {
+    public Set<FolderInfoDto> getPublicRootFolders() {
         return folderService.getPublicRootFolders();
     }
 

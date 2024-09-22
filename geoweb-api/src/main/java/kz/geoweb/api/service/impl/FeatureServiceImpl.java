@@ -91,8 +91,8 @@ public class FeatureServiceImpl implements FeatureService {
 
     @Override
     public Page<Map<String, Object>> getFeaturesPublic(String layername, Pageable pageable) {
-        LayerDto layerDto = layerService.getLayerByLayername(layername);
-        if (!layerDto.getIsPublic()) {
+        LayerInfoDto layerInfoDto = layerService.getLayerByLayername(layername);
+        if (!layerInfoDto.getIsPublic()) {
             throw new ForbiddenException("layer.is_not_public", layername);
         }
         return getFeatures(layername, pageable);
@@ -258,7 +258,7 @@ public class FeatureServiceImpl implements FeatureService {
                 String[] layerGid = geoserverFeature.getId().split("\\.");
                 if (layerGid.length != 2) continue;
                 String layername = layerGid[0];
-                LayerDto layer = layerService.getLayerByLayername(layername);
+                LayerInfoDto layer = layerService.getLayerByLayername(layername);
                 Integer gid = Integer.parseInt(layerGid[1]);
                 Map<String, Object> feature = getFeatureByGid(layername, gid);
                 Set<LayerAttrDto> layerAttrs = layerAttrsList.stream().filter(la -> la.getLayername().equals(layername))
@@ -306,8 +306,8 @@ public class FeatureServiceImpl implements FeatureService {
         String[] layers = wmsRequestDto.getLayers().split(",");
         List<String> publicLayers = new ArrayList<>();
         for (String layer : layers) {
-            LayerDto layerDto = layerService.getLayerByLayername(layer);
-            if (layerDto.getIsPublic()) {
+            LayerInfoDto layerInfoDto = layerService.getLayerByLayername(layer);
+            if (layerInfoDto.getIsPublic()) {
                 publicLayers.add(layer);
             }
         }
@@ -328,8 +328,8 @@ public class FeatureServiceImpl implements FeatureService {
 
     @Override
     public List<FeatureFileDto> getFeatureFilesPublic(String layername, Integer gid) {
-        LayerDto layerDto = layerService.getLayerByLayername(layername);
-        if (!layerDto.getIsPublic()) {
+        LayerInfoDto layerInfoDto = layerService.getLayerByLayername(layername);
+        if (!layerInfoDto.getIsPublic()) {
             throw new ForbiddenException("layer.is_not_public", layername);
         }
         return getFeatureFiles(layername, gid);
@@ -377,9 +377,9 @@ public class FeatureServiceImpl implements FeatureService {
     @Override
     public FeatureFileResponseDto downloadFeatureFilePublic(UUID id) {
         FeatureFile featureFile = getFeatureFileEntityById(id);
-        LayerDto layerDto = layerService.getLayerByLayername(featureFile.getLayername());
-        if (!layerDto.getIsPublic()) {
-            throw new ForbiddenException("layer.is_not_public", layerDto.getLayername());
+        LayerInfoDto layerInfoDto = layerService.getLayerByLayername(featureFile.getLayername());
+        if (!layerInfoDto.getIsPublic()) {
+            throw new ForbiddenException("layer.is_not_public", layerInfoDto.getLayername());
         }
         return downloadFeatureFile(id);
     }

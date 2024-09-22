@@ -12,12 +12,12 @@ public class LayerAttrDto {
     private String nameKk;
     private String nameRu;
     private String nameEn;
-    @NotBlank(message = "{layer_attr.attrname.empty}")
+    @NotBlank
     private String attrname;
     private AttrType attrType;
     private Boolean shortInfo;
     private Boolean fullInfo;
-    private LayerDto layer;
+    private LayerInfoDto layer;
     private String dictionaryCode;
     private Integer rank = 0;
 }

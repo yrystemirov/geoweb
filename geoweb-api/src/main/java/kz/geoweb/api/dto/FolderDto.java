@@ -2,6 +2,8 @@ package kz.geoweb.api.dto;
 
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -13,8 +15,8 @@ public class FolderDto {
     private String descriptionKk;
     private String descriptionRu;
     private String descriptionEn;
-    private FolderDto parent;
     private Boolean isPublic = false;
     private String imgUrl;
     private Integer rank;
+    private Set<LayerInfoDto> layers = new HashSet<>();
 }

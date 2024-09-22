@@ -9,6 +9,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class LayerLayerAttrsDto {
     private String layername;
-    private LayerDto layer;
+    private LayerInfoDto layer;
     private Set<LayerAttrDto> layerAttrs;
 }

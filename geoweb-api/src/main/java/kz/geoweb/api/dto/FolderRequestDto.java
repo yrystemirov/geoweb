@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Data
-public class FolderTreeDto {
+public class FolderRequestDto {
     private UUID id;
     private String nameKk;
     private String nameRu;
@@ -15,9 +15,9 @@ public class FolderTreeDto {
     private String descriptionKk;
     private String descriptionRu;
     private String descriptionEn;
+    private FolderRequestDto parent;
     private Boolean isPublic = false;
     private String imgUrl;
     private Integer rank;
-    private Set<FolderTreeDto> children = new HashSet<>();
     private Set<LayerInfoDto> layers = new HashSet<>();
 }

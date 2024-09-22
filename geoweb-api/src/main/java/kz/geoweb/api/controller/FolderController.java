@@ -1,7 +1,9 @@
 package kz.geoweb.api.controller;
 
-import kz.geoweb.api.dto.FolderDto;
+import kz.geoweb.api.dto.FolderRequestDto;
+import kz.geoweb.api.dto.FolderInfoDto;
 import kz.geoweb.api.dto.FolderTreeDto;
+import kz.geoweb.api.dto.FolderDto;
 import kz.geoweb.api.service.FolderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +23,7 @@ public class FolderController {
     }
 
     @GetMapping("/root")
-    public Set<FolderDto> getRootFolders() {
+    public Set<FolderInfoDto> getRootFolders() {
         return folderService.getRootFolders();
     }
 
@@ -31,14 +33,14 @@ public class FolderController {
     }
 
     @PostMapping
-    public FolderDto createFolder(@RequestBody FolderDto folderDto) {
-        return folderService.createFolder(folderDto);
+    public FolderDto createFolder(@RequestBody FolderRequestDto folderRequestDto) {
+        return folderService.createFolder(folderRequestDto);
     }
 
     @PutMapping("/{id}")
     public FolderDto updateFolder(@PathVariable UUID id,
-                                  @RequestBody FolderDto folderDto) {
-        return folderService.updateFolder(id, folderDto);
+                                  @RequestBody FolderRequestDto folderRequestDto) {
+        return folderService.updateFolder(id, folderRequestDto);
     }
 
     @DeleteMapping("/{id}")

@@ -1,13 +1,16 @@
 package kz.geoweb.api.service.impl;
 
-import kz.geoweb.api.dto.FolderDto;
+import kz.geoweb.api.dto.FolderRequestDto;
+import kz.geoweb.api.dto.FolderInfoDto;
 import kz.geoweb.api.dto.FolderTreeDto;
+import kz.geoweb.api.dto.FolderDto;
 import kz.geoweb.api.entity.Folder;
 import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.exception.ForbiddenException;
 import kz.geoweb.api.mapper.FolderMapper;
+import kz.geoweb.api.mapper.LayerMapper;
 import kz.geoweb.api.repository.FolderRepository;
 import kz.geoweb.api.service.EntityPermissionService;
 import kz.geoweb.api.service.EntityUpdateHistoryService;
@@ -24,6 +27,7 @@ import java.util.UUID;
 public class FolderServiceImpl implements FolderService {
     private final FolderRepository folderRepository;
     private final FolderMapper folderMapper;
+    private final LayerMapper layerMapper;
     private final EntityUpdateHistoryService historyService;
     private final EntityPermissionService entityPermissionService;
 
@@ -35,11 +39,11 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public FolderDto getFolder(UUID id) {
         entityPermissionService.checkFolderRead(id);
-        return folderMapper.toDto(getEntityById(id));
+        return folderMapper.toFolderWithLayersDto(getEntityById(id));
     }
 
     @Override
-    public Set<FolderDto> getRootFolders() {
+    public Set<FolderInfoDto> getRootFolders() {
         Set<Folder> folders = folderRepository.findByParentIdIsNullOrderByRank();
         Set<Folder> foldersToRemove = new HashSet<>();
         for (Folder folder : folders) {
@@ -50,13 +54,13 @@ public class FolderServiceImpl implements FolderService {
             }
         }
         folders.removeAll(foldersToRemove);
-        return folderMapper.toDto(folders);
+        return folderMapper.toFolderInfoDto(folders);
     }
 
     @Override
-    public Set<FolderDto> getPublicRootFolders() {
+    public Set<FolderInfoDto> getPublicRootFolders() {
         Set<Folder> folders = folderRepository.findByIsPublicIsTrueAndParentIdIsNullOrderByRank();
-        return folderMapper.toDto(folders);
+        return folderMapper.toFolderInfoDto(folders);
     }
 
     @Override
@@ -121,30 +125,31 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public FolderDto createFolder(FolderDto folderDto) {
-        folderDto.setId(null);
-        Folder folder = folderMapper.toEntity(folderDto);
+    public FolderDto createFolder(FolderRequestDto folderRequestDto) {
+        folderRequestDto.setId(null);
+        Folder folder = folderMapper.toEntity(folderRequestDto);
         Folder created = folderRepository.save(folder);
         historyService.saveFolder(created.getId(), Action.CREATE);
-        return folderMapper.toDto(created);
+        return folderMapper.toFolderWithLayersDto(created);
     }
 
     @Override
-    public FolderDto updateFolder(UUID id, FolderDto folderDto) {
+    public FolderDto updateFolder(UUID id, FolderRequestDto folderRequestDto) {
         entityPermissionService.checkFolderWrite(id);
         Folder folder = getEntityById(id);
-        folder.setNameKk(folderDto.getNameKk());
-        folder.setNameRu(folderDto.getNameRu());
-        folder.setNameEn(folderDto.getNameEn());
-        folder.setImgUrl(folderDto.getImgUrl());
-        folder.setDescriptionKk(folderDto.getDescriptionKk());
-        folder.setDescriptionRu(folderDto.getDescriptionRu());
-        folder.setDescriptionEn(folderDto.getDescriptionEn());
-        folder.setIsPublic(folderDto.getIsPublic());
-        folder.setRank(folderDto.getRank());
+        folder.setNameKk(folderRequestDto.getNameKk());
+        folder.setNameRu(folderRequestDto.getNameRu());
+        folder.setNameEn(folderRequestDto.getNameEn());
+        folder.setImgUrl(folderRequestDto.getImgUrl());
+        folder.setDescriptionKk(folderRequestDto.getDescriptionKk());
+        folder.setDescriptionRu(folderRequestDto.getDescriptionRu());
+        folder.setDescriptionEn(folderRequestDto.getDescriptionEn());
+        folder.setIsPublic(folderRequestDto.getIsPublic());
+        folder.setRank(folderRequestDto.getRank());
+        folder.setLayers(layerMapper.toEntity(folderRequestDto.getLayers()));
         Folder updated = folderRepository.save(folder);
         historyService.saveFolder(updated.getId(), Action.UPDATE);
-        return folderMapper.toDto(updated);
+        return folderMapper.toFolderWithLayersDto(updated);
     }
 
     @Override

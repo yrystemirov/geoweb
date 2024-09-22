@@ -1,10 +1,12 @@
 package kz.geoweb.api.service.impl;
 
+import kz.geoweb.api.dto.LayerInfoDto;
 import kz.geoweb.api.dto.LayerDto;
 import kz.geoweb.api.dto.LayerRequestDto;
 import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.exception.CustomException;
+import kz.geoweb.api.mapper.FolderMapper;
 import kz.geoweb.api.mapper.LayerMapper;
 import kz.geoweb.api.repository.LayerAttrRepository;
 import kz.geoweb.api.repository.LayerRepository;
@@ -23,6 +25,7 @@ public class LayerServiceImpl implements LayerService {
     private final LayerRepository layerRepository;
     private final LayerAttrRepository layerAttrRepository;
     private final LayerMapper layerMapper;
+    private final FolderMapper folderMapper;
     private final JdbcService jdbcService;
     private final GeoserverService geoserverService;
     private final EntityUpdateHistoryService historyService;
@@ -40,13 +43,13 @@ public class LayerServiceImpl implements LayerService {
     }
 
     @Override
-    public LayerDto getLayerByLayername(String layername) {
-        return layerMapper.toDto(layerRepository.findByLayername(layername)
+    public LayerInfoDto getLayerByLayername(String layername) {
+        return layerMapper.toLayerInfoDto(layerRepository.findByLayername(layername)
                 .orElseThrow(() -> new CustomException("layer.by_layername.not_found", layername)));
     }
 
     @Override
-    public Page<LayerDto> getLayers(String search, Pageable pageable) {
+    public Page<LayerInfoDto> getLayers(String search, Pageable pageable) {
         Page<Layer> layerPage;
         if (search != null && !search.isBlank()) {
             layerPage = layerRepository.findByLayernameContainingIgnoreCaseOrNameKkContainingIgnoreCaseOrNameRuContainingIgnoreCaseOrNameEnContainingIgnoreCase(
@@ -54,7 +57,7 @@ public class LayerServiceImpl implements LayerService {
         } else {
             layerPage = layerRepository.findAll(pageable);
         }
-        return layerPage.map(layerMapper::toDto);
+        return layerPage.map(layerMapper::toLayerInfoDto);
     }
 
     @Override
@@ -96,6 +99,7 @@ public class LayerServiceImpl implements LayerService {
         layer.setIsDynamic(layerRequestDto.getIsDynamic());
         layer.setIsPublic(layerRequestDto.getIsPublic());
         layer.setDynamicIdentityColumn(layerRequestDto.getDynamicIdentityColumn());
+        layer.setFolders(folderMapper.toEntity(layerRequestDto.getFolders()));
         Layer updated = layerRepository.save(layer);
         historyService.saveLayer(updated.getId(), Action.UPDATE);
         return layerMapper.toDto(updated);

@@ -3,6 +3,7 @@ package kz.geoweb.api.controller;
 import jakarta.validation.Valid;
 import kz.geoweb.api.dto.LayerAttrDto;
 import kz.geoweb.api.dto.LayerDto;
+import kz.geoweb.api.dto.LayerInfoDto;
 import kz.geoweb.api.dto.LayerRequestDto;
 import kz.geoweb.api.service.LayerAttrService;
 import kz.geoweb.api.service.LayerService;
@@ -27,8 +28,8 @@ public class LayerController {
     }
 
     @GetMapping
-    public Page<LayerDto> getLayers(@RequestParam(required = false) String search,
-                                    Pageable pageable) {
+    public Page<LayerInfoDto> getLayers(@RequestParam(required = false) String search,
+                                        Pageable pageable) {
         return layerService.getLayers(search, pageable);
     }
 
