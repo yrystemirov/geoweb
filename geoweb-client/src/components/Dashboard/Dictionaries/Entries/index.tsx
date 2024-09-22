@@ -8,7 +8,7 @@ import {
   GridEventListener,
   GridRowId,
   GridActionsCellItem,
-  GridToolbarContainer,
+  GridToolbarContainer
 } from '@mui/x-data-grid';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,7 +27,7 @@ import { useNotifications } from '@toolpad/core/useNotifications';
 import i18n from '../../../../i18n';
 import { constants } from '../../../../constants';
 import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
-import { ChevronLeft } from '@mui/icons-material';
+import { GoBackButton } from '../../../common/goBackButton';
 
 export type EntryDtoRow = EntryDto & { isNew?: boolean };
 
@@ -50,7 +50,10 @@ export const DictionaryEntries = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['dictionaryEntries', dictionaryId],
-    queryFn: () => dictionariesAPI.getEntries(dictionaryId, { page: pagination.page, size: pagination.pageSize }).then((res) => res.data),
+    queryFn: () =>
+      dictionariesAPI
+        .getEntries(dictionaryId, { page: pagination.page, size: pagination.pageSize })
+        .then((res) => res.data),
     enabled: !!dictionaryId,
   });
 
@@ -70,7 +73,8 @@ export const DictionaryEntries = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ newRow, oldRow }: { newRow: EntryRequestDto; oldRow: EntryDtoRow }) => dictionariesAPI.updateEntry(newRow).then((res) => res.data),
+    mutationFn: ({ newRow, oldRow }: { newRow: EntryRequestDto; oldRow: EntryDtoRow }) =>
+      dictionariesAPI.updateEntry(newRow).then((res) => res.data),
     onSuccess: (newRow) => {
       setRows(rows.map((row) => (row.id === newRow.id ? newRow : row)));
       queryClient.invalidateQueries({ queryKey: ['dictionaryEntries', dictionaryId] });
@@ -166,25 +170,13 @@ export const DictionaryEntries = () => {
             }}
             onClick={handleSaveClick(id)}
           />,
-          <GridActionsCellItem
-            icon={<CancelIcon />}
-            label="Cancel"
-            onClick={handleCancelClick(id)}
-          />,
+          <GridActionsCellItem icon={<CancelIcon />} label="Cancel" onClick={handleCancelClick(id)} />,
         ];
       }
 
       return [
-        <GridActionsCellItem
-          icon={<EditIcon />}
-          label="Edit"
-          onClick={handleEditClick(id)}
-        />,
-        <GridActionsCellItem
-          icon={<DeleteIcon />}
-          label="Delete"
-          onClick={handleDeleteClick(id)}
-        />,
+        <GridActionsCellItem icon={<EditIcon />} label="Edit" onClick={handleEditClick(id)} />,
+        <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={handleDeleteClick(id)} />,
       ];
     },
   };
@@ -209,20 +201,8 @@ export const DictionaryEntries = () => {
 
   return (
     <>
-      <Box
-        display={'flex'}
-        justifyContent={'space-between'}
-        alignItems={'center'}
-        flexWrap={'wrap'}
-      >
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={() => navigate('/dashboard/dictionaries')}
-        >
-          <ChevronLeft />
-          {t('backToList')}
-        </Button>
+      <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
+        <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/dictionaries')} />
         <CardHeader
           title={t('dictionaryEntries', { dicName: dicNameWithQuotes })}
           sx={{ textAlign: 'center', flex: 1 }}

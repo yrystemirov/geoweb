@@ -11,7 +11,7 @@ import {
   GridActionsCellItem,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
-import { LinearProgress, Button, CardHeader, Box } from '@mui/material';
+import { LinearProgress, Button, CardHeader, Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
@@ -47,7 +47,8 @@ export const Dictionaries: FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['dictionaries', pagination],
-    queryFn: () => dictionariesAPI.getDictionaries({ page: pagination.page, size: pagination.pageSize }).then((res) => res.data),
+    queryFn: () =>
+      dictionariesAPI.getDictionaries({ page: pagination.page, size: pagination.pageSize }).then((res) => res.data),
   });
 
   const onEditError = (error: any) => {
@@ -57,7 +58,8 @@ export const Dictionaries: FC = () => {
   };
 
   const addMutation = useMutation({
-    mutationFn: async (newDictionary: DictionaryRow) => dictionariesAPI.addDictionary(newDictionary).then((res) => res.data),
+    mutationFn: async (newDictionary: DictionaryRow) =>
+      dictionariesAPI.addDictionary(newDictionary).then((res) => res.data),
     onSuccess: (newRow) => {
       queryClient.invalidateQueries({ queryKey: ['dictionaries', pagination] });
       setRows(rows.map((row) => (row.id === newRow.id ? newRow : row)));
@@ -134,7 +136,10 @@ export const Dictionaries: FC = () => {
 
   const handleAddClick = () => {
     const id = Date.now().toString(); // временный идентификатор
-    setRows((oldRows) => [...oldRows, { id, nameRu: '', nameKk: '', nameEn: '', code: '', isNew: true } as DictionaryRow]);
+    setRows((oldRows) => [
+      ...oldRows,
+      { id, nameRu: '', nameKk: '', nameEn: '', code: '', isNew: true } as DictionaryRow,
+    ]);
     setRowModesModel((oldModel) => ({
       ...oldModel,
       [id]: { mode: GridRowModes.Edit, fieldToFocus: 'code' },
@@ -168,11 +173,7 @@ export const Dictionaries: FC = () => {
       }
 
       return [
-        <GridActionsCellItem
-          icon={<EditIcon />}
-          label="Edit"
-          onClick={handleEditClick(id)}
-        />,
+        <GridActionsCellItem icon={<EditIcon />} label="Edit" onClick={handleEditClick(id)} />,
         <GridActionsCellItem
           icon={<DeleteIcon />}
           label="Delete"
@@ -189,7 +190,11 @@ export const Dictionaries: FC = () => {
       field: 'nameRu',
       headerName: t('nameRu'),
       width: 300,
-      renderCell: (params) => <Link to={`/dashboard/dictionaries/${params.row.id}`}>{params.value}</Link>,
+      renderCell: (params) => (
+        <Link to={`/dashboard/dictionaries/${params.row.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+          <Typography color="primary" component='span' variant='body2'>{params.value}</Typography>
+        </Link>
+      ),
       editable: true,
       ...fieldIsRequiredProps(t('requiredField')),
     },

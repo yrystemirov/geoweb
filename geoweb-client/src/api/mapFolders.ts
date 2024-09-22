@@ -11,7 +11,7 @@ const getFolder = (id: FolderDto['id']) => {
   return instance.get<FolderDto>(`${FOLDERS_URL}/${id}`);
 };
 
-const updateFolder = (folder: FolderDto) => {
+const updateFolder = (folder: Partial<FolderDto>) => {
   return instance.put<FolderDto>(`${FOLDERS_URL}/${folder.id}`, folder);
 };
 
@@ -24,12 +24,12 @@ const addFolder = (folder: Partial<FolderDto>) => {
 };
 
 const getFolderTree = (id: FolderDto['id']) => {
-  return instance.get <FolderTreeDto[]>(`${FOLDERS_URL}/${id}/tree`);
+  return instance.get<FolderTreeDto[]>(`${FOLDERS_URL}/${id}/tree`);
 };
 
-const getFolderChildren = (id: FolderDto["id"]) => {
-    return instance.get<FolderDto[]>(`${FOLDERS_URL}/${id}/children`);
-}
+const getFolderChildren = (id: FolderDto['id']) => {
+  return instance.get<FolderDto[]>(`${FOLDERS_URL}/${id}/children`);
+};
 
 export const mapFoldersAPI = {
   addFolder,

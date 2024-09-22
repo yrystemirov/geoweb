@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect } from 'react';
-import { Link, Route, Routes, useLocation } from 'react-router-dom';
+import { Link, Route as DashboardRoute, Routes, useLocation } from 'react-router-dom';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -13,8 +13,19 @@ import { Dictionaries } from './Dictionaries';
 import { DictionaryEntries } from './Dictionaries/Entries';
 import { MapFolders } from './MapFolders';
 import { MapFolderCreate } from './MapFolders/MapFolderCreate';
+import { MapFolderEdit } from './MapFolders/MapFolderEdit';
+import { MapFolderEditLayers } from './MapFolders/MapFolderEditLayers';
 
 const parentUrl = '/dashboard';
+
+type DashboardRoute = {
+  text?: string;
+  path: string;
+  icon?: JSX.Element;
+  component: JSX.Element;
+  isMenuItem?: boolean;
+  children?: DashboardRoute[];
+};
 
 const Dashboard: React.FC = () => {
   const location = useLocation();
@@ -29,10 +40,12 @@ const Dashboard: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const routes = [
+  const routes: DashboardRoute[] = [
     { text: t('users'), path: '/users', icon: <GrouprIcon />, component: <>{t('users')}</>, isMenuItem: true },
     { text: t('maps.title'), path: '/maps', icon: <MapIcon />, component: <MapFolders />, isMenuItem: true },
     { path: '/maps/add', component: <MapFolderCreate /> },
+    { path: '/maps/:id/edit', component: <MapFolderEdit /> },
+    { path: '/maps/:id/edit-layers', component: <MapFolderEditLayers /> },
     {
       text: t('layers'),
       path: '/layers',
@@ -67,13 +80,13 @@ const Dashboard: React.FC = () => {
 
   const menuItems = routes.filter((item) => item.isMenuItem);
 
-  const getRecursiveChildrenRoutes = (item: any) => {
+  const getRecursiveChildrenRoutes = (item: DashboardRoute) => {
     if (item.children) {
-      return item.children.map((child: any) => (
-        <>
-          <Route key={child.text} path={child.path} element={child.element} />
+      return item.children.map((child, idx) => (
+        <Fragment key={idx}>
+          <DashboardRoute key={child.text} path={child.path} element={child.component} />
           {getRecursiveChildrenRoutes(child)}
-        </>
+        </Fragment>
       ));
     }
     return null;
@@ -118,11 +131,11 @@ const Dashboard: React.FC = () => {
         <Routes>
           {routes.map((item, idx) => (
             <Fragment key={idx}>
-              <Route path={item.path} element={item.component} />
+              <DashboardRoute path={item.path} element={item.component} />
               {getRecursiveChildrenRoutes(item)}
             </Fragment>
           ))}
-          <Route path="/dictionaries/:id" element={<DictionaryEntries />} />
+          <DashboardRoute path="/dictionaries/:id" element={<DictionaryEntries />} />
         </Routes>
       </Box>
     </Box>
