@@ -51,7 +51,7 @@ export const DictionaryEntries = () => {
   });
 
   const { data, isLoading } = useQuery({
-    queryKey: ['dictionaryEntries', dictionaryId],
+    queryKey: ['dictionaryEntries', dictionaryId, pagination],
     queryFn: () =>
       dictionariesAPI
         .getEntries(dictionaryId, { page: pagination.page, size: pagination.pageSize })
