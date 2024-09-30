@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect } from 'react';
-import { Link, Route as DashboardRoute, Routes, useLocation } from 'react-router-dom';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Link, Route as DashboardRoute, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Box, CardHeader, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   Map as MapIcon,
@@ -11,10 +11,11 @@ import { useTranslation } from 'react-i18next';
 import { useLoading } from '../common/loadingBar/loadingContext';
 import { Dictionaries } from './Dictionaries';
 import { DictionaryEntries } from './Dictionaries/Entries';
-import { MapFolders } from './MapFolders';
-import { MapFolderCreate } from './MapFolders/MapFolderCreate';
-import { MapFolderEdit } from './MapFolders/MapFolderEdit';
-import { MapFolderEditLayers } from './MapFolders/MapFolderEditLayers';
+import { MapFolders } from './Maps/Index';
+import { MapFolderEdit } from './Maps/Index/MapEdit';
+import { MapFolderEditLayers } from './Maps/Index/MapEditLayers';
+import { MapFolderCreateForm } from './Maps/MapFolder/CreateForm';
+import { GoBackButton } from '../common/goBackButton';
 
 const parentUrl = '/dashboard';
 
@@ -28,6 +29,7 @@ type DashboardRoute = {
 };
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
   const { setLoading } = useLoading();
@@ -43,7 +45,18 @@ const Dashboard: React.FC = () => {
   const routes: DashboardRoute[] = [
     { text: t('users'), path: '/users', icon: <GrouprIcon />, component: <>{t('users')}</>, isMenuItem: true },
     { text: t('maps.title'), path: '/maps', icon: <MapIcon />, component: <MapFolders />, isMenuItem: true },
-    { path: '/maps/add', component: <MapFolderCreate /> },
+    {
+      path: '/maps/add',
+      component: (
+        <>
+          <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
+            <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/maps')} />
+            <CardHeader title={t('maps.addMap')} sx={{ textAlign: 'center', flex: 1 }} />
+          </Box>
+          <MapFolderCreateForm onSucces={() => navigate('/dashboard/maps')} />
+        </>
+      ),
+    },
     { path: '/maps/:id/edit', component: <MapFolderEdit /> },
     { path: '/maps/:id/edit-layers', component: <MapFolderEditLayers /> },
     {

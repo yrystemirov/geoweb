@@ -1,19 +1,18 @@
-// форма с полями FolderDto для создания папки
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { FolderDto } from '../../../../api/types/mapFolders';
-import { mapFoldersAPI } from '../../../../api/mapFolders';
+import { FolderDto } from '../../../../../api/types/mapFolders';
+import { mapFoldersAPI } from '../../../../../api/mapFolders';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, CardHeader, Checkbox, FormControlLabel, TextField } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { GoBackButton } from '../../../common/goBackButton';
+import { useNavigate, useParams } from 'react-router-dom';
+import { GoBackButton } from '../../../../common/goBackButton';
 
-type CreateFolderRequest = Partial<FolderDto> & { nameRu: string };
+type EditFolderRequest = Partial<FolderDto> & { nameRu: string };
 
-const INITIAL_VALUES: CreateFolderRequest = {
+const INITIAL_VALUES: EditFolderRequest = {
   nameKk: '',
   nameRu: '',
   nameEn: '',
@@ -24,11 +23,18 @@ const INITIAL_VALUES: CreateFolderRequest = {
   parent: null,
 };
 
-export const MapFolderCreate: FC = () => {
+export const MapFolderEdit: FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const createMutation = useMutation<FolderDto, any, CreateFolderRequest>({
-    mutationFn: (folder) => mapFoldersAPI.addFolder(folder).then((res) => res.data),
+  const { id } = useParams();
+  const { data } = useQuery({
+    queryKey: ['mapProperties', id],
+    queryFn: () => mapFoldersAPI.getFolder(id!).then((res) => res.data),
+    enabled: !!id,
+  });
+
+  const editMutation = useMutation<FolderDto, any, Partial<FolderDto>>({
+    mutationFn: (folder) => mapFoldersAPI.updateFolder(folder).then((res) => res.data),
     onSuccess(data, variables, context) {
       navigate('/dashboard/maps');
     },
@@ -45,25 +51,33 @@ export const MapFolderCreate: FC = () => {
     rank: yup.number().typeError(t('mustBeNumber')).required(t('requiredField')) as yup.NumberSchema,
   });
 
-  const methods = useForm<CreateFolderRequest>({
-    defaultValues: INITIAL_VALUES,
+  const methods = useForm<EditFolderRequest>({
+    defaultValues: data || INITIAL_VALUES,
     resolver: yupResolver(schema),
   });
 
   const {
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
   } = methods;
 
-  const onSubmit = (data: CreateFolderRequest) => {
-    createMutation.mutate(data);
+  const onSubmit = (data: EditFolderRequest) => {
+    editMutation.mutate(data);
   };
+
+  useEffect(() => {
+    methods.reset(data || INITIAL_VALUES);
+  }, [data]);
+
+  if (!data) {
+    return null;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
         <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/maps')} />
-        <CardHeader title={t('maps.addMap')} sx={{ textAlign: 'center', flex: 1 }} />
+        <CardHeader title={t('editProperties')} sx={{ textAlign: 'center', flex: 1 }} />
       </Box>
       <Box display="flex" gap={2} flexWrap={'wrap'} mb={2}>
         <TextField
@@ -133,19 +147,13 @@ export const MapFolderCreate: FC = () => {
           sx={{ width: 150 }}
         />
         <FormControlLabel
-          control={<Checkbox {...methods.register('isPublic')} color="primary" />}
+          control={<Checkbox {...methods.register('isPublic')} checked={methods.watch('isPublic')} color="primary" />}
           label={t('maps.isPublic')}
           sx={{ mt: 1 }}
         />
       </Box>
-      <Button
-        type="submit"
-        size="large"
-        sx={{ float: 'right' }}
-        variant="contained"
-        disabled={createMutation.isPending}
-      >
-        {t('create')}
+      <Button type="submit" size="large" sx={{ float: 'right' }} variant="contained" disabled={editMutation.isPending}>
+        {t('save')}
       </Button>
     </form>
   );

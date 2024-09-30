@@ -3,14 +3,14 @@ import { DataGrid, GridColDef, GridPaginationModel, GridToolbarContainer } from 
 import { useQuery} from '@tanstack/react-query';
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { mapFoldersAPI } from '../../../api/mapFolders';
-import { FolderDto } from '../../../api/types/mapFolders';
+import { mapFoldersAPI } from '../../../../api/mapFolders';
+import { FolderDto } from '../../../../api/types/mapFolders';
 import MapIcon from '@mui/icons-material/Map';
 import AddIcon from '@mui/icons-material/Add';
 import { Link } from 'react-router-dom';
-import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
-import CustomNoRowsOverlay from '../../common/nodata/DataGrid';
-import { MapFolderActionsMenu } from './ActionMenu';
+import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
+import CustomNoRowsOverlay from '../../../common/nodata/DataGrid';
+import { MapActionsMenu } from './ActionsMenu';
 
 export const MapFolders: FC = () => {
   const { dataGridLocale } = useMuiLocalization();
@@ -55,7 +55,7 @@ export const MapFolders: FC = () => {
       headerName: t('actions'),
       renderCell: (params) => {
         return (
-          <MapFolderActionsMenu data={params.row} onRefresh={() => refetch()} />
+          <MapActionsMenu data={params.row} onRefresh={() => refetch()} />
         );
       },
       align: 'center',

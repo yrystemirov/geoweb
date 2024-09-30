@@ -34,34 +34,34 @@ export type LayerDto = {
 };
 
 export enum GeometryType {
-    POINT = 'POINT',
-    LINESTRING = 'LINESTRING',
-    POLYGON = 'POLYGON',
-    MULTIPOINT = 'MULTIPOINT',
-    MULTILINESTRING = 'MULTILINESTRING',
-    MULTIPOLYGON = 'MULTIPOLYGON',
-    RASTER = 'RASTER',
+  POINT = 'POINT',
+  LINESTRING = 'LINESTRING',
+  POLYGON = 'POLYGON',
+  MULTIPOINT = 'MULTIPOINT',
+  MULTILINESTRING = 'MULTILINESTRING',
+  MULTIPOLYGON = 'MULTIPOLYGON',
+  RASTER = 'RASTER',
 }
 
 export enum LayerType {
-    SIMPLE = 'SIMPLE',
-    WMS = 'WMS',
-    MAP_SERVER = 'MAP_SERVER',
-    GEOJSON = 'GEOJSON',
-    RASTER = 'RASTER',
+  SIMPLE = 'SIMPLE',
+  WMS = 'WMS',
+  MAP_SERVER = 'MAP_SERVER',
+  GEOJSON = 'GEOJSON',
+  RASTER = 'RASTER',
 }
 
 export type FolderTreeDto = {
-    id: string;
-    nameKk: string;
-    nameRu: string;
-    nameEn: string;
-    descriptionKk: string;
-    descriptionRu: string;
-    descriptionEn: string;
-    isPublic: boolean;
-    imgUrl: string;
-    rank: number;
-    children: FolderTreeDto[]; // or FolderDto[]?
-    layers: LayerDto[];
-    };
+  id: string;
+  nameKk: string;
+  nameRu: string;
+  nameEn: string;
+  descriptionKk: string;
+  descriptionRu: string;
+  descriptionEn: string;
+  isPublic: boolean;
+  imgUrl: string;
+  rank: number;
+  children: FolderTreeDto[]; // or FolderDto[]?
+  layers: LayerDto[];
+};

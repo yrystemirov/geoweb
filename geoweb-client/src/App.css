@@ -69,3 +69,19 @@
   top: .5em;
   right: .5em;
 }
+
+.edit-layers-tree {
+  .react-checkbox-tree label, .rct-node-icon {
+    display: flex;
+    align-items: center;
+  }
+
+  .rct-checkbox:empty {
+    display: none;
+  }
+
+  .react-checkbox-tree label {
+    background-color: inherit;
+    cursor: default;
+  }
+}

@@ -24,7 +24,7 @@ const addFolder = (folder: Partial<FolderDto>) => {
 };
 
 const getFolderTree = (id: FolderDto['id']) => {
-  return instance.get<FolderTreeDto[]>(`${FOLDERS_URL}/${id}/tree`);
+  return instance.get<FolderTreeDto>(`${FOLDERS_URL}/${id}/tree`);
 };
 
 const getFolderChildren = (id: FolderDto['id']) => {

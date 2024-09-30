@@ -1,19 +1,18 @@
-// форма с полями FolderDto для создания папки
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { FolderDto } from '../../../../api/types/mapFolders';
-import { mapFoldersAPI } from '../../../../api/mapFolders';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, CardHeader, Checkbox, FormControlLabel, TextField } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
-import { GoBackButton } from '../../../common/goBackButton';
+import { Box, Button, Checkbox, FormControlLabel, TextField } from '@mui/material';
+import { FolderDto } from '../../../../../api/types/mapFolders';
+import { mapFoldersAPI } from '../../../../../api/mapFolders';
+import { useNotifications } from '@toolpad/core';
+import { constants } from '../../../../../constants';
 
-type EditFolderRequest = Partial<FolderDto> & { nameRu: string };
+type CreateFolderRequest = Partial<FolderDto> & { nameRu: string };
 
-const INITIAL_VALUES: EditFolderRequest = {
+const INITIAL_VALUES: CreateFolderRequest = {
   nameKk: '',
   nameRu: '',
   nameEn: '',
@@ -24,20 +23,25 @@ const INITIAL_VALUES: EditFolderRequest = {
   parent: null,
 };
 
-export const MapFolderEdit: FC = () => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const { data } = useQuery({
-    queryKey: ['maps', id],
-    queryFn: () => mapFoldersAPI.getFolder(id!).then((res) => res.data),
-    enabled: !!id,
-  });
+type Props = {
+  parentId?: string;
+  onSucces?: () => void;
+};
 
-  const editMutation = useMutation<FolderDto, any, Partial<FolderDto>>({
-    mutationFn: (folder) => mapFoldersAPI.updateFolder(folder).then((res) => res.data),
-    onSuccess(data, variables, context) {
-      navigate('/dashboard/maps');
+export const MapFolderCreateForm: FC<Props> = ({ parentId, onSucces }) => {
+  const { t } = useTranslation();
+  const { show } = useNotifications();
+  const createMutation = useMutation<FolderDto, any, CreateFolderRequest>({
+    mutationFn: (folder) =>
+      mapFoldersAPI
+        .addFolder({ ...folder, ...(parentId ? { parent: { id: parentId } } : {}) } as CreateFolderRequest)
+        .then((res) => res.data),
+    onSuccess: () => {
+      onSucces?.();
+      show(t('success'), { severity: 'success', autoHideDuration: constants.ntfHideDelay });
+    },
+    onError: (error) => {
+      show(error?.response?.data?.message || t('errorOccurred'), { severity: 'error', autoHideDuration: constants.ntfHideDelay });
     },
   });
 
@@ -52,34 +56,22 @@ export const MapFolderEdit: FC = () => {
     rank: yup.number().typeError(t('mustBeNumber')).required(t('requiredField')) as yup.NumberSchema,
   });
 
-  const methods = useForm<EditFolderRequest>({
-    defaultValues: data || INITIAL_VALUES,
+  const methods = useForm<CreateFolderRequest>({
+    defaultValues: INITIAL_VALUES,
     resolver: yupResolver(schema),
   });
 
   const {
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
   } = methods;
 
-  const onSubmit = (data: EditFolderRequest) => {
-    editMutation.mutate(data);
+  const onSubmit = (data: CreateFolderRequest) => {
+    createMutation.mutate(data);
   };
 
-  useEffect(() => {
-    methods.reset(data || INITIAL_VALUES);
-  }, [data]);
-
-  if (!data) {
-    return null;
-  }
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
-        <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/maps')} />
-        <CardHeader title={t('editProperties')} sx={{ textAlign: 'center', flex: 1 }} />
-      </Box>
+    <Box onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }} component={'form'}>
       <Box display="flex" gap={2} flexWrap={'wrap'} mb={2}>
         <TextField
           {...methods.register('nameRu')}
@@ -148,14 +140,20 @@ export const MapFolderEdit: FC = () => {
           sx={{ width: 150 }}
         />
         <FormControlLabel
-          control={<Checkbox {...methods.register('isPublic')} checked={methods.watch('isPublic')} color="primary" />}
+          control={<Checkbox {...methods.register('isPublic')} color="primary" />}
           label={t('maps.isPublic')}
           sx={{ mt: 1 }}
         />
       </Box>
-      <Button type="submit" size="large" sx={{ float: 'right' }} variant="contained" disabled={editMutation.isPending}>
-        {t('save')}
+      <Button
+        type="submit"
+        size="large"
+        sx={{ float: 'right' }}
+        variant="contained"
+        disabled={createMutation.isPending}
+      >
+        {t('create')}
       </Button>
-    </form>
+    </Box>
   );
 };

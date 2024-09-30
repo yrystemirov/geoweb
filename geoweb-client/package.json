@@ -20,6 +20,7 @@
     "ol-ext": "^4.0.23",
     "proj4": "^2.12.1",
     "react": "^18.3.1",
+    "react-checkbox-tree": "^1.8.0",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.0",
     "react-i18next": "^15.0.1",

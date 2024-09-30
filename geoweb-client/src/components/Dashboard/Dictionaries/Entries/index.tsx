@@ -8,7 +8,7 @@ import {
   GridEventListener,
   GridRowId,
   GridActionsCellItem,
-  GridToolbarContainer,
+  GridToolbarContainer
 } from '@mui/x-data-grid';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -20,7 +20,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { dictionariesAPI } from '../../../../api/dictioanries';
 import { useTranslation } from 'react-i18next';
-import { DictionaryDto, EntryDto, EntryRequestDto } from '../../../../api/types/dictioanries';
+import { EntryDto, EntryRequestDto } from '../../../../api/types/dictioanries';
 import CustomNoRowsOverlay from '../../../common/nodata/DataGrid';
 import { fieldIsRequiredProps } from './utils';
 import { useNotifications } from '@toolpad/core/useNotifications';
@@ -29,10 +29,12 @@ import { constants } from '../../../../constants';
 import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
 import { GoBackButton } from '../../../common/goBackButton';
 import ConfirmDialog from '../../../common/confirm';
+import { useTranslatedProp } from '../../../../hooks/useTranslatedProp';
 
 export type EntryDtoRow = EntryDto & { isNew?: boolean };
 
 export const DictionaryEntries = () => {
+  const translatedNameProp = useTranslatedProp('name');
   const notifications = useNotifications();
   const { t } = useTranslation();
   const { id: dictionaryId } = useParams() as { id: string };
@@ -197,15 +199,14 @@ export const DictionaryEntries = () => {
     }
   }, [data]);
 
-  const dicName = dictionary?.[('name' + t('uLng')) as keyof DictionaryDto];
-  const dicNameWithQuotes = `"${dicName || dictionary?.nameRu || ''}"`;
+  const dicName = dictionary?.[translatedNameProp];
 
   return (
     <>
       <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
         <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/dictionaries')} />
         <CardHeader
-          title={t('dictionaryEntries', { dicName: dicNameWithQuotes })}
+          title={t('dictionaryEntries', { dicName })}
           sx={{ textAlign: 'center', flex: 1 }}
         />
       </Box>
