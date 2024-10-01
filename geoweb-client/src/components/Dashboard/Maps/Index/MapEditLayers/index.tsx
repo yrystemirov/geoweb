@@ -16,10 +16,12 @@ import ConfirmDialog from '../../../../common/confirm';
 import i18n from '../../../../../i18n';
 import { useNotifications } from '@toolpad/core';
 import { constants } from '../../../../../constants';
+import { MapFolderEditDialog } from '../../MapFolder/EditDialog';
 
 enum DialogType {
   none = '',
   create = 'create',
+  edit = 'edit',
   delete = 'delete',
 }
 
@@ -27,7 +29,7 @@ export const MapFolderEditLayers: FC = () => {
   const notifications = useNotifications();
   const [expanded, setExpanded] = useState<string[]>([]);
   const navigate = useNavigate();
-  const translatedNameProp = useTranslatedProp('name');
+  const nameProp = useTranslatedProp('name');
   const { t } = useTranslation();
   const { id } = useParams();
   const [openDialog, setOpenDialog] = useState<{ type: DialogType; selectedItem: FolderTreeDto | null }>({
@@ -61,10 +63,11 @@ export const MapFolderEditLayers: FC = () => {
       value: data.id,
       label: (
         <Box display={'flex'} alignItems={'center'}>
-          {data[translatedNameProp]}
+          {data[nameProp]}
           <MapFolderActionsMenu
             onAdd={() => setOpenDialog({ type: DialogType.create, selectedItem: data })}
             onDelete={() => setOpenDialog({ type: DialogType.delete, selectedItem: data })}
+            onEdit={() => setOpenDialog({ type: DialogType.edit, selectedItem: data })}
           />
         </Box>
       ),
@@ -73,7 +76,7 @@ export const MapFolderEditLayers: FC = () => {
         .concat(
           data.layers.map((layer) => ({
             value: layer.id,
-            label: <>{layer[translatedNameProp]}</>,
+            label: <>{layer[nameProp]}</>,
             ['data' as any]: { ...layer }, // если не надо, удалить
           })),
         ),
@@ -113,6 +116,12 @@ export const MapFolderEditLayers: FC = () => {
             refetch();
             setExpanded([...expanded, openDialog.selectedItem!.id]);
           }}
+        />
+        <MapFolderEditDialog
+          item={openDialog.selectedItem}
+          open={openDialog.type === DialogType.edit}
+          onClose={() => setOpenDialog({ type: DialogType.none, selectedItem: null })}
+          onSuccess={refetch}
         />
         <ConfirmDialog
           open={openDialog.type === DialogType.delete}

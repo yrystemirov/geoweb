@@ -12,7 +12,7 @@ import { useLoading } from '../common/loadingBar/loadingContext';
 import { Dictionaries } from './Dictionaries';
 import { DictionaryEntries } from './Dictionaries/Entries';
 import { MapFolders } from './Maps/Index';
-import { MapFolderEdit } from './Maps/Index/MapEdit';
+import { MapFolderEditForm } from './Maps/MapFolder/EditForm';
 import { MapFolderEditLayers } from './Maps/Index/MapEditLayers';
 import { MapFolderCreateForm } from './Maps/MapFolder/CreateForm';
 import { GoBackButton } from '../common/goBackButton';
@@ -53,11 +53,22 @@ const Dashboard: React.FC = () => {
             <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/maps')} />
             <CardHeader title={t('maps.addMap')} sx={{ textAlign: 'center', flex: 1 }} />
           </Box>
-          <MapFolderCreateForm onSucces={() => navigate('/dashboard/maps')} />
+          <MapFolderCreateForm onSuccess={() => navigate('/dashboard/maps')} onCancel={() => navigate('/dashboard/maps')} />
         </>
       ),
     },
-    { path: '/maps/:id/edit', component: <MapFolderEdit /> },
+    {
+      path: '/maps/:id/edit',
+      component: (
+        <>
+          <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
+            <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/maps')} />
+            <CardHeader title={t('editProperties')} sx={{ textAlign: 'center', flex: 1 }} />
+          </Box>
+          <MapFolderEditForm onSuccess={() => navigate('/dashboard/maps')} onCancel={() => navigate('/dashboard/maps')} />
+        </>
+      ),
+    },
     { path: '/maps/:id/edit-layers', component: <MapFolderEditLayers /> },
     {
       text: t('layers'),
@@ -107,12 +118,11 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box display="flex" flexDirection="row" height="100%" flex={1} border={'1px solid #ddd'}>
-      {/* Sidebar */}
       <Box borderRight={'1px solid #ddd'} width={300}>
         <List>
           {menuItems.map((item) => (
-            <>
-              <ListItem key={item.text} disablePadding>
+            <Fragment key={item.text}>
+              <ListItem disablePadding>
                 <ListItemButton
                   component={Link}
                   to={`${parentUrl}${item.path}`}
@@ -135,7 +145,7 @@ const Dashboard: React.FC = () => {
                     </ListItemButton>
                   </ListItem>
                 ))}
-            </>
+            </Fragment>
           ))}
         </List>
       </Box>

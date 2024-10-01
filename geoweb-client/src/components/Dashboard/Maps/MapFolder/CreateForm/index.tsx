@@ -25,10 +25,11 @@ const INITIAL_VALUES: CreateFolderRequest = {
 
 type Props = {
   parentId?: string;
-  onSucces?: () => void;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 };
 
-export const MapFolderCreateForm: FC<Props> = ({ parentId, onSucces }) => {
+export const MapFolderCreateForm: FC<Props> = ({ parentId, onCancel, onSuccess }) => {
   const { t } = useTranslation();
   const { show } = useNotifications();
   const createMutation = useMutation<FolderDto, any, CreateFolderRequest>({
@@ -37,11 +38,14 @@ export const MapFolderCreateForm: FC<Props> = ({ parentId, onSucces }) => {
         .addFolder({ ...folder, ...(parentId ? { parent: { id: parentId } } : {}) } as CreateFolderRequest)
         .then((res) => res.data),
     onSuccess: () => {
-      onSucces?.();
+      onSuccess?.();
       show(t('success'), { severity: 'success', autoHideDuration: constants.ntfHideDelay });
     },
     onError: (error) => {
-      show(error?.response?.data?.message || t('errorOccurred'), { severity: 'error', autoHideDuration: constants.ntfHideDelay });
+      show(error?.response?.data?.message || t('errorOccurred'), {
+        severity: 'error',
+        autoHideDuration: constants.ntfHideDelay,
+      });
     },
   });
 
@@ -71,7 +75,7 @@ export const MapFolderCreateForm: FC<Props> = ({ parentId, onSucces }) => {
   };
 
   return (
-    <Box onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }} component={'form'}>
+    <Box onSubmit={handleSubmit(onSubmit)} noValidate sx={{ pt: 1 }} component={'form'}>
       <Box display="flex" gap={2} flexWrap={'wrap'} mb={2}>
         <TextField
           {...methods.register('nameRu')}
@@ -153,6 +157,18 @@ export const MapFolderCreateForm: FC<Props> = ({ parentId, onSucces }) => {
         disabled={createMutation.isPending}
       >
         {t('create')}
+      </Button>
+      <Button
+        type="button"
+        size="large"
+        sx={{ float: 'right' }}
+        variant="text"
+        onClick={() => {
+          onCancel?.();
+          methods.reset();
+        }}
+      >
+        {t('cancel')}
       </Button>
     </Box>
   );

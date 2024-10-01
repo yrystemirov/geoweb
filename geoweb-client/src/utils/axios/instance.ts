@@ -11,22 +11,14 @@ const instance = axios.create({
   },
 });
 
-const refreshInstance = axios.create({
-  baseURL: '/geoweb/api',
-  withCredentials: true,
-  headers: {
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/json',
-  },
-});
 
 async function refreshToken() {
   const tokenData = getStoredToken();
   const token = tokenData ? JSON.parse(tokenData) : null;
 
-  return refreshInstance.post<AxiosResponse<TokenResponse>>('/auth/token/refresh', { refreshToken: token?.refreshToken }).then((res) => {
-    return res.data;
-  });
+  return instance
+    .post<AxiosResponse<TokenResponse>>('/auth/token/refresh', { refreshToken: token?.refreshToken })
+    .then((res) => res.data) as Promise<TokenResponse>;
 }
 
 instance.interceptors.request.use(
@@ -45,7 +37,7 @@ instance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 instance.interceptors.response.use(
@@ -60,13 +52,12 @@ instance.interceptors.response.use(
         originalConfig._retry = true;
 
         try {
-          const { data: tokenData } = await refreshToken();
+          const newTokenResp = await refreshToken();
 
-          setStoredToken(JSON.stringify(tokenData));
-          instance.defaults.headers.common['Authorization'] = `Bearer ${tokenData.accessToken}`;
+          setStoredToken(JSON.stringify(newTokenResp));
+          instance.defaults.headers.common['Authorization'] = `Bearer ${newTokenResp.accessToken}`;
           return instance(originalConfig);
         } catch (_error) {
-          // if refresh token expired
           clearStoredToken();
           window.location.href = '/login';
 
@@ -75,7 +66,7 @@ instance.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default instance;

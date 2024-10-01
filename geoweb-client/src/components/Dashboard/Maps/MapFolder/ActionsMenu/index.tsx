@@ -6,9 +6,10 @@ import { t } from 'i18next';
 type Props = {
   onAdd: () => void;
   onDelete: () => void;
+  onEdit: () => void;
 };
 
-export const MapFolderActionsMenu: FC<Props> = ({ onDelete, onAdd }) => {
+export const MapFolderActionsMenu: FC<Props> = ({ onAdd, onDelete, onEdit }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -29,6 +30,7 @@ export const MapFolderActionsMenu: FC<Props> = ({ onDelete, onAdd }) => {
       </IconButton>
       <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleClose} closeAfterTransition>
         <MenuItem onClick={() => onAdd()}>{t('maps.addFolder')}</MenuItem>
+        <MenuItem onClick={() => onEdit()}>{t('edit')}</MenuItem>
         <MenuItem onClick={() => onDelete()}>{t('delete')}</MenuItem>
       </Menu>
     </div>
