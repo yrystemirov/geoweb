@@ -29,7 +29,6 @@ const Measurement: React.FC<Props> = ({ map, color, mapMode }) => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    debugger;
     const vectorLayer = new VectorLayer({
       source: new VectorSource(),
       style: (f) =>

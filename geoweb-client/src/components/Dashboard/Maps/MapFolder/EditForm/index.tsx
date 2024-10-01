@@ -4,11 +4,12 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { FolderDto } from '../../../../../api/types/mapFolders';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
-import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, CardHeader, Checkbox, FormControlLabel, TextField } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
-import { GoBackButton } from '../../../../common/goBackButton';
+import { Box, Button, Checkbox, FormControlLabel, TextField } from '@mui/material';
+import { useParams } from 'react-router-dom';
+import { useNotifications } from '@toolpad/core';
+import { constants } from '../../../../../constants';
+import * as yup from 'yup';
 
 type EditFolderRequest = Partial<FolderDto> & { nameRu: string };
 
@@ -23,10 +24,17 @@ const INITIAL_VALUES: EditFolderRequest = {
   parent: null,
 };
 
-export const MapFolderEdit: FC = () => {
+type Props = {
+  id?: string;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+};
+
+export const MapFolderEditForm: FC<Props> = ({ id: idProp, onSuccess, onCancel }) => {
+  const { show } = useNotifications();
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { id } = useParams();
+  const { id: idParam } = useParams();
+  const id = idProp || idParam;
   const { data } = useQuery({
     queryKey: ['mapProperties', id],
     queryFn: () => mapFoldersAPI.getFolder(id!).then((res) => res.data),
@@ -36,7 +44,8 @@ export const MapFolderEdit: FC = () => {
   const editMutation = useMutation<FolderDto, any, Partial<FolderDto>>({
     mutationFn: (folder) => mapFoldersAPI.updateFolder(folder).then((res) => res.data),
     onSuccess(data, variables, context) {
-      navigate('/dashboard/maps');
+      onSuccess?.();
+      show(t('success'), { severity: 'success', autoHideDuration: constants.ntfHideDelay });
     },
   });
 
@@ -74,11 +83,7 @@ export const MapFolderEdit: FC = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
-        <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/maps')} />
-        <CardHeader title={t('editProperties')} sx={{ textAlign: 'center', flex: 1 }} />
-      </Box>
+    <Box onSubmit={handleSubmit(onSubmit)} noValidate sx={{ pt: 1 }} component={'form'}>
       <Box display="flex" gap={2} flexWrap={'wrap'} mb={2}>
         <TextField
           {...methods.register('nameRu')}
@@ -155,6 +160,18 @@ export const MapFolderEdit: FC = () => {
       <Button type="submit" size="large" sx={{ float: 'right' }} variant="contained" disabled={editMutation.isPending}>
         {t('save')}
       </Button>
-    </form>
+      <Button
+        type="button"
+        size="large"
+        sx={{ float: 'right' }}
+        variant="text"
+        onClick={() => {
+          onCancel?.();
+          methods.reset(data || INITIAL_VALUES);
+        }}
+      >
+        {t('cancel')}
+      </Button>
+    </Box>
   );
 };
