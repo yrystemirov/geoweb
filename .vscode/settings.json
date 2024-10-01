@@ -6,5 +6,8 @@
   "prettier.singleAttributePerLine": true,
   "editor.formatOnPaste": true,
   "prettier.bracketSameLine": false,
-  "prettier.printWidth": 150
+  "prettier.printWidth": 150,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
