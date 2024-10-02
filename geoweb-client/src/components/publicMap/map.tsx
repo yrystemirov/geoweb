@@ -7,7 +7,7 @@ import './map.css';
 import { Box } from '@mui/material';
 import { HomeExtentButton } from '../common/mapTools/HomeExtentButton';
 import MyLocation from '../common/mapTools/MyLocation';
-import { usePublicMapStore } from '../../hooks/usePublicMapStore';
+import { MapMode, usePublicMapStore } from '../../hooks/usePublicMapStore';
 import Measurement from './tools/measurement';
 import OpenlayersBaseLayersUtils, { TileLayerSourceType } from '../../utils/openlayers/OpenlayersBaseLayersUtils';
 import TileLayer from 'ol/layer/Tile';
@@ -18,16 +18,19 @@ import { LeftPanel } from './leftPanel';
 import { useQuery } from '@tanstack/react-query';
 import { mapOpenAPI } from '../../api/openApi';
 import LayerGroup from 'ol/layer/Group';
+import { IdentifyPanel } from './identifyPanel';
 
 const MapComponent = () => {
   const mapDivRef = useRef<HTMLDivElement | null>(null);
-  const { map, setMap, mapMode, userLayers, setUserLayers } = usePublicMapStore();
+  const { map, setMap, mapMode, userLayers, setUserLayers, identifyEventData, setIdentifyEventData } =
+    usePublicMapStore();
   const [baseLayersArr, setBaseLayersArr] = useState<TileLayer[]>([]);
   //const [userLayersArr, setUserLayersArr] = useState<TileLayer[]>([]);
   const [mapMouseOverCoord, setMapMouseOverCoord] = useState<string>('');
   const [mounted, setMounted] = useState<boolean>(false);
   const [mapDataLoaded, setMapDataLoaded] = useState<boolean>(false);
   const [lyrTree, setLyrTree] = useState<any>([]);
+
   const [lyrTreeInited, setLyrTreeinIted] = useState<boolean>(false);
   //const [layersToAddToMap, setLayersToAddToMap] = useState<any[]>([]);
 
@@ -37,23 +40,42 @@ const MapComponent = () => {
 
   useEffect(() => {
     if (!mounted) return;
-    let sortedLyrGroupsFromConfig: any;
-    const asyncCall = async () => {
-      await mapOpenAPI.getOpenApiRootFolders().then((res: any) => {
-        sortedLyrGroupsFromConfig = res?.data?.filter((el: any) => el.isPublic);
-      });
 
-      for (const lyrGroup of sortedLyrGroupsFromConfig) {
-        await loadLyrGroup(
-          lyrGroup,
-          lyrGroup.id === sortedLyrGroupsFromConfig[sortedLyrGroupsFromConfig.length - 1].id,
-        );
+    mapOpenAPI.getOpenApiRootFolders().then((res: any) => {
+      for (const lyrGroup of res.data) {
+        mapOpenAPI.getOpenApiRootFoldertreeById(lyrGroup.id).then((response: any) => {
+          lyrTree.push(response.data);
+          setLyrTree(lyrTree);
+          if (lyrTree.length === res.data.length) {
+            setMapDataLoaded(true);
+          }
+        });
+        //loadLyrGroup(lyrGroup, lyrGroup.id === res.data[res.data.length - 1].id);
       }
-    };
-    asyncCall();
+      if (!res.data || res.data.length === 0) {
+        setMapDataLoaded(true);
+      }
+    });
+    // let sortedLyrGroupsFromConfig: any;
+
+    // const asyncCall = async () => {
+    //   await mapOpenAPI.getOpenApiRootFolders().then((res: any) => {
+    //     sortedLyrGroupsFromConfig = res?.data?.filter((el: any) => el.isPublic);
+    //   });
+
+    //   for (const lyrGroup of sortedLyrGroupsFromConfig) {
+    //     await loadLyrGroup(
+    //       lyrGroup,
+    //       lyrGroup.id === sortedLyrGroupsFromConfig[sortedLyrGroupsFromConfig.length - 1].id,
+    //     );
+    //   }
+    // };
+    // asyncCall();
   }, [mounted]);
 
   useEffect(() => {
+    if (!mapDataLoaded) return;
+
     initLyrs();
     setLyrTreeinIted(true);
   }, [mapDataLoaded]);
@@ -102,6 +124,19 @@ const MapComponent = () => {
 
       setMapMouseOverCoord(toStringHDMS(wgsCoords, 0));
     });
+
+    mapObj.on('singleclick', (event) => {
+      if (mapMode === MapMode.IDENTIFY) {
+        setIdentifyEventData(event);
+      }
+    });
+
+    mapObj.on('dblclick', (event) => {
+      if (mapMode === MapMode.IDENTIFY) {
+        setIdentifyEventData(event);
+      }
+    });
+
     mapObj.setTarget(mapDivRef.current);
 
     setMap(mapObj);
@@ -113,6 +148,7 @@ const MapComponent = () => {
   }, [lyrTreeInited]);
 
   const initLyrs = () => {
+    console.log(mapDataLoaded);
     let mainGeoserverWmsUrl = 'http://77.240.39.93:8082/geoserver/geoweb/wms';
     let alLayerNames = getLayerNames(lyrTree);
     //context.updateLayers(lyrTree);
@@ -170,7 +206,6 @@ const MapComponent = () => {
         );
       }
     });
-
     setUserLayers(layersToAddToMap_);
   };
 
@@ -240,7 +275,7 @@ const MapComponent = () => {
 
   return (
     <div
-      className="map"
+      className="map gis"
       style={{ position: 'absolute', top: 0, bottom: 0, width: '100%', height: '100vh', minHeight: '100vh' }}
       ref={mapDivRef}
     >
@@ -258,7 +293,7 @@ const MapComponent = () => {
           zIndex: 5000,
         }}
       >
-        {map && <LeftPanel map={map} color="#5ebc67" layers={userLayers} />}
+        {map && <LeftPanel color="#5ebc67" />}
       </Box>
       <Box
         display={'flex'}
@@ -279,11 +314,12 @@ const MapComponent = () => {
             <HomeExtentButton map={map} color="#5ebc67" />
             <MyLocation map={map} color="#5ebc67" />
             <BaseLayersTool map={map} color="#5ebc67" layers={baseLayersArr} />
-            <Measurement map={map} color="#5ebc67" mapMode={mapMode} />
+            <Measurement color="#5ebc67" />
           </>
         )}
       </Box>
 
+      {identifyEventData && <IdentifyPanel />}
       <div
         className=""
         style={{

@@ -14,6 +14,8 @@ type PublicMapState = {
   setMapMode: (mode: MapMode) => void;
   userLayers: TileLayer[];
   setUserLayers: (layers: TileLayer[]) => void;
+  identifyEventData: any;
+  setIdentifyEventData: (identifyEventData: any) => void;
 };
 
 export const usePublicMapStore = create<PublicMapState>((set) => ({
@@ -23,4 +25,6 @@ export const usePublicMapStore = create<PublicMapState>((set) => ({
   setMapMode: (mapMode) => set({ mapMode }),
   userLayers: [],
   setUserLayers: (userLayers) => set({ userLayers }),
+  identifyEventData: null,
+  setIdentifyEventData: (identifyEventData)=>set({identifyEventData})
 }));

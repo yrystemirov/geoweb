@@ -10,14 +10,17 @@ import { Cancel, SquareFoot, Straighten } from '@mui/icons-material';
 import { Type } from 'ol/geom/Geometry';
 import CircleStyle from 'ol/style/Circle';
 import { useTranslation } from 'react-i18next';
+import { usePublicMapStore } from '../../../hooks/usePublicMapStore';
 import { MapMode } from '../../../hooks/usePublicMapStore';
 interface Props {
-  map: Map;
+  //map: Map;
   color?: CSSProperties['background'];
-  mapMode?: MapMode;
+  //mapMode?: MapMode;
+  //setMapMode: (mapMode: MapMode) => void;
 }
 
-const Measurement: React.FC<Props> = ({ map, color, mapMode }) => {
+const Measurement: React.FC<Props> = ({  color }) => {
+  const { map,  mapMode, setMapMode } = usePublicMapStore();
   const vectorRef = useRef<any>(null);
   const sketchRef = useRef<Feature | null>(null);
   const drawRef = useRef<Draw | null>(null);
@@ -61,19 +64,21 @@ const Measurement: React.FC<Props> = ({ map, color, mapMode }) => {
     });
     vectorRef.current = vectorLayer;
     vectorLayer.set('name', 'measureVector');
-    map.addLayer(vectorLayer);
+    map?.addLayer(vectorLayer);
 
     return () => {
-      map.removeLayer(vectorLayer);
+      map?.removeLayer(vectorLayer);
     };
   }, [map]);
 
   useEffect(() => {
     if (isActive) {
       addInteraction();
+      setMapMode(MapMode.EDIT);
     } else {
       clearInteraction();
       vectorRef.current!.getSource().clear();
+      setMapMode(MapMode.IDENTIFY);
     }
   }, [isActive]);
 
@@ -86,10 +91,10 @@ const Measurement: React.FC<Props> = ({ map, color, mapMode }) => {
 
   const addInteraction = () => {
     if (drawRef.current) {
-      map.removeInteraction(drawRef.current);
+      map?.removeInteraction(drawRef.current);
     }
     if (snapRef.current) {
-      map.removeInteraction(snapRef.current);
+      map?.removeInteraction(snapRef.current);
     }
 
     const draw = new Draw({
@@ -117,7 +122,7 @@ const Measurement: React.FC<Props> = ({ map, color, mapMode }) => {
     });
     drawRef.current = draw;
     draw.set('name', 'measureDraw');
-    map.addInteraction(draw);
+    map?.addInteraction(draw);
     draw.on('drawstart', drawStartHandler);
     draw.on('drawend', drawEndHandler);
 
@@ -126,16 +131,16 @@ const Measurement: React.FC<Props> = ({ map, color, mapMode }) => {
     });
     snapRef.current = snap;
     snap.set('name', 'measureSnap');
-    map.addInteraction(snap);
+    map?.addInteraction(snap);
   };
 
   const clearInteraction = () => {
     if (drawRef.current) {
-      map.removeInteraction(drawRef.current);
+      map?.removeInteraction(drawRef.current);
       drawRef.current = null;
     }
     if (snapRef.current) {
-      map.removeInteraction(snapRef.current);
+      map?.removeInteraction(snapRef.current);
       snapRef.current = null;
     }
   };
@@ -145,7 +150,7 @@ const Measurement: React.FC<Props> = ({ map, color, mapMode }) => {
 
     const sketch = event.feature;
     let tooltipCoord = event.coordinate;
-    map.getTargetElement().style.cursor = 'none';
+    map!.getTargetElement().style.cursor = 'none';
 
     sketchRef.current = sketch;
     sketch.getGeometry().on('change', (e: any) => {
@@ -165,13 +170,14 @@ const Measurement: React.FC<Props> = ({ map, color, mapMode }) => {
   };
 
   const drawEndHandler = (event: any) => {
+    console.log(mapMode);
     setTimeout(() => {
       drawRef.current!.setActive(true);
     }, 1000);
     drawRef.current!.setActive(false);
 
     measureTooltipRef.current!.getElement()!.className = 'tooltip tooltip-static';
-    map.getTargetElement().style.cursor = '';
+    map!.getTargetElement().style.cursor = '';
 
     sketchRef.current = null;
     createMeasureTooltip();
@@ -179,7 +185,7 @@ const Measurement: React.FC<Props> = ({ map, color, mapMode }) => {
 
   const createMeasureTooltip = () => {
     if (measureTooltipRef.current) {
-      map.removeOverlay(measureTooltipRef.current);
+      map!.removeOverlay(measureTooltipRef.current);
     }
 
     const measureTooltipElement = document.createElement('div');
@@ -190,7 +196,7 @@ const Measurement: React.FC<Props> = ({ map, color, mapMode }) => {
       positioning: 'bottom-center',
     });
     measureTooltipRef.current.set('name', 'measureOverlay');
-    map.addOverlay(measureTooltipRef.current);
+    map?.addOverlay(measureTooltipRef.current);
   };
 
   const formatLength = (line: LineString): string => {
@@ -208,7 +214,7 @@ const Measurement: React.FC<Props> = ({ map, color, mapMode }) => {
   return (
     <>
       <IconButton
-        disabled={mapMode == MapMode.EDIT}
+        //disabled={mapMode == MapMode.EDIT}
         style={{
           background: color ? color : 'rgb(64 152 68 / 70%)',
           borderRadius: 0,
