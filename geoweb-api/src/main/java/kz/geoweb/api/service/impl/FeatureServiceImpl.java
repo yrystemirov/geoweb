@@ -135,7 +135,7 @@ public class FeatureServiceImpl implements FeatureService {
             Object value = feature.get(attrname);
             if (value != null) {
                 String valueString = value.toString();
-                String[] entryValues = valueString.split("\\|");
+                String[] entryValues = valueString.split(";");
                 DictionaryDto dictionaryDto = dictionaryService.getDictionaryByCode(attr.getDictionaryCode());
                 List<EntryDto> entries = entryService.getEntries(dictionaryDto.getId(), null);
                 List<String> values = new ArrayList<>();
