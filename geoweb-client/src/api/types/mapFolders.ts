@@ -23,14 +23,24 @@ export type LayerDto = {
   layername: string;
   geometryType: GeometryType;
   layerType: LayerType;
-  styleId: string;
+  // styleId: string; // пока не используется
   url: string;
   baseLayer: boolean;
   checkIntersection: boolean;
   isBlockLayer: boolean;
   isDynamic: boolean;
   isPublic: boolean;
-  dynamicIdentityColumn: string;
+  folders: FolderDto[];
+  // dynamicIdentityColumn: string; // пока не используется
+};
+
+export type LayerRequestDto = Partial<Omit<LayerDto, 'id'>> & {
+  nameKk: string;
+  nameRu: string;
+  layerType: LayerType;
+  layername: string;
+  geometryType: GeometryType;
+  folders: { id: string }[];
 };
 
 export enum GeometryType {

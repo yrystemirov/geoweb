@@ -83,7 +83,7 @@ export const MapFolderEditForm: FC<Props> = ({ id: idProp, onSuccess, onCancel }
   }
 
   return (
-    <Box onSubmit={handleSubmit(onSubmit)} noValidate sx={{ pt: 1 }} component={'form'}>
+    <Box onSubmit={handleSubmit(onSubmit)} noValidate component={'form'} sx={{ pt: 1 }}>
       <Box display="flex" gap={2} flexWrap={'wrap'} mb={2}>
         <TextField
           {...methods.register('nameRu')}

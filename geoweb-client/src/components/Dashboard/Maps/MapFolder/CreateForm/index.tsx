@@ -2,13 +2,13 @@ import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, Checkbox, FormControlLabel, TextField } from '@mui/material';
 import { FolderDto } from '../../../../../api/types/mapFolders';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
 import { useNotifications } from '@toolpad/core';
 import { constants } from '../../../../../constants';
+import { boolean, number, NumberSchema, object, string } from 'yup';
 
 type CreateFolderRequest = Partial<FolderDto> & { nameRu: string };
 
@@ -49,15 +49,15 @@ export const MapFolderCreateForm: FC<Props> = ({ parentId, onCancel, onSuccess }
     },
   });
 
-  const schema = yup.object<Partial<FolderDto>>().shape({
-    nameKk: yup.string(),
-    nameRu: yup.string().required(t('requiredField')),
-    nameEn: yup.string(),
-    descriptionKk: yup.string(),
-    descriptionRu: yup.string(),
-    descriptionEn: yup.string(),
-    isPublic: yup.boolean(),
-    rank: yup.number().typeError(t('mustBeNumber')).required(t('requiredField')) as yup.NumberSchema,
+  const schema = object<Partial<FolderDto>>().shape({
+    nameKk: string(),
+    nameRu: string().required(t('requiredField')),
+    nameEn: string(),
+    descriptionKk: string(),
+    descriptionRu: string(),
+    descriptionEn: string(),
+    isPublic: boolean(),
+    rank: number().typeError(t('mustBeNumber')).required(t('requiredField')) as NumberSchema,
   });
 
   const methods = useForm<CreateFolderRequest>({
@@ -75,7 +75,7 @@ export const MapFolderCreateForm: FC<Props> = ({ parentId, onCancel, onSuccess }
   };
 
   return (
-    <Box onSubmit={handleSubmit(onSubmit)} noValidate sx={{ pt: 1 }} component={'form'}>
+    <Box onSubmit={handleSubmit(onSubmit)} noValidate component={'form'} sx={{ pt: 1}}>
       <Box display="flex" gap={2} flexWrap={'wrap'} mb={2}>
         <TextField
           {...methods.register('nameRu')}
