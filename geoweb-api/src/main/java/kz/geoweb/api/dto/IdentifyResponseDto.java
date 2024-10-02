@@ -9,5 +9,5 @@ public class IdentifyResponseDto {
     private LayerInfoDto layer;
     private Integer gid;
     private String geom;
-    private Set<IdentifyFeatureDto> features;
+    private Set<IdentifyAttrDto> attributes;
 }

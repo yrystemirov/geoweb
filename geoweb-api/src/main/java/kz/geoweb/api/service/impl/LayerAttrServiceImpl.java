@@ -70,6 +70,8 @@ public class LayerAttrServiceImpl implements LayerAttrService {
                     attrname, layerAttrDto.getLayer().getId().toString());
         }
         LayerAttr layerAttr = layerAttrMapper.toEntity(layerAttrDto);
+        Layer layer = getLayerEntityById(layerAttrDto.getLayer().getId());
+        layerAttr.setLayer(layer);
         LayerAttr created = layerAttrRepository.save(layerAttr);
         jdbcService.createAttribute(created.getLayer().getLayername(), created.getAttrname(), created.getAttrType());
         geoserverService.reload();

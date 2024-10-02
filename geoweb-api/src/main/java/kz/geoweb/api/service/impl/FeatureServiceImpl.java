@@ -141,6 +141,7 @@ public class FeatureServiceImpl implements FeatureService {
                 List<String> values = new ArrayList<>();
                 for (String entryValue : entryValues) {
                     Optional<EntryDto> entry = entries.stream().filter(e -> e.getCode().equals(entryValue.trim())).findFirst();
+                    // TODO: localization
                     entry.ifPresent(e -> values.add(e.getRu()));
                 }
                 if (!values.isEmpty()) {
@@ -268,7 +269,7 @@ public class FeatureServiceImpl implements FeatureService {
                     layerAttrsList.add(new LayerLayerAttrsDto(layername, layer, layerAttrs));
                 }
                 IdentifyResponseDto identifyResponseDto = new IdentifyResponseDto();
-                Set<IdentifyFeatureDto> identifyFeatureDtoSet = new HashSet<>();
+                Set<IdentifyAttrDto> identifyAttrDtoSet = new HashSet<>();
                 for (Map.Entry<String, Object> entry : feature.entrySet()) {
                     String key = entry.getKey();
                     if (key.equals(GID) || key.equals(GEOM)) continue;
@@ -277,22 +278,22 @@ public class FeatureServiceImpl implements FeatureService {
                             .filter(attr -> attr.getAttrname().equals(key))
                             .findFirst()
                             .ifPresent(layerAttr -> {
-                                IdentifyFeatureDto identifyFeatureDto = new IdentifyFeatureDto();
-                                identifyFeatureDto.setAttr(layerAttr);
+                                IdentifyAttrDto identifyAttrDto = new IdentifyAttrDto();
+                                identifyAttrDto.setAttr(layerAttr);
                                 if (layerAttr.getAttrType() == AttrType.DICTIONARY) {
                                     fillDictionaryValue(feature, layerAttr);
-                                    identifyFeatureDto.setValue(feature.get(key));
+                                    identifyAttrDto.setValue(feature.get(key));
                                 } else {
-                                    identifyFeatureDto.setValue(value);
+                                    identifyAttrDto.setValue(value);
                                 }
-                                identifyFeatureDtoSet.add(identifyFeatureDto);
+                                identifyAttrDtoSet.add(identifyAttrDto);
                             });
                 }
                 String geom = feature.get(GEOM).toString();
                 identifyResponseDto.setGid(gid);
                 identifyResponseDto.setGeom(geom);
                 identifyResponseDto.setLayer(layer);
-                identifyResponseDto.setFeatures(identifyFeatureDtoSet);
+                identifyResponseDto.setAttributes(identifyAttrDtoSet);
                 identifyResponseDtoList.add(identifyResponseDto);
             } catch (Exception e) {
                 log.error("Error identifying feature: {}", e.getMessage());
