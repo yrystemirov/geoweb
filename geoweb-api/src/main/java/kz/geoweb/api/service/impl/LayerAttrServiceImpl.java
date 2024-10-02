@@ -4,6 +4,7 @@ import kz.geoweb.api.dto.LayerAttrDto;
 import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.entity.LayerAttr;
 import kz.geoweb.api.enums.Action;
+import kz.geoweb.api.enums.AttrType;
 import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.exception.ForbiddenException;
 import kz.geoweb.api.mapper.LayerAttrMapper;
@@ -87,6 +88,9 @@ public class LayerAttrServiceImpl implements LayerAttrService {
         layerAttr.setNameEn(layerAttrDto.getNameEn());
         layerAttr.setShortInfo(layerAttrDto.getShortInfo());
         layerAttr.setFullInfo(layerAttrDto.getFullInfo());
+        if (layerAttrDto.getAttrType() == AttrType.DICTIONARY) {
+            layerAttr.setAttrType(AttrType.DICTIONARY);
+        }
         layerAttr.setDictionaryCode(layerAttrDto.getDictionaryCode());
         layerAttr.setRank(layerAttrDto.getRank());
         LayerAttr updated = layerAttrRepository.save(layerAttr);
