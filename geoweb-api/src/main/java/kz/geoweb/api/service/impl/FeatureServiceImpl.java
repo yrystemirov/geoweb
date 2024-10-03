@@ -311,6 +311,8 @@ public class FeatureServiceImpl implements FeatureService {
             if (layer.contains(":")) {
                 layername = layer.split(":")[1];
             }
+            log.info("Identifying public layer: {}", layer);
+            log.info("Identifying public layername: {}", layername);
             LayerInfoDto layerInfoDto = layerService.getLayerByLayername(layername);
             if (layerInfoDto.getIsPublic()) {
                 publicLayers.add(layer);
