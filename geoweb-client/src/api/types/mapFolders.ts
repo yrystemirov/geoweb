@@ -75,3 +75,17 @@ export type FolderTreeDto = {
   children: FolderTreeDto[]; // or FolderDto[]?
   layers: LayerDto[];
 };
+
+export type LayerAttrDto = {
+    id: string,
+    nameKk: string,
+    nameRu: string,
+    nameEn: string,
+    attrname: string,
+    attrType: string,
+    shortInfo: true,
+    fullInfo: true,
+    layer: LayerDto,
+    dictionaryCode: string,
+    rank: number
+  }

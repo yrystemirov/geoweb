@@ -37,8 +37,7 @@ class GeoserverIdnetifyParams {
 }
 
 export const IdentifyPanel = (props: any) => {
-  const { map, setMap, mapMode, setMapMode, userLayers, setUserLayers, identifyEventData, setIdentifyEventData } =
-    usePublicMapStore();
+  const { map, userLayers, identifyEventData, setIdentifyEventData } = usePublicMapStore();
   const [identData, setIdentData] = useState<any>();
   const [selectedFeature, setSelectedFeature] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -51,7 +50,7 @@ export const IdentifyPanel = (props: any) => {
   useEffect(() => {
     if (!identifyEventData || !map) return;
     setIdentData([]);
-    
+
     let identData_: any[] = [];
     /*context.map.forEachFeatureAtPixel(context.identifyEventData.pixel, (feat: any) => {
             let layerAttrs_ = [];
@@ -81,7 +80,6 @@ export const IdentifyPanel = (props: any) => {
             }
             identData_.push(item_);
         })*/
-    setIdentData(identData_);
     setIsLoading(true);
     let _layerNames: any[] = [];
     let layerGroups: any = map?.getLayers().getArray();
@@ -155,20 +153,19 @@ export const IdentifyPanel = (props: any) => {
   function getIdent(url: any, identData_: any[]) {
     const newData: any[] = identData_ ? identData_ : [];
     const urlParams = new URLSearchParams(url);
-    if (!urlParams.get('LAYERS')){
-        return;
-    }
-      mapOpenAPI
-        .getOpenApiIdentify({
-          layers: urlParams.get('LAYERS'),
-          updatedTime: urlParams.get('updatedTime'),
-          i: urlParams.get('I'),
-          j: urlParams.get('J'),
-          bbox: urlParams.get('BBOX'),
-        })
-        .then((res: any) => {
-            
-        });
+
+    mapOpenAPI
+      .getOpenApiIdentify({
+        layers: urlParams.get('LAYERS'),
+        updatedTime: urlParams.get('updatedTime'),
+        i: urlParams.get('I'),
+        j: urlParams.get('J'),
+        bbox: urlParams.get('BBOX'),
+      })
+      .then((res: any) => {
+        setIdentData(res.data);
+      });
+
     /*api
       .post(`${gisApi}/features/wms`, {
         layers: urlParams.get('LAYERS'),
@@ -348,11 +345,11 @@ export const IdentifyPanel = (props: any) => {
   const renderList = () => {
     const list = identData?.map((item: any, index: number) => {
       return (
-        <TabContext value={tab} key={item.attrs[0].gid}>
+        <TabContext value={tab} key={item.gid}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <TabList onChange={handleChange} aria-label="">
               <Tab label="Атрибуты" value="attribute" />
-              <Tab label="Файлы" value="file" />
+              {/* <Tab label="Файлы" value="file" /> */}
             </TabList>
           </Box>
           <TabPanel value="attribute" sx={{ width: '100%', padding: 0, marginTop: '10px' }}>
@@ -368,7 +365,7 @@ export const IdentifyPanel = (props: any) => {
                 classes={{ expanded: 'expanded' }}
               >
                 {/* <Typography>{translateField(item.layer, 'name', locale)}</Typography> */}
-                <Typography>{item.layerNameRu}</Typography>
+                <Typography>{item.layer.nameRu}</Typography>
               </AccordionSummary>
               <AccordionDetails sx={{ padding: '8px 0px 0px', width: '100%', overflowX: 'scroll' }}>
                 <Table
@@ -380,36 +377,35 @@ export const IdentifyPanel = (props: any) => {
                   }}
                 >
                   <TableBody>
-                    {item.layer.layerAttrs.length > 0 &&
-                      item.layer.layerAttrs
-                        .filter((x: any) => x.shortinfo)
-                        .map((column: any) => (
-                          <TableRow key={column.nameRu}>
-                            <TableCell
-                              component="th"
-                              scope="row"
-                              sx={{ padding: '2px' }}
-                              style={{
-                                padding: '6px 2px',
-                                wordWrap: 'break-word',
-                                whiteSpace: 'normal',
-                              }}
-                              width={180}
-                            >
-                              {column.nameRu}
-                            </TableCell>
-                            <TableCell
-                              width={270}
-                              style={{
-                                padding: '6px 2px',
-                                wordWrap: 'break-word',
-                                whiteSpace: 'normal',
-                              }}
-                            >
-                              {getValueFixed(item, column.attrname)}
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                    {item.attributes.length > 0 &&
+                      item.attributes.map((attributeItem: any) => (
+                        <TableRow key={attributeItem.attr.nameRu}>
+                          <TableCell
+                            component="th"
+                            scope="row"
+                            sx={{ padding: '2px' }}
+                            style={{
+                              padding: '6px 2px',
+                              wordWrap: 'break-word',
+                              whiteSpace: 'normal',
+                            }}
+                            width={180}
+                          >
+                            {attributeItem.attr.nameRu}
+                          </TableCell>
+                          <TableCell
+                            width={270}
+                            style={{
+                              padding: '6px 2px',
+                              wordWrap: 'break-word',
+                              whiteSpace: 'normal',
+                            }}
+                          >
+                            {/* {getValueFixed(item, attributeItem.value)} */}
+                          {attributeItem.value}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </AccordionDetails>
@@ -489,7 +485,20 @@ export const IdentifyPanel = (props: any) => {
           // boxShadow: '0px 32px 32px -8px rgba(18, 18, 18, 0.08), 0px 0px 32px -8px rgba(18, 18, 18, 0.12), 0px 0px 1px rgba(18, 18, 18, 0.2)',
         }}
       >
-        <div className="menu">
+        <div
+          className="menu"
+          style={{
+            width: '43px',
+            background: '#e5e5e5',
+            borderLeft: '1px #dadada solid',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            padding: '2px',
+            gap: '12px',
+          }}
+        >
           <IconButton
             aria-label="delete"
             onClick={() => {

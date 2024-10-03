@@ -12,13 +12,14 @@ import TileLayer from 'ol/layer/Tile';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import LayerGroup from 'ol/layer/Group';
 import { usePublicMapStore } from '../../../hooks/usePublicMapStore';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
 interface Props {
   color?: CSSProperties['background'];
 }
 
 export const LeftPanel: React.FC<Props> = ({ color }) => {
-  const { map, userLayers } = usePublicMapStore();
+  const { map, userLayers, attributeTables, setAttributeTables, setCurrentAttributeTable } = usePublicMapStore();
   const { t } = useTranslation();
   const label = t('maps.title');
   const [layerList, setLayerList] = useState<any[]>([]);
@@ -28,11 +29,9 @@ export const LeftPanel: React.FC<Props> = ({ color }) => {
     if (!userLayers || userLayers.length == 0) return;
     let layerListNew: any[] = [];
     userLayers.map((layerItem: TileLayer) => {
-      layerListNew.push({
-        code: layerItem.getProperties().code,
-        layer: layerItem.getProperties().label,
-        visible: layerItem.getVisible(),
-      });
+      let layerItem_ = layerItem.getProperties().systemLayerProps;
+      layerItem_.visible = layerItem.getVisible();
+      layerListNew.push(layerItem_);
     });
     setLayerList(layerListNew);
   }, [userLayers]);
@@ -45,7 +44,7 @@ export const LeftPanel: React.FC<Props> = ({ color }) => {
     setDialogOpen(false);
   };
 
-  const switchLayer = (layerName: string, visible: boolean, code: string) => {
+  const switchLayer = (visible: boolean, code: string) => {
     if (userLayers.length > 0) {
       for (let userLayer_ of userLayers) {
         if (userLayer_.getProperties().code === code) {
@@ -105,26 +104,36 @@ export const LeftPanel: React.FC<Props> = ({ color }) => {
           </Typography>
           {layerList.map((layerItem: any) => {
             return (
-              <div key={layerItem.layer}>
+              <div key={layerItem.layername}>
+                {layerItem.layername}
                 <IconButton
                   onClick={() => {
                     let visible_ = false;
                     let layers_: any[] = [];
                     layerList.map((layer_) => {
-                      if (layer_.code == layerItem.code) {
+                      if (layer_.id == layerItem.id) {
                         visible_ = !layer_.visible;
                         layer_.visible = !layer_.visible;
                       }
                       layers_.push(layer_);
                     });
                     setLayerList(layers_);
-                    switchLayer(layerItem.layer, visible_, layerItem.code);
+                    switchLayer(visible_, layerItem.id);
                   }}
                 >
                   {layerItem.visible && <VisibilityIcon />}
                   {!layerItem.visible && <VisibilityOffIcon />}
                 </IconButton>
-                {layerItem.layer}
+                <IconButton
+                  onClick={() => {
+                    debugger;
+                    attributeTables.push(layerItem);
+                    setAttributeTables(attributeTables);
+                    setCurrentAttributeTable(layerItem);
+                  }}
+                >
+                  <ListAltIcon />
+                </IconButton>
               </div>
             );
           })}

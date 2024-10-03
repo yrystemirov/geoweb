@@ -16,6 +16,10 @@ type PublicMapState = {
   setUserLayers: (layers: TileLayer[]) => void;
   identifyEventData: any;
   setIdentifyEventData: (identifyEventData: any) => void;
+  attributeTables: any[];
+  setAttributeTables: (attributeTables: any[]) => void;
+  currentAttributeTable: any;
+  setCurrentAttributeTable: (currentAttributeTable: any) => void;
 };
 
 export const usePublicMapStore = create<PublicMapState>((set) => ({
@@ -26,5 +30,9 @@ export const usePublicMapStore = create<PublicMapState>((set) => ({
   userLayers: [],
   setUserLayers: (userLayers) => set({ userLayers }),
   identifyEventData: null,
-  setIdentifyEventData: (identifyEventData)=>set({identifyEventData})
+  setIdentifyEventData: (identifyEventData) => set({ identifyEventData }),
+  attributeTables: [],
+  setAttributeTables: (attributeTables: any[]) => set({ attributeTables }),
+  currentAttributeTable: null,
+  setCurrentAttributeTable: (currentAttributeTable: any) => set({ currentAttributeTable }),
 }));

@@ -19,10 +19,11 @@ import { useQuery } from '@tanstack/react-query';
 import { mapOpenAPI } from '../../api/openApi';
 import LayerGroup from 'ol/layer/Group';
 import { IdentifyPanel } from './identifyPanel';
+import { AttributeTabsPanel } from './attributeTabsPanel';
 
 const MapComponent = () => {
   const mapDivRef = useRef<HTMLDivElement | null>(null);
-  const { map, setMap, mapMode, userLayers, setUserLayers, identifyEventData, setIdentifyEventData } =
+  const { map, setMap, mapMode, userLayers, setUserLayers, identifyEventData, setIdentifyEventData, attributeTables } =
     usePublicMapStore();
   const [baseLayersArr, setBaseLayersArr] = useState<TileLayer[]>([]);
   //const [userLayersArr, setUserLayersArr] = useState<TileLayer[]>([]);
@@ -30,7 +31,7 @@ const MapComponent = () => {
   const [mounted, setMounted] = useState<boolean>(false);
   const [mapDataLoaded, setMapDataLoaded] = useState<boolean>(false);
   const [lyrTree, setLyrTree] = useState<any>([]);
-
+  const mainColor = '#5ebc67'; //5ebc67-green    196fa6-blue
   const [lyrTreeInited, setLyrTreeinIted] = useState<boolean>(false);
   //const [layersToAddToMap, setLayersToAddToMap] = useState<any[]>([]);
 
@@ -93,8 +94,10 @@ const MapComponent = () => {
 
     const mapObj = new Map({
       view: new View({
-        center: [7739532.205446683, 6290648.115801078],
-        zoom: 5.15,
+        //center: [7739532.205446683, 6290648.115801078],
+        center: [7945476.188792471, 5295863.006421878],
+        //zoom: 5.15,
+        zoom: 15,
       }),
       layers: [
         new LayerGroup({
@@ -202,6 +205,7 @@ const MapComponent = () => {
             url: mainGeoserverWmsUrl + '?layers=geoweb:' + maplayer.layername,
             sourceType: TileLayerSourceType.WMS,
             opacity: 1,
+            systemLayerProps: maplayer,
           }),
         );
       }
@@ -293,7 +297,7 @@ const MapComponent = () => {
           zIndex: 5000,
         }}
       >
-        {map && <LeftPanel color="#5ebc67" />}
+        {map && <LeftPanel color={mainColor} />}
       </Box>
       <Box
         display={'flex'}
@@ -311,15 +315,16 @@ const MapComponent = () => {
       >
         {map && (
           <>
-            <HomeExtentButton map={map} color="#5ebc67" />
-            <MyLocation map={map} color="#5ebc67" />
-            <BaseLayersTool map={map} color="#5ebc67" layers={baseLayersArr} />
-            <Measurement color="#5ebc67" />
+            <HomeExtentButton map={map} color={mainColor} />
+            <MyLocation map={map} color={mainColor} />
+            <BaseLayersTool map={map} color={mainColor} layers={baseLayersArr} />
+            <Measurement color={mainColor} />
           </>
         )}
       </Box>
 
       {identifyEventData && <IdentifyPanel />}
+      {attributeTables && attributeTables.length > 0 && <AttributeTabsPanel key="map-attr-table" toggle={true} />}
       <div
         className=""
         style={{
