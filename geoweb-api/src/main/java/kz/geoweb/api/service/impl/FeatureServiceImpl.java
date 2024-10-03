@@ -307,7 +307,11 @@ public class FeatureServiceImpl implements FeatureService {
         String[] layers = wmsRequestDto.getLayers().split(",");
         List<String> publicLayers = new ArrayList<>();
         for (String layer : layers) {
-            LayerInfoDto layerInfoDto = layerService.getLayerByLayername(layer);
+            String layername = layer;
+            if (layer.contains(":")) {
+                layername = layer.split(":")[1];
+            }
+            LayerInfoDto layerInfoDto = layerService.getLayerByLayername(layername);
             if (layerInfoDto.getIsPublic()) {
                 publicLayers.add(layer);
             }
