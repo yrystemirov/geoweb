@@ -304,21 +304,19 @@ public class FeatureServiceImpl implements FeatureService {
 
     @Override
     public List<IdentifyResponseDto> identifyPublic(WmsRequestDto wmsRequestDto) {
-//        String[] layers = wmsRequestDto.getLayers().split(",");
-//        List<String> publicLayers = new ArrayList<>();
-//        for (String layer : layers) {
-//            String layername = layer;
-//            if (layer.contains(":")) {
-//                layername = layer.split(":")[1];
-//            }
-//            log.info("Identifying public layer: {}", layer);
-//            log.info("Identifying public layername: {}", layername);
-//            LayerInfoDto layerInfoDto = layerService.getLayerByLayername(layername);
-//            if (layerInfoDto.getIsPublic()) {
-//                publicLayers.add(layer);
-//            }
-//        }
-//        wmsRequestDto.setLayers(String.join(",", publicLayers));
+        String[] layers = wmsRequestDto.getLayers().split(",");
+        List<String> publicLayers = new ArrayList<>();
+        for (String layer : layers) {
+            String layername = layer;
+            if (layer.contains(":")) {
+                layername = layer.split(":")[1];
+            }
+            LayerInfoDto layerInfoDto = layerService.getLayerByLayername(layername);
+            if (layerInfoDto.getIsPublic()) {
+                publicLayers.add(layer);
+            }
+        }
+        wmsRequestDto.setLayers(String.join(",", publicLayers));
         return identify(wmsRequestDto);
     }
 
