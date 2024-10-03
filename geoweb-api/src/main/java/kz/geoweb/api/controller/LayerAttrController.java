@@ -21,6 +21,7 @@ public class LayerAttrController {
 
     @PostMapping
     public LayerAttrDto createLayerAttr(@RequestBody @Valid LayerAttrDto layerAttrDto) {
+        // TODO: if geoserver error, delete layer_attr
         return layerAttrService.createLayerAttr(layerAttrDto);
     }
 
