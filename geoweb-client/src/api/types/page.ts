@@ -32,3 +32,7 @@ export type PaginationRequest = {
   size?: number;
   sort?: string[];
 };
+
+export type SearchablePaginationRequest = PaginationRequest & {
+  search?: string;
+};

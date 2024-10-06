@@ -38,7 +38,7 @@ export const InfiniteScrollSelect = <T,>({
   onChange,
   fetchFn,
   disabledFn,
-  searchKey = 'name',
+  searchKey = 'search',
   searchIsEnabled,
   getOptionLabel,
   getOptionValue,
@@ -153,7 +153,7 @@ export const InfiniteScrollSelect = <T,>({
         {searchIsEnabled && (
           <Box px={2} py={1}>
             <TextField
-              placeholder={t('common:search')}
+              placeholder={t('search')}
               fullWidth
               onChange={(e) => setSearch(e.target.value)}
               onClick={(e) => {
@@ -196,7 +196,7 @@ export const InfiniteScrollSelect = <T,>({
 
         {allItems.length === 0 && (
           <MenuItem disabled sx={{ whiteSpace: 'normal' }}>
-            {t(debouncedSearch ? 'common:noResult' : 'common:noData')}
+            {t(debouncedSearch ? 'noResult' : 'noData')}
           </MenuItem>
         )}
 

@@ -22,11 +22,11 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { dictionariesAPI } from '../../../api/dictioanries';
 import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
 import { fieldIsRequiredProps } from './Entries/utils';
-import { useNotifications } from '@toolpad/core';
 import i18n from '../../../i18n';
-import { constants } from '../../../constants';
 import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
 import ConfirmDialog from '../../common/Confirm';
+import { useNotify } from '../../../hooks/useNotify';
+import { AxiosError } from 'axios';
 
 export type DictionaryRow = {
   id: string;
@@ -38,7 +38,7 @@ export type DictionaryRow = {
 };
 
 export const Dictionaries: FC = () => {
-  const notifications = useNotifications();
+  const { showSuccess, showError } = useNotify();
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
   const [rows, setRows] = useState<DictionaryRow[]>([]);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
@@ -56,7 +56,7 @@ export const Dictionaries: FC = () => {
   const onEditError = (error: any) => {
     const hasTranslation = i18n.exists(error?.response?.data?.message);
     const message = hasTranslation ? t(error.response.data.message) : t('errorOccurred');
-    notifications.show(message, { severity: 'error', autoHideDuration: constants.ntfHideDelay });
+    showError({ text: message });
   };
 
   const addMutation = useMutation({
@@ -65,6 +65,7 @@ export const Dictionaries: FC = () => {
     onSuccess: (newRow) => {
       queryClient.invalidateQueries({ queryKey: ['dictionaries', pagination] });
       setRows(rows.map((row) => (row.id === newRow.id ? newRow : row)));
+      showSuccess();
     },
     onError: onEditError,
   });
@@ -75,10 +76,12 @@ export const Dictionaries: FC = () => {
     onSuccess: (updatedRow) => {
       queryClient.invalidateQueries({ queryKey: ['dictionaries', pagination] });
       setRows(rows.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
+      showSuccess();
     },
-    onError: (e, { oldRow }) => {
-      onEditError(e);
+    onError: (error: AxiosError<any>, { oldRow }) => {
+      onEditError(error);
       setRows(rows.map((row) => (row.id === oldRow.id ? oldRow : row)));
+      showError({ text: error?.response?.data?.message });
     },
   });
 
@@ -87,6 +90,7 @@ export const Dictionaries: FC = () => {
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['dictionaries', pagination] });
       setRows(rows.filter((row) => row.id !== id));
+      showSuccess();
     },
     onError: onEditError,
   });

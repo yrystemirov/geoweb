@@ -20,6 +20,7 @@ import { MapFolderEditForm } from '../../MapFolder/EditForm';
 import { MapFolderCreateForm } from '../../MapFolder/CreateForm';
 import { LayerForm } from '../../MapFolder/LayerForm';
 import { layersAPI } from '../../../../../api/layer';
+import { uuidv4 } from '../../../../../utils/uidv4';
 
 enum DialogType {
   none = '',
@@ -95,20 +96,19 @@ export const MapFolderEditLayers: FC = () => {
         .map((child) => recursiveConvertToTreeNode(child))
         .concat(
           data.layers.map((layer) => ({
-            value: layer.id,
+            // вынужденное решение, т.к. react-checkbox-tree не поддерживает дубликаты value, а у нас могут быть папки с одинаковыми слоями
+            value: uuidv4(),
             label: (
               <Box display={'flex'} alignItems={'center'}>
                 {layer[nameProp]}
                 <MapFolderActionsMenu
                   onEditLayer={() => setOpenDialog({ type: DialogType.editLayer, selectedItem: layer })}
-                  onDeleteLayer={() => setOpenDialog({ type: DialogType.deleteLayer, selectedItem: layer })}
+                  onDeleteLayerAtAll={() => setOpenDialog({ type: DialogType.deleteLayer, selectedItem: layer })}
                 />
               </Box>
             ),
-            ['data' as any]: { ...layer }, // если не надо, удалить
           })),
         ),
-      ['data' as any]: { ...data }, // если не надо, удалить
     };
   };
 
@@ -120,6 +120,12 @@ export const MapFolderEditLayers: FC = () => {
     }
     return '';
   }, [openDialog.selectedItem, nameProp]);
+
+  const addExpand = (id?: string) => {
+    if (id && !expanded.includes(id)) {
+      setExpanded((prev) => [...prev, id]);
+    }
+  };
 
   return (
     <>
@@ -153,6 +159,7 @@ export const MapFolderEditLayers: FC = () => {
             onSuccess={() => {
               onClose();
               refetch();
+              addExpand(openDialog.selectedItem?.id);
             }}
             onCancel={onClose}
           />
@@ -176,6 +183,7 @@ export const MapFolderEditLayers: FC = () => {
             onSuccess={() => {
               onClose();
               refetch();
+              addExpand(openDialog.selectedItem?.id);
             }}
             onCancel={onClose}
             addFolderId={openDialog.selectedItem?.id}
@@ -208,7 +216,7 @@ export const MapFolderEditLayers: FC = () => {
           open={openDialog.type === DialogType.deleteLayer}
           onClose={onClose}
           onSubmit={() => deleteLayerMutation.mutate(openDialog.selectedItem!.id)}
-          title={t('maps.deleteLayer')}
+          title={t('maps.deleteLayerAtAll')}
           isLoading={deleteLayerMutation.isPending}
         >
           {t('deleteConfirmDescription')}
