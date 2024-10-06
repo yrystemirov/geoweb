@@ -61,7 +61,7 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
         }}
       >
         <MenuItem onClick={() => navigate(`/dashboard/maps/${data.id}/edit`)}>
-          <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties')}
+          <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
 
         <MenuItem onClick={() => navigate(`/dashboard/maps/${data.id}/edit-layers`)}>

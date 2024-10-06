@@ -13,45 +13,49 @@ import { FolderTreeDto, LayerDto } from '../../../../../api/types/mapFolders';
 import { useTranslatedProp } from '../../../../../hooks/useTranslatedProp';
 import ConfirmDialog from '../../../../common/Confirm';
 import i18n from '../../../../../i18n';
-import { useNotifications } from '@toolpad/core';
-import { constants } from '../../../../../constants';
 import { Dialog } from '../../../../common/Dialog';
 import { MapFolderEditForm } from '../../MapFolder/EditForm';
 import { MapFolderCreateForm } from '../../MapFolder/CreateForm';
 import { LayerForm } from '../../MapFolder/LayerForm';
 import { layersAPI } from '../../../../../api/layer';
 import { uuidv4 } from '../../../../../utils/uidv4';
+import { useNotify } from '../../../../../hooks/useNotify';
 
 enum DialogType {
   none = '',
+  createFolder = 'createFolder',
+  editFolder = 'editFolder',
+  deleteFolder = 'deleteFolder',
   addLayer = 'addLayer',
-  create = 'create',
-  edit = 'edit',
   editLayer = 'editLayer',
-  delete = 'delete',
   deleteLayer = 'deleteLayer',
+  removeLayerFromFolder = 'removeLayerFromFolder',
+  removeLayerFromAllFolders = 'removeLayerFromAllFolders',
 }
 
 export const MapFolderEditLayers: FC = () => {
-  const notifications = useNotifications();
+  const { showSuccess, showError } = useNotify();
   const [expanded, setExpanded] = useState<string[]>([]);
   const navigate = useNavigate();
   const nameProp = useTranslatedProp('name');
   const { t } = useTranslation();
   const { id } = useParams();
-  const [openDialog, setOpenDialog] = useState<{ type: DialogType; selectedItem: FolderTreeDto | LayerDto | null }>({
+  const [openDialog, setOpenDialog] = useState<{
+    type: DialogType;
+    selectedItem: { layer?: LayerDto; folder?: FolderTreeDto } | null;
+  }>({
     type: DialogType.none,
     selectedItem: null,
   });
 
-  const onClose = () => {
+  const closeDialogs = () => {
     setOpenDialog({ type: DialogType.none, selectedItem: null });
   };
 
   const handleError = (error: any) => {
     const hasTranslation = i18n.exists(error?.response?.data?.message);
     const message = hasTranslation ? t(error.response.data.message) : t('errorOccurred');
-    notifications.show(message, { severity: 'error', autoHideDuration: constants.ntfHideDelay });
+    showError({ text: message });
   };
 
   const { data: treeData, refetch } = useQuery({
@@ -63,8 +67,8 @@ export const MapFolderEditLayers: FC = () => {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => mapFoldersAPI.deleteFolder(id).then((res) => res.data),
     onSuccess: () => {
-      refetch();
-      onClose();
+      handleSuccess();
+      showSuccess();
     },
     onError: handleError,
   });
@@ -72,38 +76,78 @@ export const MapFolderEditLayers: FC = () => {
   const deleteLayerMutation = useMutation({
     mutationFn: (id: string) => layersAPI.deleteLayer(id).then((res) => res.data),
     onSuccess: () => {
-      refetch();
-      onClose();
+      handleSuccess();
+      showSuccess();
     },
     onError: handleError,
   });
 
-  const recursiveConvertToTreeNode = (data: FolderTreeDto): Node => {
+  const getAndRemoveLayerFromFolderMutation = useMutation({
+    mutationFn: (layerId: string) => layersAPI.getLayer(layerId).then((res) => res.data),
+    onSuccess: (data) => {
+      editLayerMutation.mutate({
+        ...data,
+        folders: data.folders.filter((f) => f.id !== openDialog.selectedItem?.folder?.id),
+      });
+    },
+    onError: handleError,
+  });
+
+  const getAndRemoveLayerFromAllFoldersMutation = useMutation({
+    mutationFn: (layerId: string) => layersAPI.getLayer(layerId).then((res) => res.data),
+    onSuccess: (data) => {
+      editLayerMutation.mutate({ ...data, folders: [] });
+    },
+    onError: handleError,
+  });
+
+  const editLayerMutation = useMutation({
+    mutationFn: (layer: LayerDto) => layersAPI.updateLayer(layer.id, layer),
+    onSuccess: () => {
+      handleSuccess();
+      showSuccess();
+    },
+    onError: handleError,
+  });
+
+  const handleSuccess = (idToExpand?: string) => {
+    closeDialogs();
+    refetch();
+    addExpand(idToExpand);
+  };
+
+  const recursiveConvertToTreeNode = (folder: FolderTreeDto): Node => {
     return {
-      value: data.id,
+      value: folder.id,
       label: (
         <Box display={'flex'} alignItems={'center'}>
-          {data[nameProp]}
+          {folder[nameProp]}
           <MapFolderActionsMenu
-            onAdd={() => setOpenDialog({ type: DialogType.create, selectedItem: data })}
-            onDelete={() => setOpenDialog({ type: DialogType.delete, selectedItem: data })}
-            onEdit={() => setOpenDialog({ type: DialogType.edit, selectedItem: data })}
-            onAddLayer={() => setOpenDialog({ type: DialogType.addLayer, selectedItem: data })}
+            onAdd={() => setOpenDialog({ type: DialogType.createFolder, selectedItem: { folder } })}
+            onDelete={() => setOpenDialog({ type: DialogType.deleteFolder, selectedItem: { folder } })}
+            onEdit={() => setOpenDialog({ type: DialogType.editFolder, selectedItem: { folder } })}
+            onAddLayer={() => setOpenDialog({ type: DialogType.addLayer, selectedItem: { folder } })}
           />
         </Box>
       ),
-      children: data.children
+      children: folder.children
         .map((child) => recursiveConvertToTreeNode(child))
         .concat(
-          data.layers.map((layer) => ({
+          folder.layers.map((layer) => ({
             // вынужденное решение, т.к. react-checkbox-tree не поддерживает дубликаты value, а у нас могут быть папки с одинаковыми слоями
             value: uuidv4(),
             label: (
               <Box display={'flex'} alignItems={'center'}>
                 {layer[nameProp]}
                 <MapFolderActionsMenu
-                  onEditLayer={() => setOpenDialog({ type: DialogType.editLayer, selectedItem: layer })}
-                  onDeleteLayerAtAll={() => setOpenDialog({ type: DialogType.deleteLayer, selectedItem: layer })}
+                  onEditLayer={() => setOpenDialog({ type: DialogType.editLayer, selectedItem: { layer } })}
+                  onDeleteLayer={() => setOpenDialog({ type: DialogType.deleteLayer, selectedItem: { layer } })}
+                  onRemoveLayerFromFolder={() =>
+                    setOpenDialog({ type: DialogType.removeLayerFromFolder, selectedItem: { layer, folder } })
+                  }
+                  onRemoveLayerFromAllFolders={() =>
+                    setOpenDialog({ type: DialogType.removeLayerFromAllFolders, selectedItem: { layer } })
+                  }
                 />
               </Box>
             ),
@@ -114,11 +158,14 @@ export const MapFolderEditLayers: FC = () => {
 
   const treeNodes = treeData ? [recursiveConvertToTreeNode(treeData)] : [];
 
-  const selectedItemNameTitle = useMemo(() => {
+  const selectedItemName = useMemo(() => {
     if (openDialog.selectedItem) {
-      return openDialog.selectedItem[nameProp] ? `"${openDialog.selectedItem[nameProp]}": ` : '';
+      return {
+        folder: openDialog.selectedItem.folder ? `"${openDialog.selectedItem.folder[nameProp]}"` : '',
+        layer: openDialog.selectedItem.layer ? `"${openDialog.selectedItem.layer[nameProp]}"` : '',
+      };
     }
-    return '';
+    return null;
   }, [openDialog.selectedItem, nameProp]);
 
   const addExpand = (id?: string) => {
@@ -150,74 +197,83 @@ export const MapFolderEditLayers: FC = () => {
           }}
         />
         <Dialog
-          open={openDialog.type === DialogType.create}
-          onClose={onClose}
-          title={`${selectedItemNameTitle}${t('maps.addFolder')}`}
+          open={openDialog.type === DialogType.createFolder}
+          onClose={closeDialogs}
+          title={t('maps.addFolderTitle', { folder: selectedItemName?.folder })}
         >
           <MapFolderCreateForm
-            parentId={openDialog.selectedItem?.id}
-            onSuccess={() => {
-              onClose();
-              refetch();
-              addExpand(openDialog.selectedItem?.id);
-            }}
-            onCancel={onClose}
+            parentId={openDialog.selectedItem?.folder?.id}
+            onSuccess={() => handleSuccess(openDialog.selectedItem?.folder?.id)}
+            onCancel={closeDialogs}
           />
         </Dialog>
-        <Dialog open={openDialog.type === DialogType.edit} onClose={onClose} title={t('editProperties')}>
-          <MapFolderEditForm
-            id={openDialog.selectedItem?.id}
-            onSuccess={() => {
-              onClose();
-              refetch();
-            }}
-            onCancel={onClose}
-          />
+        <Dialog
+          open={openDialog.type === DialogType.editFolder}
+          onClose={closeDialogs}
+          title={t('editProperties', { name: selectedItemName?.folder })}
+        >
+          <MapFolderEditForm id={openDialog.selectedItem?.folder?.id} onSuccess={handleSuccess} onCancel={closeDialogs} />
         </Dialog>
+
         <Dialog
           open={openDialog.type === DialogType.addLayer}
-          onClose={onClose}
-          title={`${selectedItemNameTitle}${t('maps.addLayer')}`}
+          onClose={closeDialogs}
+          title={t('maps.addLayerTitle', { folder: selectedItemName?.folder })}
         >
           <LayerForm
-            onSuccess={() => {
-              onClose();
-              refetch();
-              addExpand(openDialog.selectedItem?.id);
-            }}
-            onCancel={onClose}
-            addFolderId={openDialog.selectedItem?.id}
+            onSuccess={() => handleSuccess(openDialog.selectedItem?.folder?.id)}
+            onCancel={closeDialogs}
+            addFolderId={openDialog.selectedItem?.folder?.id}
           />
         </Dialog>
+
         <Dialog
           open={openDialog.type === DialogType.editLayer}
-          onClose={onClose}
-          title={`${selectedItemNameTitle}${t('maps.editLayer')}`}
+          onClose={closeDialogs}
+          title={t('maps.editLayer', { layer: selectedItemName?.layer })}
         >
-          <LayerForm
-            editLayerId={openDialog.selectedItem?.id}
-            onSuccess={() => {
-              onClose();
-              refetch();
-            }}
-            onCancel={onClose}
-          />
+          <LayerForm editLayerId={openDialog.selectedItem?.layer?.id} onSuccess={handleSuccess} onCancel={closeDialogs} />
         </Dialog>
+
         <ConfirmDialog
-          open={openDialog.type === DialogType.delete}
-          onClose={onClose}
-          onSubmit={() => deleteMutation.mutate(openDialog.selectedItem!.id)}
+          open={openDialog.type === DialogType.deleteFolder}
+          onClose={closeDialogs}
+          onSubmit={() => deleteMutation.mutate(openDialog.selectedItem!.folder!.id)}
           title={t('maps.deleteFolder')}
           isLoading={deleteMutation.isPending}
         >
           {t('deleteConfirmDescription')}
         </ConfirmDialog>
+
         <ConfirmDialog
           open={openDialog.type === DialogType.deleteLayer}
-          onClose={onClose}
-          onSubmit={() => deleteLayerMutation.mutate(openDialog.selectedItem!.id)}
-          title={t('maps.deleteLayerAtAll')}
+          onClose={closeDialogs}
+          onSubmit={() => deleteLayerMutation.mutate(openDialog.selectedItem!.layer!.id)}
+          title={t('maps.deleteLayer')}
           isLoading={deleteLayerMutation.isPending}
+        >
+          {t('deleteConfirmDescription')}
+        </ConfirmDialog>
+
+        <ConfirmDialog
+          open={openDialog.type === DialogType.removeLayerFromFolder}
+          onClose={closeDialogs}
+          onSubmit={() => getAndRemoveLayerFromFolderMutation.mutate(openDialog.selectedItem!.layer!.id)}
+          title={t('maps.removeLayerFromFolder', { folder: selectedItemName?.folder })}
+          isLoading={getAndRemoveLayerFromFolderMutation.isPending}
+        >
+          {t('maps.removeLayerFromFolderDescription', {
+            layer: selectedItemName?.layer,
+            folder: selectedItemName?.folder,
+          })}
+        </ConfirmDialog>
+
+        <ConfirmDialog
+          open={openDialog.type === DialogType.removeLayerFromAllFolders}
+          onClose={closeDialogs}
+          onSubmit={() => getAndRemoveLayerFromAllFoldersMutation.mutate(openDialog.selectedItem!.layer!.id)}
+          title={t('maps.removeLayerFromAllFolders')}
+          isLoading={getAndRemoveLayerFromAllFoldersMutation.isPending}
         >
           {t('deleteConfirmDescription')}
         </ConfirmDialog>
