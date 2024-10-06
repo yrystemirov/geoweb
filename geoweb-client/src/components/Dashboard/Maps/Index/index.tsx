@@ -9,7 +9,7 @@ import MapIcon from '@mui/icons-material/Map';
 import AddIcon from '@mui/icons-material/Add';
 import { Link } from 'react-router-dom';
 import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
-import CustomNoRowsOverlay from '../../../common/nodata/DataGrid';
+import CustomNoRowsOverlay from '../../../common/NoRows/DataGrid';
 import { MapActionsMenu } from './ActionsMenu';
 
 export const MapFolders: FC = () => {

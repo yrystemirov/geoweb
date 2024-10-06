@@ -7,17 +7,17 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, Checkbox, FormControlLabel, MenuItem, TextField } from '@mui/material';
-import { Loader } from '../../../../common/loader';
+import { Loader } from '../../../../common/Loader';
 import { useNotifications } from '@toolpad/core';
 import { constants } from '../../../../../constants';
 
 type LayerRequestForm = Omit<LayerRequestDto, 'folders'>;
 
 type Props = {
-  editLayerId?: LayerDto['id'];
+  editLayerId?: LayerDto['id']; // when editing layer
+  addFolderId?: string; // when adding new layer
   onSuccess?: () => void;
   onCancel?: () => void;
-  newLayerFolderId?: string;
 };
 
 const INITIAL_VALUES: LayerRequestForm = {
@@ -38,13 +38,14 @@ const INITIAL_VALUES: LayerRequestForm = {
   isPublic: false,
 };
 
-export const LayerForm: FC<Props> = ({ editLayerId, newLayerFolderId, onSuccess, onCancel }) => {
+export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCancel }) => {
+  const isEditing = Boolean(editLayerId);
   const { t } = useTranslation();
   const { show } = useNotifications();
   const { data: layerToEdit, isLoading: isLayerLoading } = useQuery({
     queryKey: ['layers', editLayerId],
     queryFn: () => layersAPI.getLayer(editLayerId!).then((res) => res.data),
-    enabled: !!editLayerId,
+    enabled: isEditing,
   });
 
   const onError = (error: any) => {
@@ -59,10 +60,9 @@ export const LayerForm: FC<Props> = ({ editLayerId, newLayerFolderId, onSuccess,
       layersAPI
         .createLayer({
           ...layer,
-          folders: [{ id: newLayerFolderId! } as FolderDto],
+          folders: [{ id: addFolderId! } as FolderDto],
         })
         .then((res) => res.data),
-
     onSuccess: () => {
       onSuccess?.();
     },

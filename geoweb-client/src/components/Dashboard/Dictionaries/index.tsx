@@ -20,13 +20,13 @@ import CancelIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { dictionariesAPI } from '../../../api/dictioanries';
-import CustomNoRowsOverlay from '../../common/nodata/DataGrid';
+import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
 import { fieldIsRequiredProps } from './Entries/utils';
 import { useNotifications } from '@toolpad/core';
 import i18n from '../../../i18n';
 import { constants } from '../../../constants';
 import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
-import ConfirmDialog from '../../common/confirm';
+import ConfirmDialog from '../../common/Confirm';
 
 export type DictionaryRow = {
   id: string;

@@ -7,15 +7,15 @@ import CheckboxTree, { Node } from 'react-checkbox-tree';
 import { Folder, FolderOpen, Image, KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material';
 import { MapFolderActionsMenu } from '../../MapFolder/ActionsMenu';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
-import { GoBackButton } from '../../../../common/goBackButton';
+import { GoBackButton } from '../../../../common/GoBackButton';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 import { FolderTreeDto, LayerDto } from '../../../../../api/types/mapFolders';
 import { useTranslatedProp } from '../../../../../hooks/useTranslatedProp';
-import ConfirmDialog from '../../../../common/confirm';
+import ConfirmDialog from '../../../../common/Confirm';
 import i18n from '../../../../../i18n';
 import { useNotifications } from '@toolpad/core';
 import { constants } from '../../../../../constants';
-import { Dialog } from '../../../../common/dialog';
+import { Dialog } from '../../../../common/Dialog';
 import { MapFolderEditForm } from '../../MapFolder/EditForm';
 import { MapFolderCreateForm } from '../../MapFolder/CreateForm';
 import { LayerForm } from '../../MapFolder/LayerForm';
@@ -87,7 +87,7 @@ export const MapFolderEditLayers: FC = () => {
             onAdd={() => setOpenDialog({ type: DialogType.create, selectedItem: data })}
             onDelete={() => setOpenDialog({ type: DialogType.delete, selectedItem: data })}
             onEdit={() => setOpenDialog({ type: DialogType.edit, selectedItem: data })}
-            onAddLayer={() => setOpenDialog({ type: DialogType.addLayer, selectedItem: null })}
+            onAddLayer={() => setOpenDialog({ type: DialogType.addLayer, selectedItem: data })}
           />
         </Box>
       ),
@@ -178,9 +178,14 @@ export const MapFolderEditLayers: FC = () => {
               refetch();
             }}
             onCancel={onClose}
+            addFolderId={openDialog.selectedItem?.id}
           />
         </Dialog>
-        <Dialog open={openDialog.type === DialogType.editLayer} onClose={onClose} title={`${selectedItemNameTitle}${t('maps.editLayer')}`}>
+        <Dialog
+          open={openDialog.type === DialogType.editLayer}
+          onClose={onClose}
+          title={`${selectedItemNameTitle}${t('maps.editLayer')}`}
+        >
           <LayerForm
             editLayerId={openDialog.selectedItem?.id}
             onSuccess={() => {
