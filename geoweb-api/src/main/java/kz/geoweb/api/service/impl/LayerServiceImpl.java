@@ -5,7 +5,10 @@ import kz.geoweb.api.dto.LayerDto;
 import kz.geoweb.api.dto.LayerRequestDto;
 import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.enums.Action;
+import kz.geoweb.api.enums.EntityType;
+import kz.geoweb.api.enums.Permission;
 import kz.geoweb.api.exception.CustomException;
+import kz.geoweb.api.exception.ForbiddenException;
 import kz.geoweb.api.mapper.FolderMapper;
 import kz.geoweb.api.mapper.LayerMapper;
 import kz.geoweb.api.repository.LayerAttrRepository;
@@ -38,7 +41,10 @@ public class LayerServiceImpl implements LayerService {
 
     @Override
     public LayerDto getLayer(UUID id) {
-        entityPermissionService.checkLayerRead(id);
+        boolean hasPermission = entityPermissionService.hasPermission(EntityType.LAYER, id, Permission.READ);
+        if (!hasPermission) {
+            throw new ForbiddenException("layer.read.forbidden");
+        }
         return layerMapper.toDto(getEntityById(id));
     }
 
@@ -81,7 +87,10 @@ public class LayerServiceImpl implements LayerService {
 
     @Override
     public LayerDto updateLayer(UUID id, LayerRequestDto layerRequestDto) {
-        entityPermissionService.checkLayerWrite(id);
+        boolean hasPermission = entityPermissionService.hasPermission(EntityType.LAYER, id, Permission.WRITE);
+        if (!hasPermission) {
+            throw new ForbiddenException("layer.update.forbidden");
+        }
         if (layerRequestDto.getIsDynamic() && layerRequestDto.getDynamicIdentityColumn() == null) {
             throw new CustomException("layer.dynamic.without_identity_column");
         }
@@ -107,7 +116,10 @@ public class LayerServiceImpl implements LayerService {
 
     @Override
     public void deleteLayer(UUID id) {
-        entityPermissionService.checkLayerWrite(id);
+        boolean hasPermission = entityPermissionService.hasPermission(EntityType.LAYER, id, Permission.WRITE);
+        if (!hasPermission) {
+            throw new ForbiddenException("layer.delete.forbidden");
+        }
         Layer layer = getEntityById(id);
         layerAttrRepository.deleteByLayerId(id);
         layerRepository.deleteById(id);

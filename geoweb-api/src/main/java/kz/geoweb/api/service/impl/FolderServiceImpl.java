@@ -7,6 +7,8 @@ import kz.geoweb.api.dto.FolderDto;
 import kz.geoweb.api.entity.Folder;
 import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.enums.Action;
+import kz.geoweb.api.enums.EntityType;
+import kz.geoweb.api.enums.Permission;
 import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.exception.ForbiddenException;
 import kz.geoweb.api.mapper.FolderMapper;
@@ -38,7 +40,10 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public FolderDto getFolder(UUID id) {
-        entityPermissionService.checkFolderRead(id);
+        boolean hasPermission = entityPermissionService.hasPermission(EntityType.FOLDER, id, Permission.READ);
+        if (!hasPermission) {
+            throw new ForbiddenException("folder.read.forbidden");
+        }
         return folderMapper.toFolderWithLayersDto(getEntityById(id));
     }
 
@@ -48,7 +53,10 @@ public class FolderServiceImpl implements FolderService {
         Set<Folder> foldersToRemove = new HashSet<>();
         for (Folder folder : folders) {
             try {
-                entityPermissionService.checkFolderRead(folder.getId());
+                boolean hasPermission = entityPermissionService.hasPermission(EntityType.FOLDER, folder.getId(), Permission.READ);
+                if (!hasPermission) {
+                    throw new ForbiddenException("folder.read.forbidden");
+                }
             } catch (ForbiddenException e) {
                 foldersToRemove.add(folder);
             }
@@ -65,7 +73,10 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public FolderTreeDto getFolderTree(UUID id) {
-        entityPermissionService.checkFolderRead(id);
+        boolean hasPermission = entityPermissionService.hasPermission(EntityType.FOLDER, id, Permission.READ);
+        if (!hasPermission) {
+            throw new ForbiddenException("folder.read.forbidden");
+        }
         Folder folder = getEntityById(id);
         removeForbidden(folder);
         return folderMapper.toFolderTreeDto(folder);
@@ -76,12 +87,18 @@ public class FolderServiceImpl implements FolderService {
         Set<Folder> childrenToRemove = new HashSet<>();
         for (Folder child : children) {
             try {
-                entityPermissionService.checkFolderRead(child.getId());
+                boolean hasPermission = entityPermissionService.hasPermission(EntityType.FOLDER, child.getId(), Permission.READ);
+                if (!hasPermission) {
+                    throw new ForbiddenException("folder.read.forbidden");
+                }
                 removeForbidden(child);
                 Set<Layer> layersToRemove = new HashSet<>();
                 for (Layer layer : child.getLayers()) {
                     try {
-                        entityPermissionService.checkLayerRead(layer.getId());
+                        boolean hasPermissionLayer = entityPermissionService.hasPermission(EntityType.LAYER, layer.getId(), Permission.READ);
+                        if (!hasPermissionLayer) {
+                            throw new ForbiddenException("layer.read.forbidden");
+                        }
                     } catch (ForbiddenException e) {
                         layersToRemove.add(layer);
                     }
@@ -135,7 +152,10 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public FolderDto updateFolder(UUID id, FolderRequestDto folderRequestDto) {
-        entityPermissionService.checkFolderWrite(id);
+        boolean hasPermission = entityPermissionService.hasPermission(EntityType.FOLDER, id, Permission.WRITE);
+        if (!hasPermission) {
+            throw new ForbiddenException("folder.update.forbidden");
+        }
         Folder folder = getEntityById(id);
         folder.setNameKk(folderRequestDto.getNameKk());
         folder.setNameRu(folderRequestDto.getNameRu());
@@ -154,7 +174,10 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public void deleteFolder(UUID id) {
-        entityPermissionService.checkFolderWrite(id);
+        boolean hasPermission = entityPermissionService.hasPermission(EntityType.FOLDER, id, Permission.WRITE);
+        if (!hasPermission) {
+            throw new ForbiddenException("folder.delete.forbidden");
+        }
         getEntityById(id);
         folderRepository.deleteById(id);
         historyService.saveFolder(id, Action.DELETE);
