@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { AccountTreeOutlined, DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import ConfirmDialog from '../../../../common/confirm';
+import ConfirmDialog from '../../../../common/Confirm';
 import { useMutation } from '@tanstack/react-query';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
 
@@ -61,7 +61,7 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
         }}
       >
         <MenuItem onClick={() => navigate(`/dashboard/maps/${data.id}/edit`)}>
-          <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties')}
+          <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
 
         <MenuItem onClick={() => navigate(`/dashboard/maps/${data.id}/edit-layers`)}>
