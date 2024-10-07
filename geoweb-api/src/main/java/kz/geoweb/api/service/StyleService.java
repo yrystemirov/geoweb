@@ -11,8 +11,8 @@ import java.util.UUID;
 public interface StyleService {
     Page<StyleResponseDto> getStyles(Pageable pageable);
     StyleResponseFullDto getStyleById(UUID id);
-    StyleResponseDto createStyle(StyleRequestDto styleRequestDto, UUID layerId);
-    StyleResponseDto updateStyle(UUID styleId, StyleRequestDto styleRequestDto);
+    StyleResponseDto createStyle(StyleRequestDto styleRequestDto, UUID layerId, Boolean sld);
+    StyleResponseDto updateStyle(UUID styleId, StyleRequestDto styleRequestDto, Boolean sld);
     void deleteStyle(UUID id);
     String generateStyleXml(StyleRequestDto styleRequestDto);
 }

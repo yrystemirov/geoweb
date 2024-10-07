@@ -10,4 +10,5 @@ public class StyleRequestDto {
     private String name;
     private GeometryType geomType;
     private List<StyleRuleDto> rules;
+    private String sld = "";
 }
