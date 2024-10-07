@@ -6,6 +6,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Divider,
   IconButton,
   Paper,
   Tab,
@@ -37,7 +38,7 @@ class GeoserverIdnetifyParams {
 }
 
 export const IdentifyPanel = (props: any) => {
-  const { map, userLayers, identifyEventData, setIdentifyEventData } = usePublicMapStore();
+  const { map, userLayers, identifyEventData, setIdentifyEventData, systemThemeColor } = usePublicMapStore();
   const [identData, setIdentData] = useState<any>();
   const [selectedFeature, setSelectedFeature] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -163,67 +164,24 @@ export const IdentifyPanel = (props: any) => {
         bbox: urlParams.get('BBOX'),
       })
       .then((res: any) => {
-        setIdentData(res.data);
-      });
-
-    /*api
-      .post(`${gisApi}/features/wms`, {
-        layers: urlParams.get('LAYERS'),
-        updatedTime: urlParams.get('updatedTime'),
-        i: urlParams.get('I'),
-        j: urlParams.get('J'),
-        bbox: urlParams.get('BBOX'),
-      })
-      .then((response) => {
-        response.data.features;
-        if (response.data.features && response.data.features.length > 0) {
-          response.data.features.map((item: any, index: number) => {
-            let layerName_ = item.id.split('.')[0];
-            let featureId_ = item.id.split('.')[1];
-            let layer_ = getLayerByLayerName(layerName_);
-            api
-              .get(`${gisApi}/open-api-identify/layerobject?layerName=${layerName_}&gid=${featureId_}&withGeometry=`)
-              .then((response2: any) => {
-                api
-                  .get(`${gisApi}/open-api-layers/${layer_.id}/attrs`)
-                  .then((response3) => {
-                    layer_.layerAttrs = response3.data;
-                    layer_.layerAttrs.forEach((attr_: any) => {
-                      if (attr_.dictionaryCode && attr_.shortinfo == true) {
-                        getListByCode(attr_.dictionaryCode);
-                      }
-                    });
-                    response2.data[0].geom = response.data.features.filter(
-                      (_: any) => _.id == layer_.layername + '.' + response2.data[0].gid,
-                    )[0].geometry;
-                    newData.push({ layer: layer_, attrs: response2.data });
-                    if (index === response.data.features.length - 1) {
-                      const _list = newData.filter((data) => data.attrs);
-                      setIdentData(_list);
-                    }
-                    setIsLoading(false);
-                  })
-                  .catch((error) => {
-                    console.log('err', error);
-                    setIsLoading(false);
-                  });
-              })
-              .catch((err) => {
-                console.log('err', err);
-                setIsLoading(false);
-              });
-          });
-        } else {
-          toast.warning(t('gis:gis.no_identification_data_available'), {
-            delay: 3,
+        let identDataByLayers: any = {};
+        if (res.data && res.data.length > 0) {
+          res.data.map((item_: any) => {
+            if (!identDataByLayers[item_.layer.id]) {
+              identDataByLayers[item_.layer.id] = {
+                layer: item_.layer,
+                features: [],
+              };
+            }
+            identDataByLayers[item_.layer.id].features.push({
+              attributes: item_.attributes,
+              gid: item_.gid,
+              geom: item_.geom,
+            });
           });
         }
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        toast.warning(t('gis:gis.identification_error'), { delay: 3 });
-        setIsLoading(false);
-      });*/
+        setIdentData(identDataByLayers);
+      });
   }
 
   const getValueFixed = (item: any, columnname: any) => {
@@ -343,104 +301,175 @@ export const IdentifyPanel = (props: any) => {
   };
 
   const renderList = () => {
-    const list = identData?.map((item: any, index: number) => {
-      return (
-        <TabContext value={tab} key={item.gid}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <TabList onChange={handleChange} aria-label="">
-              <Tab label="Атрибуты" value="attribute" />
-              {/* <Tab label="Файлы" value="file" /> */}
-            </TabList>
-          </Box>
-          <TabPanel value="attribute" sx={{ width: '100%', padding: 0, marginTop: '10px' }}>
-            <Accordion
-              sx={{ width: '100%', height: 'auto' }}
-              defaultExpanded={index === 0 ? true : false}
-              onChange={(event, expanded) => setSelectedFeature(item)}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-                classes={{ expanded: 'expanded' }}
-              >
-                {/* <Typography>{translateField(item.layer, 'name', locale)}</Typography> */}
-                <Typography>{item.layer.nameRu}</Typography>
-              </AccordionSummary>
-              <AccordionDetails sx={{ padding: '8px 0px 0px', width: '100%', overflowX: 'scroll' }}>
-                <Table
-                  aria-label="custom pagination table"
-                  size="small"
-                  sx={{
-                    wordWrap: 'break-word',
-                    tableLayout: 'fixed',
-                  }}
-                >
-                  <TableBody>
-                    {item.attributes.length > 0 &&
-                      item.attributes.map((attributeItem: any) => (
-                        <TableRow key={attributeItem.attr.nameRu}>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ padding: '2px' }}
-                            style={{
-                              padding: '6px 2px',
-                              wordWrap: 'break-word',
-                              whiteSpace: 'normal',
-                            }}
-                            width={180}
-                          >
-                            {attributeItem.attr.nameRu}
-                          </TableCell>
-                          <TableCell
-                            width={270}
-                            style={{
-                              padding: '6px 2px',
-                              wordWrap: 'break-word',
-                              whiteSpace: 'normal',
-                            }}
-                          >
-                            {/* {getValueFixed(item, attributeItem.value)} */}
-                          {attributeItem.value}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </AccordionDetails>
-            </Accordion>
-          </TabPanel>
-          <TabPanel value="file">
-            <Box sx={{ width: '100%', padding: 0, marginTop: '10px' }}>
-              {files.map((file: any, index: number) => (
-                <a onClick={() => downloadSource(file)} key={index} rel="noreferrer">
-                  {file.isImg ? (
-                    <img
-                      src={getSource(file)}
-                      alt={file.fileName}
-                      style={{
-                        width: '100%',
-                        maxWidth: '340px',
-                        height: '10%',
-                        maxHeight: '250px',
-                        cursor: 'pointer',
-                      }}
-                    />
-                  ) : (
-                    <Box sx={{ display: 'flex', gap: '3', alignItems: 'center' }}>
-                      <p style={{ textDecoration: 'underline', color: 'primary' }}>{file.fileName}</p>
-                      <FileOpenIcon color="primary" />
-                    </Box>
-                  )}
-                </a>
-              ))}
-            </Box>
-          </TabPanel>
-        </TabContext>
+    let result = [];
+    let index = 0;
+    for (var key in identData) {
+      result.push(
+        <Accordion
+          sx={{ width: '100%', height: 'auto' }}
+          defaultExpanded={index === 0 ? true : false}
+          //onChange={(event, expanded) => setSelectedFeature(item)}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+            classes={{ expanded: 'expanded' }}
+          >
+            {/* <Typography>{translateField(item.layer, 'name', locale)}</Typography> */}
+            <Typography>{`${identData[key].layer.nameRu} (${identData[key].features.length})`}</Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ padding: '8px 0px 0px', width: '100%', overflowX: 'scroll' }}>
+            {identData[key].features.map((feature_: any, index: number) => {
+              return (
+                <>
+                  <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+                    {index + 1}
+                  </Typography>
+                  <Divider sx={{background:'red'}}/>
+                  <Table
+                    aria-label="custom pagination table"
+                    size="small"
+                    sx={{
+                      wordWrap: 'break-word',
+                      tableLayout: 'fixed',
+                    }}
+                  >
+                    <TableBody>
+                      {feature_.attributes.length > 0 &&
+                        feature_.attributes.map((attributeItem: any) => (
+                          <TableRow key={attributeItem.attr.nameRu}>
+                            <TableCell
+                              component="th"
+                              scope="row"
+                              // sx={{ padding: '2px' }}
+                              style={{
+                                // padding: '6px 2px',
+                                wordWrap: 'break-word',
+                                whiteSpace: 'normal',
+                              }}
+                              width={180}
+                            >
+                              {attributeItem.attr.nameRu}
+                            </TableCell>
+                            <TableCell
+                              width={270}
+                              style={{
+                                // padding: '6px 2px',
+                                wordWrap: 'break-word',
+                                whiteSpace: 'normal',
+                              }}
+                            >
+                              {/* {getValueFixed(item, attributeItem.value)} */}
+                              {attributeItem.value}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </>
+              );
+            })}
+          </AccordionDetails>
+        </Accordion>,
       );
-    });
-    return list;
+      index++;
+    }
+    // const list = identData?.map((item: any, index: number) => {
+    //   return (
+    //     <TabContext value={tab} key={item.gid}>
+    //       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+    //         <TabList onChange={handleChange} aria-label="">
+    //           <Tab label="Атрибуты" value="attribute" />
+    //         </TabList>
+    //       </Box>
+    //       <TabPanel value="attribute" sx={{ width: '100%', padding: 0, marginTop: '10px' }}>
+    //         <Accordion
+    //           sx={{ width: '100%', height: 'auto' }}
+    //           defaultExpanded={index === 0 ? true : false}
+    //           onChange={(event, expanded) => setSelectedFeature(item)}
+    //         >
+    //           <AccordionSummary
+    //             expandIcon={<ExpandMoreIcon />}
+    //             aria-controls="panel1a-content"
+    //             id="panel1a-header"
+    //             classes={{ expanded: 'expanded' }}
+    //           >
+    //             <Typography>{item.layer.nameRu}</Typography>
+    //           </AccordionSummary>
+    //           <AccordionDetails sx={{ padding: '8px 0px 0px', width: '100%', overflowX: 'scroll' }}>
+    //             <Table
+    //               aria-label="custom pagination table"
+    //               size="small"
+    //               sx={{
+    //                 wordWrap: 'break-word',
+    //                 tableLayout: 'fixed',
+    //               }}
+    //             >
+    //               <TableBody>
+    //                 {item.attributes.length > 0 &&
+    //                   item.attributes.map((attributeItem: any) => (
+    //                     <TableRow key={attributeItem.attr.nameRu}>
+    //                       <TableCell
+    //                         component="th"
+    //                         scope="row"
+    //                         sx={{ padding: '2px' }}
+    //                         style={{
+    //                           padding: '6px 2px',
+    //                           wordWrap: 'break-word',
+    //                           whiteSpace: 'normal',
+    //                         }}
+    //                         width={180}
+    //                       >
+    //                         {attributeItem.attr.nameRu}
+    //                       </TableCell>
+    //                       <TableCell
+    //                         width={270}
+    //                         style={{
+    //                           padding: '6px 2px',
+    //                           wordWrap: 'break-word',
+    //                           whiteSpace: 'normal',
+    //                         }}
+    //                       >
+    //                         {attributeItem.value}
+    //                       </TableCell>
+    //                     </TableRow>
+    //                   ))}
+    //               </TableBody>
+    //             </Table>
+    //           </AccordionDetails>
+    //         </Accordion>
+    //       </TabPanel>
+    //       <TabPanel value="file">
+    //         <Box sx={{ width: '100%', padding: 0, marginTop: '10px' }}>
+    //           {files.map((file: any, index: number) => (
+    //             <a onClick={() => downloadSource(file)} key={index} rel="noreferrer">
+    //               {file.isImg ? (
+    //                 <img
+    //                   src={getSource(file)}
+    //                   alt={file.fileName}
+    //                   style={{
+    //                     width: '100%',
+    //                     maxWidth: '340px',
+    //                     height: '10%',
+    //                     maxHeight: '250px',
+    //                     cursor: 'pointer',
+    //                   }}
+    //                 />
+    //               ) : (
+    //                 <Box sx={{ display: 'flex', gap: '3', alignItems: 'center' }}>
+    //                   <p style={{ textDecoration: 'underline', color: 'primary' }}>{file.fileName}</p>
+    //                   <FileOpenIcon color="primary" />
+    //                 </Box>
+    //               )}
+    //             </a>
+    //           ))}
+    //         </Box>
+    //       </TabPanel>
+    //     </TabContext>
+    //   );
+    // });
+    return result;
   };
 
   const getIdentifyLayer = () => {
@@ -472,7 +501,7 @@ export const IdentifyPanel = (props: any) => {
     <>
       <Paper
         sx={{
-          display: 'flex',
+          // display: 'flex',
           position: 'absolute',
           height: '80%',
           width: '450px',
@@ -488,18 +517,12 @@ export const IdentifyPanel = (props: any) => {
         <div
           className="menu"
           style={{
-            width: '43px',
-            background: '#e5e5e5',
-            borderLeft: '1px #dadada solid',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            padding: '2px',
-            gap: '12px',
+            height: '43px',
+            background: systemThemeColor,
           }}
         >
           <IconButton
+            sx={{ float: 'right', color: 'white' }}
             aria-label="delete"
             onClick={() => {
               let vector = getIdentifyLayer();
@@ -508,7 +531,7 @@ export const IdentifyPanel = (props: any) => {
               setIdentifyEventData(null);
             }}
           >
-            <CloseIcon />
+            <CloseIcon fontSize={'small'} />
           </IconButton>
         </div>
         <div className="details">{renderList()}</div>

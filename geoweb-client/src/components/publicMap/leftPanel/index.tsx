@@ -126,9 +126,13 @@ export const LeftPanel: React.FC<Props> = ({ color }) => {
                 </IconButton>
                 <IconButton
                   onClick={() => {
-                    debugger;
-                    attributeTables.push(layerItem);
-                    setAttributeTables(attributeTables);
+                    if (
+                      attributeTables.length == 0 ||
+                      attributeTables.filter((at) => at.id == layerItem.id).length == 0
+                    ) {
+                      attributeTables.push(layerItem);
+                      setAttributeTables(attributeTables);
+                    }
                     setCurrentAttributeTable(layerItem);
                   }}
                 >

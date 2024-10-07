@@ -122,7 +122,7 @@ export const AttributeTableTab = (props: any) => {
       mapOpenAPI
         .getOpenApiLayerAttribtes(layer.id)
         .then((response) => {
-          const _attrs: any[] = response.data.filter((x: any) => x.attrname !== 'gid' && x.shortinfo);
+          const _attrs: any[] = response.data.filter((x: any) => x.attrname !== 'gid');
           setAttrs(_attrs);
           const _displayedColumns = _attrs.map((x) => x.attrname);
           setDisplayedColumns(_displayedColumns);
@@ -153,26 +153,15 @@ export const AttributeTableTab = (props: any) => {
       criteriaParam: [],
     };
     setAttrList([]);
-
+    debugger;
     mapOpenAPI
       .getOpenApiLayerFeatures(layer.layername, page, rowsPerPage)
       .then((response) => {
         if (response.status === 200 || response.status === 201) {
-          if (response.data && response.data.features) {
-            setTotal(response.data.fullcount);
-            const buffer: any[] = [];
-            response.data.features.forEach((f: any) => {
-              const item: any = { gid: f.gid };
-              if (f.attributes) {
-                for (let i = 0; i < displayedColumns.length; i++) {
-                  item[displayedColumns[i]] = f.attributes[displayedColumns[i]];
-                }
-                buffer.push(item);
-              }
-            });
-
-            setAttrList(buffer);
-            setAttrFilterList(buffer);
+          if (response.data && response.data.content) {
+            setTotal(response.data.totalElements);
+            setAttrList(response.data.content);
+            setAttrFilterList(response.data.content);
           }
         }
       })
@@ -269,7 +258,7 @@ export const AttributeTableTab = (props: any) => {
 
   return (
     <>
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', zIndex: 500000 }}>
         {/* <input
           type="file"
           onChange={handleInputFileChange}
@@ -279,7 +268,7 @@ export const AttributeTableTab = (props: any) => {
         /> */}
         <div className="attr-table-filter">
           <div className="attr-table-pagination">
-            <TablePagination
+            {/* <TablePagination
               align="left"
               rowsPerPageOptions={[10, 25, 100]}
               component="div"
@@ -291,32 +280,31 @@ export const AttributeTableTab = (props: any) => {
               sx={{ display: 'flex' }}
               //labelRowsPerPage={t('gis:gis.numberLinesPerPage')}
               labelDisplayedRows={({ from, to, count }) => `${from}-${to} из ${count}`}
-            />
+            /> */}
           </div>
-          <div style={{ display: 'flex' }}>
+          {/* <div style={{ display: 'flex' }}>
             <div style={{ color: 'darkslateblue', marginRight: '18px', cursor: 'pointer' }} title="экспорт файла">
               <CloudDownloadIcon onClick={clickExportExcel}></CloudDownloadIcon>
             </div>
             <input placeholder="Поиск" className="inp-search" onKeyUp={handleSearch} />
-          </div>
+          </div> */}
         </div>
         <TableContainer sx={{ minHeight: '182px', height: 'calc(100% - 50px)' }}>
           <Table stickyHeader size="small" aria-label="sticky table">
-            {/* <TableHead>
+            <TableHead>
               <TableRow>
-                <TableCell key="file_column">Файл</TableCell>
                 {attrs.map((column) => (
                   <TableCell
                     key={column.id}
                     // align={column.align}
                     // style={{minWidth: column.minWidth}}
                   >
-                    {translateField(column, 'name', locale)}
+                    {column.nameRu}
                   </TableCell>
                 ))}
               </TableRow>
-            </TableHead> */}
-            <TableBody>
+            </TableHead>
+            <TableBody className="skjdfhkjshfhsdkjf">
               {attrList.map((row) => {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.gid}>

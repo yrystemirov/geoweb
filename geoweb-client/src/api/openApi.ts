@@ -21,7 +21,7 @@ const getOpenApiLayerAttribtes = (layerId: string) => {
 };
 
 const getOpenApiLayerFeatures = (layerName: string, page: number, size: number) => {
-  return instance.post<any>(`${OPEN_API_URL}/features?layername=${layerName}`, { page: page, size: size });
+  return instance.get<any>(`${OPEN_API_URL}/features?layername=${layerName}&page=${page}&size=${size}`);
 };
 
 export const mapOpenAPI = {

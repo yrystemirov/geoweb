@@ -8,6 +8,7 @@ export enum MapMode {
 }
 
 type PublicMapState = {
+  systemThemeColor: string;
   map: Map | null;
   setMap: (map: Map | null) => void;
   mapMode: MapMode;
@@ -23,6 +24,7 @@ type PublicMapState = {
 };
 
 export const usePublicMapStore = create<PublicMapState>((set) => ({
+  systemThemeColor: '#196fa6', // //5ebc67-green    196fa6-blue
   map: null,
   setMap: (map) => set({ map }),
   mapMode: MapMode.IDENTIFY,

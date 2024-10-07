@@ -15,7 +15,6 @@ import { BaseLayersTool } from './tools/baseLayers';
 import proj4 from 'proj4';
 import { toStringHDMS } from 'ol/coordinate';
 import { LeftPanel } from './leftPanel';
-import { useQuery } from '@tanstack/react-query';
 import { mapOpenAPI } from '../../api/openApi';
 import LayerGroup from 'ol/layer/Group';
 import { IdentifyPanel } from './identifyPanel';
@@ -23,17 +22,25 @@ import { AttributeTabsPanel } from './attributeTabsPanel';
 
 const MapComponent = () => {
   const mapDivRef = useRef<HTMLDivElement | null>(null);
-  const { map, setMap, mapMode, userLayers, setUserLayers, identifyEventData, setIdentifyEventData, attributeTables } =
-    usePublicMapStore();
+  const {
+    map,
+    setMap,
+    mapMode,
+    userLayers,
+    setUserLayers,
+    identifyEventData,
+    setIdentifyEventData,
+    attributeTables,
+    systemThemeColor,
+  } = usePublicMapStore();
   const [baseLayersArr, setBaseLayersArr] = useState<TileLayer[]>([]);
-  //const [userLayersArr, setUserLayersArr] = useState<TileLayer[]>([]);
   const [mapMouseOverCoord, setMapMouseOverCoord] = useState<string>('');
   const [mounted, setMounted] = useState<boolean>(false);
   const [mapDataLoaded, setMapDataLoaded] = useState<boolean>(false);
   const [lyrTree, setLyrTree] = useState<any>([]);
-  const mainColor = '#5ebc67'; //5ebc67-green    196fa6-blue
+  
   const [lyrTreeInited, setLyrTreeinIted] = useState<boolean>(false);
-  //const [layersToAddToMap, setLayersToAddToMap] = useState<any[]>([]);
+  
 
   useEffect(() => {
     setMounted(true);
@@ -51,27 +58,11 @@ const MapComponent = () => {
             setMapDataLoaded(true);
           }
         });
-        //loadLyrGroup(lyrGroup, lyrGroup.id === res.data[res.data.length - 1].id);
       }
       if (!res.data || res.data.length === 0) {
         setMapDataLoaded(true);
       }
     });
-    // let sortedLyrGroupsFromConfig: any;
-
-    // const asyncCall = async () => {
-    //   await mapOpenAPI.getOpenApiRootFolders().then((res: any) => {
-    //     sortedLyrGroupsFromConfig = res?.data?.filter((el: any) => el.isPublic);
-    //   });
-
-    //   for (const lyrGroup of sortedLyrGroupsFromConfig) {
-    //     await loadLyrGroup(
-    //       lyrGroup,
-    //       lyrGroup.id === sortedLyrGroupsFromConfig[sortedLyrGroupsFromConfig.length - 1].id,
-    //     );
-    //   }
-    // };
-    // asyncCall();
   }, [mounted]);
 
   useEffect(() => {
@@ -263,20 +254,6 @@ const MapComponent = () => {
     return res;
   };
 
-  const loadLyrGroup = async ({ id }: { id: string }, isLastLyrGroup: boolean = false) => {
-    return mapOpenAPI
-      .getOpenApiRootFoldertreeById(id)
-      .then((response: any) => {
-        setLyrTree((prevValue: any) => [...prevValue, { ...response.data }]);
-        if (isLastLyrGroup) {
-          setMapDataLoaded(true);
-        }
-      })
-      .catch((error: any) => {
-        console.error('gis api error', error);
-      });
-  };
-
   return (
     <div
       className="map gis"
@@ -297,7 +274,7 @@ const MapComponent = () => {
           zIndex: 5000,
         }}
       >
-        {map && <LeftPanel color={mainColor} />}
+        {map && <LeftPanel color={systemThemeColor} />}
       </Box>
       <Box
         display={'flex'}
@@ -315,10 +292,10 @@ const MapComponent = () => {
       >
         {map && (
           <>
-            <HomeExtentButton map={map} color={mainColor} />
-            <MyLocation map={map} color={mainColor} />
-            <BaseLayersTool map={map} color={mainColor} layers={baseLayersArr} />
-            <Measurement color={mainColor} />
+            <HomeExtentButton map={map} color={systemThemeColor} />
+            <MyLocation map={map} color={systemThemeColor} />
+            <BaseLayersTool map={map} color={systemThemeColor} layers={baseLayersArr} />
+            <Measurement color={systemThemeColor} />
           </>
         )}
       </Box>
@@ -331,11 +308,11 @@ const MapComponent = () => {
           position: 'fixed',
           left: '2rem',
           bottom: '4.55rem',
-          zIndex: 10000000,
+          zIndex: 1000,
           width: '210px',
           height: '23px',
           padding: '3px 25px',
-          background: '#5ebc67',
+          background: systemThemeColor,
           color: 'white',
           fontSize: '12px',
           borderRadius: '16px',
