@@ -34,7 +34,10 @@ export type LayerDto = {
   // dynamicIdentityColumn: string; // пока не используется
 };
 
-export type LayerRequestDto = Partial<Omit<LayerDto, 'id'>> & {
+export type LayerRequestDto = NullableFields<
+  Partial<Omit<LayerDto, 'id'>>,
+  'nameEn' | 'descriptionRu' | 'descriptionKk' | 'descriptionEn' | 'url'
+> & {
   nameKk: string;
   nameRu: string;
   layerType: LayerType;
@@ -74,4 +77,22 @@ export type FolderTreeDto = {
   rank: number;
   children: FolderTreeDto[]; // or FolderDto[]?
   layers: LayerDto[];
+};
+
+export type LayerAttrDto = {
+  id: string;
+  nameKk: string;
+  nameRu: string;
+  nameEn: string;
+  attrname: string;
+  attrType: string;
+  shortInfo: true;
+  fullInfo: true;
+  layer: LayerDto;
+  dictionaryCode: string;
+  rank: number;
+};
+
+type NullableFields<T, K extends keyof T> = Omit<T, K> & {
+  [P in K]: T[P] | null;
 };

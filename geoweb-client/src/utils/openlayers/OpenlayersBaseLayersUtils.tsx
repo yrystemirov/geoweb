@@ -37,6 +37,7 @@ export interface TileLayerProps {
   opacity: number | null;
   sourceType: TileLayerSourceType;
   geoserverLayerName?: string;
+  systemLayerProps?: any;
 }
 
 export default class OpenlayersBaseLayersUtils {
@@ -93,6 +94,7 @@ export default class OpenlayersBaseLayersUtils {
         label: props.label,
         code: props.code,
         geoserverLayerName: props.geoserverLayerName,
+        systemLayerProps:props.systemLayerProps,
       },
       source: source,
       opacity: props.opacity ? props.opacity : 1,

@@ -7,9 +7,8 @@ import { mapFoldersAPI } from '../../../../../api/mapFolders';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, Checkbox, FormControlLabel, TextField } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { useNotifications } from '@toolpad/core';
-import { constants } from '../../../../../constants';
 import * as yup from 'yup';
+import { useNotify } from '../../../../../hooks/useNotify';
 
 type EditFolderRequest = Partial<FolderDto> & { nameRu: string };
 
@@ -31,7 +30,7 @@ type Props = {
 };
 
 export const MapFolderEditForm: FC<Props> = ({ id: idProp, onSuccess, onCancel }) => {
-  const { show } = useNotifications();
+  const { showSuccess } = useNotify();
   const { t } = useTranslation();
   const { id: idParam } = useParams();
   const id = idProp || idParam;
@@ -45,7 +44,7 @@ export const MapFolderEditForm: FC<Props> = ({ id: idProp, onSuccess, onCancel }
     mutationFn: (folder) => mapFoldersAPI.updateFolder(folder).then((res) => res.data),
     onSuccess(data, variables, context) {
       onSuccess?.();
-      show(t('success'), { severity: 'success', autoHideDuration: constants.ntfHideDelay });
+      showSuccess();
     },
   });
 

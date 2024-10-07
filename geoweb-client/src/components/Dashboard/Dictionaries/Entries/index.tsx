@@ -21,14 +21,14 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { dictionariesAPI } from '../../../../api/dictioanries';
 import { useTranslation } from 'react-i18next';
 import { EntryDto, EntryRequestDto } from '../../../../api/types/dictioanries';
-import CustomNoRowsOverlay from '../../../common/nodata/DataGrid';
+import CustomNoRowsOverlay from '../../../common/NoRows/DataGrid';
 import { fieldIsRequiredProps } from './utils';
 import { useNotifications } from '@toolpad/core/useNotifications';
 import i18n from '../../../../i18n';
 import { constants } from '../../../../constants';
 import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
-import { GoBackButton } from '../../../common/goBackButton';
-import ConfirmDialog from '../../../common/confirm';
+import { GoBackButton } from '../../../common/GoBackButton';
+import ConfirmDialog from '../../../common/Confirm';
 import { useTranslatedProp } from '../../../../hooks/useTranslatedProp';
 
 export type EntryDtoRow = EntryDto & { isNew?: boolean };

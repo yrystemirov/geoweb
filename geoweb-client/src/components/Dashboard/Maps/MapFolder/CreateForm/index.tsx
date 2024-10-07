@@ -6,9 +6,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, Checkbox, FormControlLabel, TextField } from '@mui/material';
 import { FolderDto } from '../../../../../api/types/mapFolders';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
-import { useNotifications } from '@toolpad/core';
-import { constants } from '../../../../../constants';
 import { boolean, number, NumberSchema, object, string } from 'yup';
+import { useNotify } from '../../../../../hooks/useNotify';
 
 type CreateFolderRequest = Partial<FolderDto> & { nameRu: string };
 
@@ -31,7 +30,7 @@ type Props = {
 
 export const MapFolderCreateForm: FC<Props> = ({ parentId, onCancel, onSuccess }) => {
   const { t } = useTranslation();
-  const { show } = useNotifications();
+  const { showSuccess, showError } = useNotify();
   const createMutation = useMutation<FolderDto, any, CreateFolderRequest>({
     mutationFn: (folder) =>
       mapFoldersAPI
@@ -39,13 +38,10 @@ export const MapFolderCreateForm: FC<Props> = ({ parentId, onCancel, onSuccess }
         .then((res) => res.data),
     onSuccess: () => {
       onSuccess?.();
-      show(t('success'), { severity: 'success', autoHideDuration: constants.ntfHideDelay });
+      showSuccess();
     },
     onError: (error) => {
-      show(error?.response?.data?.message || t('errorOccurred'), {
-        severity: 'error',
-        autoHideDuration: constants.ntfHideDelay,
-      });
+      showError({ text: error?.response?.data?.message })
     },
   });
 
@@ -75,7 +71,7 @@ export const MapFolderCreateForm: FC<Props> = ({ parentId, onCancel, onSuccess }
   };
 
   return (
-    <Box onSubmit={handleSubmit(onSubmit)} noValidate component={'form'} sx={{ pt: 1}}>
+    <Box onSubmit={handleSubmit(onSubmit)} noValidate component={'form'} sx={{ pt: 1 }}>
       <Box display="flex" gap={2} flexWrap={'wrap'} mb={2}>
         <TextField
           {...methods.register('nameRu')}

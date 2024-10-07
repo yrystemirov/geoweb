@@ -1,0 +1,368 @@
+.gis {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+
+  &__left-menu {
+    display: flex;
+    background-color: #eee;
+    width: 400px;
+    height: calc(100% - 0px);
+    flex-direction: column;
+    position: relative;
+    z-index: 2;
+
+    & .toggle {
+      position: absolute;
+      left: 100%;
+      z-index: 1;
+      cursor: pointer;
+      ;
+    }
+
+    & .legend-transparency-box {
+      height: 60px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 25px 10px 15px;
+      gap: 20px;
+    }
+
+    & .search-box {
+      background: transparent;
+      height: 45px;
+      padding: 5px 15px;
+      display: flex;
+      width: 100%;
+
+      & input {
+        padding: 5px 10px;
+        font-size: 16px;
+        width: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: #000000;
+        border-bottom: 2px solid green;
+      }
+    }
+
+    & .tree-box {
+      display: flex;
+      width: 100%;
+      margin-top: 20px;
+      padding: 5px 12px;
+
+      ul.tree-ul {
+        width: 100%;
+      }
+    }
+  }
+
+  &__map-container {
+    width: calc(100% - 400px);
+    height: 100%;
+    flex: 1;
+  }
+
+  &__attr-table {
+    display: flex;
+    position: absolute;
+    bottom: 0px;
+    height: 270px;
+    width: 100%;
+    background: #ffffff;
+    z-index: 3;
+
+    .attr-table-filter {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-left: 0px;
+      margin-right: 12px;
+
+      .attr-table-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+
+      input.inp-search {
+        padding: 5px;
+        border: none;
+        border-bottom: 1px solid #000;
+        outline: none;
+        width: 250px;
+      }
+    }
+  }
+
+  &__ident {
+    display: flex;
+    position: absolute;
+    height: 95%;
+    width: 450px;
+    z-index: 3;
+    top: 10px;
+    right: 100px;
+    /* // max-height: 40vh; */
+    overflow-y: auto;
+    overflow-x: hidden !important;
+    background: #ffffff;
+    box-shadow: 0px 32px 32px -8px rgba(18, 18, 18, 0.08), 0px 0px 32px -8px rgba(18, 18, 18, 0.12), 0px 0px 1px rgba(18, 18, 18, 0.2);
+
+    .details {
+      flex: 1;
+      display: flex;
+      height: 100%;
+      align-items: flex-start;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      flex-direction: column;
+      padding: 4px;
+
+      .expanded {
+        background-color: #3f50b5;
+        color: white;
+      }
+    }
+
+    .menu {
+      width: 43px;
+      background-color: #e5e5e5;
+      border-left: 1px #dadada solid;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2px;
+      gap: 12px;
+
+      &__page {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        flex-direction: row;
+      }
+    }
+  }
+
+  &__ident-details {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+
+    & .layers {
+      width: 270px;
+      height: 223px;
+      overflow: auto scroll;
+
+      .active {
+        background-color: #3f50b5;
+        color: white;
+        cursor: pointer;
+      }
+    }
+
+    & .attrs {
+      flex: 1;
+      height: 223px;
+      overflow: auto scroll;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+
+.checkbox {
+  font-size: 16px;
+  user-select: none;
+  min-height: 320px;
+  padding: 20px;
+  box-sizing: content-box;
+}
+
+.checkbox .tree,
+.checkbox .tree-node,
+.checkbox .tree-node-group {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.checkbox .tree-branch-wrapper,
+.checkbox .tree-node__leaf {
+  outline: none;
+}
+
+.checkbox .tree-node {
+  cursor: pointer;
+}
+
+.checkbox .tree-node .name:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.checkbox .tree-node--focused .name {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.checkbox .tree-node {
+  display: inline-block;
+}
+
+.checkbox .checkbox-icon {
+  margin: 0 5px;
+  vertical-align: middle;
+}
+
+.checkbox button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.checkbox .arrow {
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+.checkbox .arrow--open {
+  transform: rotate(90deg);
+}
+.react-checkbox-tree{
+  overflow: auto !important;
+}
+
+.react-checkbox-tree label {
+  display: flex;
+  flex-direction: row;
+}
+
+.rct-checkbox {
+  color: blue;
+}
+
+/*  admin layer tree table */
+.layer-table {
+  width: 100%;
+  border: 1px solid #f0e7e7;
+  padding: 5px;
+}
+
+.layer-tree {
+  width: 40%;
+  padding: 12px;
+
+  .css-cveggr-MuiListItemIcon-root {
+    min-width: 30px !important;
+  }
+}
+
+.list-layer {
+  margin: 30px;
+
+  &__filter {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 40px;
+    padding-left: 12px;
+
+    & .btn {
+      height: 40px;
+    }
+
+  }
+}
+
+.style-table {
+  border-collapse: collapse;
+  width: 700px;
+  /* // height: 600px; */
+  overflow-x: hidden;
+
+  td {
+    border: 1px solid rgba(224, 224, 224, 1);
+    padding: 0px !important;
+
+    .style-input {
+      height: 30px;
+      outline: none;
+      width: '100px' !important;
+    }
+
+    .btn-filter {
+      width: 100%;
+      outline: none;
+    }
+  }
+}
+
+.public-map {
+  &__lyrs-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 80px;
+    margin-left: 10px;
+
+    &__item {
+      position: relative;
+
+      &__icon {
+        width: 55px;
+        height: 55px;
+        background: #303F46;
+        box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+        border: 1px solid #fff;
+        &:hover {
+          background: #44c085;
+        }
+        &--active {
+          background: #44c085;
+        }
+      }
+
+      &__tree {
+        background: #DAE1E7;
+        box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+        display: none;
+        position: absolute;
+        left: calc(100% + 12px);
+        top: 0;
+        width: max-content;
+        max-width: min(500px, 80vw);
+        max-height: 300px;
+        overflow-y: auto;
+        &__inner {
+          overflow-y: auto;
+          max-height: 300px;
+          padding: 18px 12px;
+        }
+        /* // треугольник */
+        &::before {
+          content: '';
+          position: absolute;
+          top: 25px;
+          left: -12px;
+          transform: translateY(-50%);
+          border-top: 12px solid transparent;
+          border-bottom: 12px solid transparent;
+          border-right: 12px solid #DAE1E7;
+        }
+      }
+    }
+  }
+}

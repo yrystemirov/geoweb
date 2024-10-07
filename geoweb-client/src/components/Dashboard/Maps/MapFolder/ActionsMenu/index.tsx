@@ -9,10 +9,21 @@ type Props = {
   onEdit?: () => void;
   onAddLayer?: () => void;
   onEditLayer?: () => void;
+  onRemoveLayerFromFolder?: () => void;
+  onRemoveLayerFromAllFolders?: () => void;
   onDeleteLayer?: () => void;
 };
 
-export const MapFolderActionsMenu: FC<Props> = ({ onAdd, onDelete, onEdit, onAddLayer, onEditLayer, onDeleteLayer }) => {
+export const MapFolderActionsMenu: FC<Props> = ({
+  onAdd,
+  onDelete,
+  onEdit,
+  onAddLayer,
+  onEditLayer,
+  onRemoveLayerFromFolder,
+  onRemoveLayerFromAllFolders,
+  onDeleteLayer,
+}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -37,7 +48,9 @@ export const MapFolderActionsMenu: FC<Props> = ({ onAdd, onDelete, onEdit, onAdd
         {onAdd && <MenuItem onClick={() => onAdd()}>{t('maps.addFolder')}</MenuItem>}
         {onAddLayer && <MenuItem onClick={() => onAddLayer()}>{t('maps.addLayer')}</MenuItem>}
         {onDelete && <MenuItem onClick={() => onDelete()}>{t('delete')}</MenuItem>}
-        {onDeleteLayer && <MenuItem onClick={() => onDeleteLayer()}>{t('delete')}</MenuItem>}
+        {onRemoveLayerFromFolder && <MenuItem onClick={() => onRemoveLayerFromFolder()}>{t('maps.removeLayerFromFolder', { folder: ''})}</MenuItem>}
+        {onRemoveLayerFromAllFolders && <MenuItem onClick={() => onRemoveLayerFromAllFolders()}>{t('maps.removeLayerFromAllFolders')}</MenuItem>}
+        {onDeleteLayer && <MenuItem onClick={() => onDeleteLayer()}>{t('maps.deleteLayer')}</MenuItem>}
       </Menu>
     </div>
   );

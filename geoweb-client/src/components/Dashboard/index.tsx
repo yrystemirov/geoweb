@@ -15,7 +15,7 @@ import { MapFolders } from './Maps/Index';
 import { MapFolderEditForm } from './Maps/MapFolder/EditForm';
 import { MapFolderEditLayers } from './Maps/Index/MapEditLayers';
 import { MapFolderCreateForm } from './Maps/MapFolder/CreateForm';
-import { GoBackButton } from '../common/goBackButton';
+import { GoBackButton } from '../common/GoBackButton';
 
 const parentUrl = '/dashboard';
 
@@ -53,7 +53,10 @@ const Dashboard: React.FC = () => {
             <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/maps')} />
             <CardHeader title={t('maps.addMap')} sx={{ textAlign: 'center', flex: 1 }} />
           </Box>
-          <MapFolderCreateForm onSuccess={() => navigate('/dashboard/maps')} onCancel={() => navigate('/dashboard/maps')} />
+          <MapFolderCreateForm
+            onSuccess={() => navigate('/dashboard/maps')}
+            onCancel={() => navigate('/dashboard/maps')}
+          />
         </>
       ),
     },
@@ -63,9 +66,12 @@ const Dashboard: React.FC = () => {
         <>
           <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
             <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/maps')} />
-            <CardHeader title={t('editProperties')} sx={{ textAlign: 'center', flex: 1 }} />
+            <CardHeader title={t('editProperties', { name: '' })} sx={{ textAlign: 'center', flex: 1 }} />
           </Box>
-          <MapFolderEditForm onSuccess={() => navigate('/dashboard/maps')} onCancel={() => navigate('/dashboard/maps')} />
+          <MapFolderEditForm
+            onSuccess={() => navigate('/dashboard/maps')}
+            onCancel={() => navigate('/dashboard/maps')}
+          />
         </>
       ),
     },
