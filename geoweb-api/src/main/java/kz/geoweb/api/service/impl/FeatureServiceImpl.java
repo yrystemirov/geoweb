@@ -53,7 +53,7 @@ public class FeatureServiceImpl implements FeatureService {
 
     private Map<String, Object> getFeatureByGid(String layername, Integer gid) {
         String tableName = LAYERS_SCHEMA + "." + layername;
-        Set<LayerAttrDto> layerAttrs = layerAttrService.getLayerAttrsByLayername(layername);
+        List<LayerAttrDto> layerAttrs = layerAttrService.getLayerAttrsByLayername(layername);
         String fields = layerAttrs.stream()
                 .map(LayerAttrDto::getAttrname)
                 .collect(Collectors.joining(", "));
@@ -68,7 +68,7 @@ public class FeatureServiceImpl implements FeatureService {
     @Override
     public Page<Map<String, Object>> getFeatures(String layername, Pageable pageable) {
         String tableName = LAYERS_SCHEMA + "." + layername;
-        Set<LayerAttrDto> layerAttrs = layerAttrService.getLayerAttrsByLayername(layername);
+        List<LayerAttrDto> layerAttrs = layerAttrService.getLayerAttrsByLayername(layername);
         String fields = layerAttrs.stream()
                 .map(LayerAttrDto::getAttrname)
                 .collect(Collectors.joining(", "));
@@ -121,7 +121,7 @@ public class FeatureServiceImpl implements FeatureService {
         return " ORDER BY " + orderBy;
     }
 
-    private void fillDictionaryValues(List<Map<String, Object>> features, Set<LayerAttrDto> layerAttrs) {
+    private void fillDictionaryValues(List<Map<String, Object>> features, List<LayerAttrDto> layerAttrs) {
         String language = LocaleContextHolder.getLocale().getLanguage();
         if (features.isEmpty()) return;
         List<LayerAttrDto> dictionaryLayerAttrs = layerAttrs.stream().filter(attr -> attr.getAttrType() == AttrType.DICTIONARY).toList();
@@ -170,7 +170,7 @@ public class FeatureServiceImpl implements FeatureService {
     @Override
     public void save(String layername, List<FeatureSaveDto> featureSaveDtoList) {
         String tableName = LAYERS_SCHEMA + "." + layername;
-        Set<LayerAttrDto> layerAttrs = layerAttrService.getLayerAttrsByLayername(layername);
+        List<LayerAttrDto> layerAttrs = layerAttrService.getLayerAttrsByLayername(layername);
 
         for (FeatureSaveDto feature : featureSaveDtoList) {
             convertStringDatesToLocalDateTime(feature.getAttributes(), layerAttrs);
@@ -231,7 +231,7 @@ public class FeatureServiceImpl implements FeatureService {
                 .update();
     }
 
-    private void convertStringDatesToLocalDateTime(Map<String, Object> attributes, Set<LayerAttrDto> layerAttrs) {
+    private void convertStringDatesToLocalDateTime(Map<String, Object> attributes, List<LayerAttrDto> layerAttrs) {
         for (Map.Entry<String, Object> entry : attributes.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
@@ -277,7 +277,7 @@ public class FeatureServiceImpl implements FeatureService {
                 LayerInfoDto layer = layerService.getLayerByLayername(layername);
                 Integer gid = Integer.parseInt(layerGid[1]);
                 Map<String, Object> feature = getFeatureByGid(layername, gid);
-                Set<LayerAttrDto> layerAttrs = layerAttrsList.stream().filter(la -> la.getLayername().equals(layername))
+                List<LayerAttrDto> layerAttrs = layerAttrsList.stream().filter(la -> la.getLayername().equals(layername))
                         .findFirst().map(LayerLayerAttrsDto::getLayerAttrs).orElse(null);
                 if (layerAttrs == null) {
                     layerAttrs = layerAttrService.getLayerAttrsByLayername(layername);
