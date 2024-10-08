@@ -24,7 +24,7 @@ import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
 import { fieldIsRequiredProps } from './Entries/utils';
 import i18n from '../../../i18n';
 import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
-import ConfirmDialog from '../../common/Confirm';
+import ConfirmDialog from '../../common/confirm';
 import { useNotify } from '../../../hooks/useNotify';
 import { AxiosError } from 'axios';
 
