@@ -1,13 +1,16 @@
 package kz.geoweb.api.service;
 
+import kz.geoweb.api.dto.EntityPermissionDto;
+import kz.geoweb.api.enums.EntityType;
+import kz.geoweb.api.enums.Permission;
+
+import java.util.List;
 import java.util.UUID;
 
 public interface EntityPermissionService {
-    void checkFolderRead(UUID entityId);
+    boolean hasPermission(EntityType entityType, UUID entityId, Permission permission);
 
-    void checkFolderWrite(UUID entityId);
+    List<EntityPermissionDto> getEntityPermissions(EntityType entityType, UUID entityId);
 
-    void checkLayerRead(UUID entityId);
-
-    void checkLayerWrite(UUID entityId);
+    void updateEntityPermission(List<EntityPermissionDto> entityPermissions);
 }

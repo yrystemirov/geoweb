@@ -54,8 +54,13 @@ public class StyleServiceImpl implements StyleService {
     }
 
     @Override
-    public StyleResponseDto createStyle(StyleRequestDto styleRequestDto, UUID layerId) {
-        String xml = generateStyleXml(styleRequestDto);
+    public StyleResponseDto createStyle(StyleRequestDto styleRequestDto, UUID layerId, Boolean sld) {
+        String xml;
+        if (sld) {
+            xml = styleRequestDto.getSld();
+        } else {
+            xml = generateStyleXml(styleRequestDto);
+        }
         geoserverService.createStyle(xml);
         Style style = styleMapper.requestToEntity(styleRequestDto);
         Style created = styleRepository.save(style);
@@ -64,8 +69,13 @@ public class StyleServiceImpl implements StyleService {
     }
 
     @Override
-    public StyleResponseDto updateStyle(UUID styleId, StyleRequestDto styleRequestDto) {
-        String xml = generateStyleXml(styleRequestDto);
+    public StyleResponseDto updateStyle(UUID styleId, StyleRequestDto styleRequestDto, Boolean sld) {
+        String xml;
+        if (sld) {
+            xml = styleRequestDto.getSld();
+        } else {
+            xml = generateStyleXml(styleRequestDto);
+        }
         geoserverService.updateStyle(styleRequestDto.getName(), xml);
         Style requeststyle = styleMapper.requestToEntity(styleRequestDto);
         Style dbstyle = getEntityById(styleId);
