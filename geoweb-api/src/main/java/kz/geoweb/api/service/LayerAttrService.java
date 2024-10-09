@@ -2,15 +2,15 @@ package kz.geoweb.api.service;
 
 import kz.geoweb.api.dto.LayerAttrDto;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 public interface LayerAttrService {
     LayerAttrDto getLayerAttr(UUID id);
 
-    Set<LayerAttrDto> getLayerAttrs(UUID layerId);
+    List<LayerAttrDto> getLayerAttrs(UUID layerId);
 
-    Set<LayerAttrDto> getLayerAttrsPublic(UUID layerId);
+    List<LayerAttrDto> getLayerAttrsPublic(UUID layerId);
 
     LayerAttrDto createLayerAttr(LayerAttrDto layerAttrDto);
 
@@ -18,5 +18,5 @@ public interface LayerAttrService {
 
     void deleteLayerAttr(UUID id);
 
-    Set<LayerAttrDto> getLayerAttrsByLayername(String layername);
+    List<LayerAttrDto> getLayerAttrsByLayername(String layername);
 }

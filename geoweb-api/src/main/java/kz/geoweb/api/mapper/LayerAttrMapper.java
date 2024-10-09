@@ -6,8 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -18,8 +17,8 @@ public class LayerAttrMapper {
         return modelMapper.map(layerAttr, LayerAttrDto.class);
     }
 
-    public Set<LayerAttrDto> toDto(Set<LayerAttr> layerAttrs) {
-        return layerAttrs.stream().map(this::toDto).collect(Collectors.toSet());
+    public List<LayerAttrDto> toDto(List<LayerAttr> layerAttrs) {
+        return layerAttrs.stream().map(this::toDto).toList();
     }
 
     public LayerAttr toEntity(LayerAttrDto layerAttrDto) {

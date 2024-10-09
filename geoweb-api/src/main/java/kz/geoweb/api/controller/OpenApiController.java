@@ -62,7 +62,7 @@ public class OpenApiController {
     }
 
     @GetMapping("/layers/{id}/attrs")
-    public Set<LayerAttrDto> getLayerAttrsPublic(@PathVariable UUID id) {
+    public List<LayerAttrDto> getLayerAttrsPublic(@PathVariable UUID id) {
         return layerAttrService.getLayerAttrsPublic(id);
     }
 }

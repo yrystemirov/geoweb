@@ -17,8 +17,8 @@ import kz.geoweb.api.service.LayerAttrService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -47,12 +47,12 @@ public class LayerAttrServiceImpl implements LayerAttrService {
     }
 
     @Override
-    public Set<LayerAttrDto> getLayerAttrs(UUID layerId) {
+    public List<LayerAttrDto> getLayerAttrs(UUID layerId) {
         return layerAttrMapper.toDto(layerAttrRepository.findByLayerIdOrderByRank(layerId));
     }
 
     @Override
-    public Set<LayerAttrDto> getLayerAttrsPublic(UUID layerId) {
+    public List<LayerAttrDto> getLayerAttrsPublic(UUID layerId) {
         Layer layer = getLayerEntityById(layerId);
         if (!layer.getIsPublic()) {
             throw new ForbiddenException("layer.is_not_public", layer.getLayername());
@@ -108,7 +108,7 @@ public class LayerAttrServiceImpl implements LayerAttrService {
     }
 
     @Override
-    public Set<LayerAttrDto> getLayerAttrsByLayername(String layername) {
+    public List<LayerAttrDto> getLayerAttrsByLayername(String layername) {
         Layer layer = layerRepository.findByLayername(layername).orElseThrow();
         return layerAttrMapper.toDto(layerAttrRepository.findByLayerIdOrderByRank(layer.getId()));
     }

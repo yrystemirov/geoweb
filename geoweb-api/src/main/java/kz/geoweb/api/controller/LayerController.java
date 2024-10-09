@@ -12,7 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -50,7 +50,7 @@ public class LayerController {
     }
 
     @GetMapping("/{id}/attrs")
-    public Set<LayerAttrDto> getLayerAttrs(@PathVariable UUID id) {
+    public List<LayerAttrDto> getLayerAttrs(@PathVariable UUID id) {
         return layerAttrService.getLayerAttrs(id);
     }
 }

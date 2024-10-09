@@ -7,6 +7,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.Locale;
 
 public class LanguageUtils {
+    public static final String LOCALE_EN = "en";
+    public static final String LOCALE_KK = "kk";
     private static final String DEFAULT_LOCALE_CODE = "ru";
 
     public static Locale getLocale() {
