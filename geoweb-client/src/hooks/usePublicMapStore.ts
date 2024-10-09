@@ -24,7 +24,7 @@ type PublicMapState = {
 };
 
 export const usePublicMapStore = create<PublicMapState>((set) => ({
-  systemThemeColor: '#196fa6', // //5ebc67-green    196fa6-blue
+  systemThemeColor: '#5ebc67', // //5ebc67-green    196fa6-blue
   map: null,
   setMap: (map) => set({ map }),
   mapMode: MapMode.IDENTIFY,
