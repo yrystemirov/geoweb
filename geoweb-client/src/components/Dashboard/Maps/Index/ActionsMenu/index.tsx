@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { AccountTreeOutlined, DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import ConfirmDialog from '../../../../common/Confirm';
+import ConfirmDialog from '../../../../common/confirm';
 import { useMutation } from '@tanstack/react-query';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
 

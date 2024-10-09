@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useFormContext } from 'react-hook-form';
 import ClearIcon from '@mui/icons-material/Clear';
 import { AxiosResponse } from 'axios';
-import { Loader } from '../Loader';
+import { Loader } from '../loader';
 import { Pages } from '../../../api/types/page';
 import useDebounce from '../../../hooks/useDebounce';
 
