@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, Checkbox, FormControlLabel, MenuItem, TextField } from '@mui/material';
-import { Loader } from '../../../../common/loader';
+import { Loader } from '../../../../common/Loader';
 import { InfiniteScrollSelect } from '../../../../common/InfiniteScrollSelect';
 import { useTranslatedProp } from '../../../../../hooks/useTranslatedProp';
 import { useNotify } from '../../../../../hooks/useNotify';
