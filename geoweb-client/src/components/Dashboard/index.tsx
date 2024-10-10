@@ -15,7 +15,7 @@ import { MapFolders } from './Maps/Index';
 import { MapFolderEditForm } from './Maps/MapFolder/EditForm';
 import { MapFolderEditLayers } from './Maps/Index/MapEditLayers';
 import { MapFolderCreateForm } from './Maps/MapFolder/CreateForm';
-import { GoBackButton } from '../common/goBackButton';
+import { GoBackButton } from '../common/GoBackButton';
 
 const parentUrl = '/dashboard';
 

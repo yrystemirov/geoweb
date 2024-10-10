@@ -27,8 +27,8 @@ import { useNotifications } from '@toolpad/core/useNotifications';
 import i18n from '../../../../i18n';
 import { constants } from '../../../../constants';
 import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
-import { GoBackButton } from '../../../common/goBackButton';
-import ConfirmDialog from '../../../common/confirm';
+import { GoBackButton } from '../../../common/GoBackButton';
+import ConfirmDialog from '../../../common/Confirm';
 import { useTranslatedProp } from '../../../../hooks/useTranslatedProp';
 
 export type EntryDtoRow = EntryDto & { isNew?: boolean };
