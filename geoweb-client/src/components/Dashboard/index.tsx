@@ -16,6 +16,9 @@ import { MapFolderEditForm } from './Maps/MapFolder/EditForm';
 import { MapFolderEditLayers } from './Maps/Index/MapEditLayers';
 import { MapFolderCreateForm } from './Maps/MapFolder/CreateForm';
 import { GoBackButton } from '../common/GoBackButton';
+import { Users } from './Users';
+import { UserCreateForm } from './Users/CreateForm';
+import { UserEditForm } from './Users/EditForm';
 
 const parentUrl = '/dashboard';
 
@@ -26,6 +29,19 @@ type DashboardRoute = {
   component: JSX.Element;
   isMenuItem?: boolean;
   children?: DashboardRoute[];
+};
+
+type ChildPageLayoutProps = { backTitle: string; backOnClick: () => void; title: string; children: React.ReactNode };
+const ChildPageLayout: React.FC<ChildPageLayoutProps> = ({ backTitle, backOnClick, title, children }) => {
+  return (
+    <>
+      <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
+        <GoBackButton text={backTitle} onClick={backOnClick} />
+        <CardHeader title={title} sx={{ textAlign: 'center', flex: 1 }} />
+      </Box>
+      {children}
+    </>
+  );
 };
 
 const Dashboard: React.FC = () => {
@@ -43,36 +59,63 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const routes: DashboardRoute[] = [
-    { text: t('users'), path: '/users', icon: <GrouprIcon />, component: <>{t('users')}</>, isMenuItem: true },
+    { text: t('users.title'), path: '/users', icon: <GrouprIcon />, component: <Users />, isMenuItem: true },
+    {
+      path: '/users/add',
+      component: (
+        <ChildPageLayout
+          backTitle={t('backToList')}
+          backOnClick={() => navigate('/dashboard/users')}
+          title={t('users.create')}
+        >
+          <UserCreateForm
+            onSuccess={() => navigate('/dashboard/users')}
+            onCancel={() => navigate('/dashboard/users')}
+          />
+        </ChildPageLayout>
+      ),
+    },
+    {
+      path: '/users/:id/edit',
+      component: (
+        <ChildPageLayout
+          backTitle={t('backToList')}
+          backOnClick={() => navigate('/dashboard/users')}
+          title={t('editProperties', { name: '' })}
+        >
+          <UserEditForm onSuccess={() => navigate('/dashboard/users')} onCancel={() => navigate('/dashboard/users')} />
+        </ChildPageLayout>
+      ),
+    },
     { text: t('maps.title'), path: '/maps', icon: <MapIcon />, component: <MapFolders />, isMenuItem: true },
     {
       path: '/maps/add',
       component: (
-        <>
-          <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
-            <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/maps')} />
-            <CardHeader title={t('maps.addMap')} sx={{ textAlign: 'center', flex: 1 }} />
-          </Box>
+        <ChildPageLayout
+          backTitle={t('backToList')}
+          backOnClick={() => navigate('/dashboard/maps')}
+          title={t('maps.addMap')}
+        >
           <MapFolderCreateForm
             onSuccess={() => navigate('/dashboard/maps')}
             onCancel={() => navigate('/dashboard/maps')}
           />
-        </>
+        </ChildPageLayout>
       ),
     },
     {
       path: '/maps/:id/edit',
       component: (
-        <>
-          <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
-            <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/maps')} />
-            <CardHeader title={t('editProperties', { name: '' })} sx={{ textAlign: 'center', flex: 1 }} />
-          </Box>
+        <ChildPageLayout
+          backTitle={t('backToList')}
+          backOnClick={() => navigate('/dashboard/maps')}
+          title={t('editProperties', { name: '' })}
+        >
           <MapFolderEditForm
             onSuccess={() => navigate('/dashboard/maps')}
             onCancel={() => navigate('/dashboard/maps')}
           />
-        </>
+        </ChildPageLayout>
       ),
     },
     { path: '/maps/:id/edit-layers', component: <MapFolderEditLayers /> },
