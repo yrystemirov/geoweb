@@ -40,7 +40,7 @@ export const Roles: FC = () => {
 
   return (
     <>
-      <CardHeader title={t('users.title')} sx={{ textAlign: 'center' }} />
+      <CardHeader title={t('roles.title')} sx={{ textAlign: 'center' }} />
       <Box>
         <DataGrid<RoleDto>
           rows={data?.content || []}
