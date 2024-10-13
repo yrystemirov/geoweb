@@ -8,7 +8,7 @@ import {
   GridEventListener,
   GridRowId,
   GridActionsCellItem,
-  GridToolbarContainer
+  GridToolbarContainer,
 } from '@mui/x-data-grid';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -23,9 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { EntryDto, EntryRequestDto } from '../../../../api/types/dictioanries';
 import CustomNoRowsOverlay from '../../../common/NoRows/DataGrid';
 import { fieldIsRequiredProps } from './utils';
-import { useNotifications } from '@toolpad/core/useNotifications';
-import i18n from '../../../../i18n';
-import { constants } from '../../../../constants';
+import { useNotify } from '../../../../hooks/useNotify';
 import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
 import { GoBackButton } from '../../../common/GoBackButton';
 import ConfirmDialog from '../../../common/Confirm';
@@ -35,7 +33,7 @@ export type EntryDtoRow = EntryDto & { isNew?: boolean };
 
 export const DictionaryEntries = () => {
   const translatedNameProp = useTranslatedProp('name');
-  const notifications = useNotifications();
+  const { showError } = useNotify();
   const { t } = useTranslation();
   const { id: dictionaryId } = useParams() as { id: string };
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
@@ -61,10 +59,8 @@ export const DictionaryEntries = () => {
     enabled: !!dictionaryId,
   });
 
-  const handleError = (error: any) => {
-    const hasTranslation = i18n.exists(error?.response?.data?.message);
-    const message = hasTranslation ? t(error.response.data.message) : t('errorOccurred');
-    notifications.show(message, { severity: 'error', autoHideDuration: constants.ntfHideDelay });
+  const onError = (error: any) => {
+    showError({ error });
   };
 
   const addMutation = useMutation({
@@ -73,7 +69,7 @@ export const DictionaryEntries = () => {
       setRows(rows.map((row) => (row.id === newRow.id ? newRow : row)));
       queryClient.invalidateQueries({ queryKey: ['dictionaryEntries', dictionaryId] });
     },
-    onError: handleError,
+    onError,
   });
 
   const updateMutation = useMutation({
@@ -84,7 +80,7 @@ export const DictionaryEntries = () => {
       queryClient.invalidateQueries({ queryKey: ['dictionaryEntries', dictionaryId] });
     },
     onError: (e, { oldRow }) => {
-      handleError(e);
+      onError(e);
       setRows(rows.map((row) => (row.id === oldRow.id ? oldRow : row)));
     },
   });
@@ -95,7 +91,7 @@ export const DictionaryEntries = () => {
       queryClient.invalidateQueries({ queryKey: ['dictionaryEntries', dictionaryId] });
       setRows(rows.filter((row) => row.id !== id));
     },
-    onError: handleError,
+    onError,
   });
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
@@ -205,10 +201,7 @@ export const DictionaryEntries = () => {
     <>
       <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
         <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/dictionaries')} />
-        <CardHeader
-          title={t('dictionaryEntries', { dicName })}
-          sx={{ textAlign: 'center', flex: 1 }}
-        />
+        <CardHeader title={t('dictionaryEntries', { dicName })} sx={{ textAlign: 'center', flex: 1 }} />
       </Box>
       <Box>
         <DataGrid

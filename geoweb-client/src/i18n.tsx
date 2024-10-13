@@ -24,7 +24,7 @@ const resources = {
       create: 'Құру',
       save: 'Сақтау',
       edit: 'Өңдеу',
-      editProperties: '{{name}} Мүшелерді өңдеу',
+      editProperties: '{{name}} Қасиеттерді өңдеу',
       cancel: 'Бас тарту',
       confirm: 'Растау',
       delete: 'Жою',
@@ -86,6 +86,13 @@ const resources = {
         isBlockLayer: 'Блоктық қабат',
         isDynamic: 'Динамикалық',
         useExistingLayer: 'Бар қабатты пайдалану',
+      },
+      roles: {
+        title: 'Рөлдер',
+        create: 'Рөлді құру',
+        name: 'Атауы',
+        code: 'Код',
+        description: 'Сипаттамасы',
       },
       users: {
         title: 'Пайдаланушылар',
@@ -188,6 +195,13 @@ const resources = {
         isBlockLayer: 'Блочный слой',
         isDynamic: 'Динамический',
         useExistingLayer: 'Использовать существующий слой',
+      },
+      roles: {
+        title: 'Роли',
+        create: 'Создать роль',
+        name: 'Наименование',
+        code: 'Код',
+        description: 'Описание',
       },
       users: {
         title: 'Пользователи',

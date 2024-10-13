@@ -1,3 +1,5 @@
+import { RoleDto } from "./role";
+
 export type UserDto = {
     id: string;
     username: string;
@@ -6,13 +8,6 @@ export type UserDto = {
     phoneNumber: string;
     blocked: boolean;
     roles: RoleDto[];
-};
-
-export type RoleDto = {
-    id: string;
-    code: string;
-    name: string;
-    description: string;
 };
 
 export type UserCreateDto = Omit<UserDto, 'id' | 'blocked'> & {

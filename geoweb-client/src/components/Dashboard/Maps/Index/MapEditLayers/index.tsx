@@ -12,7 +12,6 @@ import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 import { FolderTreeDto, LayerDto } from '../../../../../api/types/mapFolders';
 import { useTranslatedProp } from '../../../../../hooks/useTranslatedProp';
 import ConfirmDialog from '../../../../common/Confirm';
-import i18n from '../../../../../i18n';
 import { Dialog } from '../../../../common/Dialog';
 import { MapFolderEditForm } from '../../MapFolder/EditForm';
 import { MapFolderCreateForm } from '../../MapFolder/CreateForm';
@@ -52,10 +51,8 @@ export const MapFolderEditLayers: FC = () => {
     setOpenDialog({ type: DialogType.none, selectedItem: null });
   };
 
-  const handleError = (error: any) => {
-    const hasTranslation = i18n.exists(error?.response?.data?.message);
-    const message = hasTranslation ? t(error.response.data.message) : t('errorOccurred');
-    showError({ text: message });
+  const onError = (error: any) => {
+    showError({ error });
   };
 
   const { data: treeData, refetch } = useQuery({
@@ -70,7 +67,7 @@ export const MapFolderEditLayers: FC = () => {
       handleSuccess();
       showSuccess();
     },
-    onError: handleError,
+    onError,
   });
 
   const deleteLayerMutation = useMutation({
@@ -79,7 +76,7 @@ export const MapFolderEditLayers: FC = () => {
       handleSuccess();
       showSuccess();
     },
-    onError: handleError,
+    onError,
   });
 
   const getAndRemoveLayerFromFolderMutation = useMutation({
@@ -90,7 +87,7 @@ export const MapFolderEditLayers: FC = () => {
         folders: data.folders.filter((f) => f.id !== openDialog.selectedItem?.folder?.id),
       });
     },
-    onError: handleError,
+    onError,
   });
 
   const getAndRemoveLayerFromAllFoldersMutation = useMutation({
@@ -98,7 +95,7 @@ export const MapFolderEditLayers: FC = () => {
     onSuccess: (data) => {
       editLayerMutation.mutate({ ...data, folders: [] });
     },
-    onError: handleError,
+    onError,
   });
 
   const editLayerMutation = useMutation({
@@ -107,7 +104,7 @@ export const MapFolderEditLayers: FC = () => {
       handleSuccess();
       showSuccess();
     },
-    onError: handleError,
+    onError,
   });
 
   const handleSuccess = (idToExpand?: string) => {
@@ -196,6 +193,7 @@ export const MapFolderEditLayers: FC = () => {
             parentClose: <Folder />,
           }}
         />
+
         <Dialog
           open={openDialog.type === DialogType.createFolder}
           onClose={closeDialogs}
@@ -207,6 +205,7 @@ export const MapFolderEditLayers: FC = () => {
             onCancel={closeDialogs}
           />
         </Dialog>
+
         <Dialog
           open={openDialog.type === DialogType.editFolder}
           onClose={closeDialogs}

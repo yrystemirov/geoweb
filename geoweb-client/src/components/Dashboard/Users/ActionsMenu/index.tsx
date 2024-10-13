@@ -45,7 +45,7 @@ export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
       <IconButton
         aria-haspopup="true"
         onClick={handleClick}
-        aria-controls={anchorEl ? 'disk-menu' : undefined}
+        aria-controls={anchorEl ? 'user-menu' : undefined}
         aria-expanded={!!anchorEl}
       >
         <MoreVert />
@@ -64,7 +64,10 @@ export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
 
-        <MenuItem onClick={() => setDeleteDialogOpen(true)}>
+        <MenuItem onClick={() => {
+          setDeleteDialogOpen(true);
+          handleClose();
+        }}>
           <DeleteOutline sx={{ marginRight: 1 }} /> {t('delete')}
         </MenuItem>
       </Menu>

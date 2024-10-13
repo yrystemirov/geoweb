@@ -1,30 +1,36 @@
-import { FC, useState } from 'react';
-import { FolderDto } from '../../../../../api/types/mapFolders';
+import { FC, MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
-import { AccountTreeOutlined, DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import ConfirmDialog from '../../../../common/Confirm';
+import { DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
 import { useMutation } from '@tanstack/react-query';
-import { mapFoldersAPI } from '../../../../../api/mapFolders';
+import ConfirmDialog from '../../../common/Confirm';
+import { roleAPI } from '../../../../api/roles';
+import { RoleDto } from '../../../../api/types/role';
+import { RoleForm } from '../Form';
+import { Dialog } from '../../../common/Dialog';
+import { useNotify } from '../../../../hooks/useNotify';
 
 type Props = {
-  data: FolderDto;
+  data: RoleDto;
   onRefresh: () => void;
 };
 
-export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
+export const RoleActionsMenu: FC<Props> = ({ data, onRefresh }) => {
+  const { showSuccess, showError } = useNotify();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const onSuccess = () => {
+    showSuccess();
     onRefresh();
     handleClose();
+    setDeleteDialogOpen(false);
+    setEditDialogOpen(false);
   };
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
   };
@@ -36,8 +42,11 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
   const isOpen = Boolean(anchorEl);
 
   const deleteMutation = useMutation({
-    mutationFn: () => mapFoldersAPI.deleteFolder(data.id).then((res) => res.data),
+    mutationFn: () => roleAPI.deleteRole(data.id),
     onSuccess,
+    onError: (error) => {
+      showError({ error });
+    },
   });
 
   return (
@@ -45,7 +54,7 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
       <IconButton
         aria-haspopup="true"
         onClick={handleClick}
-        aria-controls={anchorEl ? 'map-menu' : undefined}
+        aria-controls={anchorEl ? 'role-menu' : undefined}
         aria-expanded={!!anchorEl}
       >
         <MoreVert />
@@ -60,18 +69,21 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={() => navigate(`/dashboard/maps/${data.id}/edit`)}>
+        <MenuItem
+          onClick={() => {
+            setEditDialogOpen(true);
+            handleClose();
+          }}
+        >
           <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
 
-        <MenuItem onClick={() => navigate(`/dashboard/maps/${data.id}/edit-layers`)}>
-          <AccountTreeOutlined sx={{ marginRight: 1 }} /> {t('maps.editStructure')}
-        </MenuItem>
-
-        <MenuItem onClick={() => {
-          setDeleteDialogOpen(true);
-          handleClose();
-        }}>
+        <MenuItem
+          onClick={() => {
+            setDeleteDialogOpen(true);
+            handleClose();
+          }}
+        >
           <DeleteOutline sx={{ marginRight: 1 }} /> {t('delete')}
         </MenuItem>
       </Menu>
@@ -85,6 +97,9 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
       >
         {t('deleteConfirmDescription')}
       </ConfirmDialog>
+      <Dialog open={editDialogOpen} onClose={handleClose} title={t('editProperties', { name: `"${data.name}"` })}>
+        <RoleForm editData={data} onSuccess={onSuccess} onCancel={() => setEditDialogOpen(false)} />
+      </Dialog>
     </Box>
   );
 };

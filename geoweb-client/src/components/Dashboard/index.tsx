@@ -1,11 +1,12 @@
 import React, { Fragment, useEffect } from 'react';
-import { Link, Route as DashboardRoute, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Box, CardHeader, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   Map as MapIcon,
   Settings as SettingsIcon,
   Group as GrouprIcon,
+  AdminPanelSettings as RolesIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '../common/loadingBar/loadingContext';
@@ -19,6 +20,7 @@ import { GoBackButton } from '../common/GoBackButton';
 import { Users } from './Users';
 import { UserCreateForm } from './Users/CreateForm';
 import { UserEditForm } from './Users/EditForm';
+import { Roles } from './Roles';
 
 const parentUrl = '/dashboard';
 
@@ -59,66 +61,92 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const routes: DashboardRoute[] = [
-    { text: t('users.title'), path: '/users', icon: <GrouprIcon />, component: <Users />, isMenuItem: true },
     {
-      path: '/users/add',
-      component: (
-        <ChildPageLayout
-          backTitle={t('backToList')}
-          backOnClick={() => navigate('/dashboard/users')}
-          title={t('users.create')}
-        >
-          <UserCreateForm
-            onSuccess={() => navigate('/dashboard/users')}
-            onCancel={() => navigate('/dashboard/users')}
-          />
-        </ChildPageLayout>
-      ),
+      text: t('users.title'),
+      path: '/users',
+      icon: <GrouprIcon />,
+      component: <Users />,
+      isMenuItem: true,
+      children: [
+        {
+          text: t('roles.title'),
+          path: '/roles',
+          icon: <RolesIcon />,
+          component: <Roles />,
+          isMenuItem: true,
+        },
+        {
+          path: '/users/add',
+          component: (
+            <ChildPageLayout
+              backTitle={t('backToList')}
+              backOnClick={() => navigate('/dashboard/users')}
+              title={t('users.create')}
+            >
+              <UserCreateForm
+                onSuccess={() => navigate('/dashboard/users')}
+                onCancel={() => navigate('/dashboard/users')}
+              />
+            </ChildPageLayout>
+          ),
+        },
+        {
+          path: '/users/:id/edit',
+          component: (
+            <ChildPageLayout
+              backTitle={t('backToList')}
+              backOnClick={() => navigate('/dashboard/users')}
+              title={t('editProperties', { name: '' })}
+            >
+              <UserEditForm
+                onSuccess={() => navigate('/dashboard/users')}
+                onCancel={() => navigate('/dashboard/users')}
+              />
+            </ChildPageLayout>
+          ),
+        },
+      ],
     },
     {
-      path: '/users/:id/edit',
-      component: (
-        <ChildPageLayout
-          backTitle={t('backToList')}
-          backOnClick={() => navigate('/dashboard/users')}
-          title={t('editProperties', { name: '' })}
-        >
-          <UserEditForm onSuccess={() => navigate('/dashboard/users')} onCancel={() => navigate('/dashboard/users')} />
-        </ChildPageLayout>
-      ),
+      text: t('maps.title'),
+      path: '/maps',
+      icon: <MapIcon />,
+      component: <MapFolders />,
+      isMenuItem: true,
+      children: [
+        {
+          path: '/maps/add',
+          component: (
+            <ChildPageLayout
+              backTitle={t('backToList')}
+              backOnClick={() => navigate('/dashboard/maps')}
+              title={t('maps.addMap')}
+            >
+              <MapFolderCreateForm
+                onSuccess={() => navigate('/dashboard/maps')}
+                onCancel={() => navigate('/dashboard/maps')}
+              />
+            </ChildPageLayout>
+          ),
+        },
+        {
+          path: '/maps/:id/edit',
+          component: (
+            <ChildPageLayout
+              backTitle={t('backToList')}
+              backOnClick={() => navigate('/dashboard/maps')}
+              title={t('editProperties', { name: '' })}
+            >
+              <MapFolderEditForm
+                onSuccess={() => navigate('/dashboard/maps')}
+                onCancel={() => navigate('/dashboard/maps')}
+              />
+            </ChildPageLayout>
+          ),
+        },
+        { path: '/maps/:id/edit-layers', component: <MapFolderEditLayers /> },
+      ],
     },
-    { text: t('maps.title'), path: '/maps', icon: <MapIcon />, component: <MapFolders />, isMenuItem: true },
-    {
-      path: '/maps/add',
-      component: (
-        <ChildPageLayout
-          backTitle={t('backToList')}
-          backOnClick={() => navigate('/dashboard/maps')}
-          title={t('maps.addMap')}
-        >
-          <MapFolderCreateForm
-            onSuccess={() => navigate('/dashboard/maps')}
-            onCancel={() => navigate('/dashboard/maps')}
-          />
-        </ChildPageLayout>
-      ),
-    },
-    {
-      path: '/maps/:id/edit',
-      component: (
-        <ChildPageLayout
-          backTitle={t('backToList')}
-          backOnClick={() => navigate('/dashboard/maps')}
-          title={t('editProperties', { name: '' })}
-        >
-          <MapFolderEditForm
-            onSuccess={() => navigate('/dashboard/maps')}
-            onCancel={() => navigate('/dashboard/maps')}
-          />
-        </ChildPageLayout>
-      ),
-    },
-    { path: '/maps/:id/edit-layers', component: <MapFolderEditLayers /> },
     {
       text: t('layers'),
       path: '/layers',
@@ -148,6 +176,12 @@ const Dashboard: React.FC = () => {
       icon: <DashboardIcon />,
       component: <Dictionaries />,
       isMenuItem: true,
+      children: [
+        {
+          path: '/dictionaries/:id',
+          component: <DictionaryEntries />,
+        },
+      ],
     },
   ];
 
@@ -157,7 +191,7 @@ const Dashboard: React.FC = () => {
     if (item.children) {
       return item.children.map((child, idx) => (
         <Fragment key={idx}>
-          <DashboardRoute key={child.text} path={child.path} element={child.component} />
+          <Route key={child.text} path={child.path} element={child.component} />
           {getRecursiveChildrenRoutes(child)}
         </Fragment>
       ));
@@ -182,18 +216,21 @@ const Dashboard: React.FC = () => {
                 </ListItemButton>
               </ListItem>
               {item.children &&
-                item.children.map((child) => (
-                  <ListItem key={child.text} disablePadding sx={{ pl: 4 }}>
-                    <ListItemButton
-                      component={Link}
-                      to={`${parentUrl}${child.path}`}
-                      selected={window.location.pathname === `${parentUrl}${child.path}`}
-                    >
-                      <ListItemIcon>{child.icon}</ListItemIcon>
-                      <ListItemText primary={child.text} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
+                item.children.map(
+                  (child) =>
+                    child.isMenuItem && (
+                      <ListItem key={child.text} disablePadding sx={{ pl: 4 }}>
+                        <ListItemButton
+                          component={Link}
+                          to={`${parentUrl}${child.path}`}
+                          selected={window.location.pathname === `${parentUrl}${child.path}`}
+                        >
+                          <ListItemIcon>{child.icon}</ListItemIcon>
+                          <ListItemText primary={child.text} />
+                        </ListItemButton>
+                      </ListItem>
+                    ),
+                )}
             </Fragment>
           ))}
         </List>
@@ -203,11 +240,10 @@ const Dashboard: React.FC = () => {
         <Routes>
           {routes.map((item, idx) => (
             <Fragment key={idx}>
-              <DashboardRoute path={item.path} element={item.component} />
+              <Route path={item.path} element={item.component} />
               {getRecursiveChildrenRoutes(item)}
             </Fragment>
           ))}
-          <DashboardRoute path="/dictionaries/:id" element={<DictionaryEntries />} />
         </Routes>
       </Box>
     </Box>

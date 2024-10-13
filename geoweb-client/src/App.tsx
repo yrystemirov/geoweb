@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import Header from './components/common/header';
 import Footer from './components/common/footer';
 ///import Footer from './components/Footer';
@@ -29,7 +28,6 @@ export enum FooterType {
   MINI,
 }
 const App: React.FC = () => {
-  const { t } = useTranslation();
   const { isLoading } = useLoading(); // Get loading state from context
   const [footerType, setFooterType] = useState<FooterType>(FooterType.BIG);
   return (
