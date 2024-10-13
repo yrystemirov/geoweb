@@ -19,6 +19,8 @@ import './App.css';
 // import './styles/gis.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
+import { ThemeProvider } from '@mui/material';
+import theme from './config/theme';
 
 const queryClient = new QueryClient();
 
@@ -96,9 +98,11 @@ const App: React.FC = () => {
 export default function AppWrapper() {
   return (
     <QueryClientProvider client={queryClient}>
-      <LoadingProvider>
-        <App />
-      </LoadingProvider>
+      <ThemeProvider theme={theme}>
+        <LoadingProvider>
+          <App />
+        </LoadingProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
