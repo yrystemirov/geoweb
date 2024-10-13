@@ -22,6 +22,7 @@ import { userAPI } from '../../../../api/user';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { RoleDto } from '../../../../api/types/role';
 import { roleAPI } from '../../../../api/roles';
+import { useNavigate } from 'react-router-dom';
 
 const INITIAL_VALUES: UserCreateDto = {
   username: '',
@@ -35,9 +36,11 @@ const INITIAL_VALUES: UserCreateDto = {
 type Props = {
   onSuccess?: () => void;
   onCancel?: () => void;
+  goBackPath?: string;
 };
 
-export const UserCreateForm: FC<Props> = ({ onCancel, onSuccess }) => {
+export const UserCreateForm: FC<Props> = ({ goBackPath, onCancel, onSuccess }) => {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { showSuccess, showError } = useNotify();
   const [showPassword, setShowPassword] = useState(true);
@@ -52,6 +55,7 @@ export const UserCreateForm: FC<Props> = ({ onCancel, onSuccess }) => {
     onSuccess: () => {
       onSuccess?.();
       showSuccess();
+      goBackPath && navigate(goBackPath);
     },
     onError: (error) => {
       showError({ text: error?.response?.data?.message });
@@ -193,6 +197,7 @@ export const UserCreateForm: FC<Props> = ({ onCancel, onSuccess }) => {
         variant="text"
         onClick={() => {
           onCancel?.();
+          goBackPath && navigate(goBackPath);
           methods.reset();
         }}
       >

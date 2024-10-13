@@ -15,7 +15,7 @@ import {
   Select,
   TextField,
 } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as yup from 'yup';
 import { UserDto, UserUpdateDto } from '../../../../api/types/user';
 import { useNotify } from '../../../../hooks/useNotify';
@@ -37,9 +37,11 @@ type Props = {
   id?: string;
   onSuccess?: () => void;
   onCancel?: () => void;
+  goBackPath?: string;
 };
 
-export const UserEditForm: FC<Props> = ({ id: idProp, onSuccess, onCancel }) => {
+export const UserEditForm: FC<Props> = ({ id: idProp, goBackPath, onSuccess, onCancel }) => {
+  const navigate = useNavigate();
   const { showSuccess } = useNotify();
   const { t } = useTranslation();
   const { id: idParam } = useParams();
@@ -70,6 +72,7 @@ export const UserEditForm: FC<Props> = ({ id: idProp, onSuccess, onCancel }) => 
     onSuccess: () => {
       onSuccess?.();
       showSuccess();
+      goBackPath && navigate(goBackPath);
     },
   });
 
@@ -148,7 +151,12 @@ export const UserEditForm: FC<Props> = ({ id: idProp, onSuccess, onCancel }) => 
             fullWidth
             error={!!errors.roles}
             value={methods.watch('roles')}
-            renderValue={(selected) => roles.filter((role) => selected.includes(role.id)).map((role) => role.name).join(', ')}
+            renderValue={(selected) =>
+              roles
+                .filter((role) => selected.includes(role.id))
+                .map((role) => role.name)
+                .join(', ')
+            }
           >
             {roles.map((role) => (
               <MenuItem key={role.id} value={role.id}>
@@ -179,6 +187,7 @@ export const UserEditForm: FC<Props> = ({ id: idProp, onSuccess, onCancel }) => 
         onClick={() => {
           onCancel?.();
           methods.reset(data || INITIAL_VALUES);
+          goBackPath && navigate(goBackPath);
         }}
       >
         {t('cancel')}

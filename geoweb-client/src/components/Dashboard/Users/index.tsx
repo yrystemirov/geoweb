@@ -18,8 +18,8 @@ export const Users: FC = () => {
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['users'],
-    queryFn: () => userAPI.getUsers().then((res) => res.data),
+    queryKey: ['users', pagination],
+    queryFn: () => userAPI.getUsers({ page: pagination.page, size: pagination.pageSize }).then((res) => res.data),
   });
 
   const columns: GridColDef<UserDto>[] = [

@@ -19,8 +19,8 @@ export const Roles: FC = () => {
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['roles'],
-    queryFn: () => roleAPI.getRoles().then((res) => res.data),
+    queryKey: ['roles', pagination],
+    queryFn: () => roleAPI.getRoles({ page: pagination.page, size: pagination.pageSize }).then((res) => res.data),
   });
 
   const columns: GridColDef<RoleDto>[] = [
