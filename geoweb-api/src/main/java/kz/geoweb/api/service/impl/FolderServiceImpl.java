@@ -18,14 +18,17 @@ import kz.geoweb.api.service.EntityPermissionService;
 import kz.geoweb.api.service.EntityUpdateHistoryService;
 import kz.geoweb.api.service.FolderService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FolderServiceImpl implements FolderService {
     private final FolderRepository folderRepository;
     private final FolderMapper folderMapper;
@@ -130,12 +133,18 @@ public class FolderServiceImpl implements FolderService {
             } else {
                 removeNotPublic(child);
                 Set<Layer> layersToRemove = new HashSet<>();
+                log.info("folder: {}", child.getNameRu());
+                log.info("all layers" + child.getLayers().stream().map(Layer::getNameRu).collect(Collectors.joining(",")));
                 for (Layer layer : child.getLayers()) {
+                    log.info("layer: {}", layer.getNameRu());
                     if (!layer.getIsPublic()) {
+                        log.info("layer not public: {}", layer.getNameRu());
                         layersToRemove.add(layer);
                     }
                 }
+                log.info("layers to remove" + layersToRemove.stream().map(Layer::getNameRu).collect(Collectors.joining(",")));
                 child.getLayers().removeAll(layersToRemove);
+                log.info("rest layers" + child.getLayers().stream().map(Layer::getNameRu).collect(Collectors.joining(",")));
             }
         }
         children.removeAll(childrenToRemove);

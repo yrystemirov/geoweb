@@ -1,9 +1,8 @@
 package kz.geoweb.api.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import kz.geoweb.api.enums.AttrType;
 import lombok.Data;
-
-import java.util.UUID;
 
 @Data
 public class DictionaryRequestDto {
@@ -12,4 +11,5 @@ public class DictionaryRequestDto {
     private String nameKk;
     private String nameRu;
     private String nameEn;
+    private AttrType type = AttrType.TEXT;
 }

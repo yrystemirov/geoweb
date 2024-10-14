@@ -68,9 +68,6 @@ public class LayerServiceImpl implements LayerService {
 
     @Override
     public LayerDto createLayer(LayerRequestDto layerRequestDto) {
-        if (layerRequestDto.getIsDynamic() && layerRequestDto.getDynamicIdentityColumn() == null) {
-            throw new CustomException("layer.dynamic.without_identity_column");
-        }
         String layername = layerRequestDto.getLayername();
         Optional<Layer> layerEntityOptional = layerRepository
                 .findByLayername(layername.trim());
@@ -91,9 +88,6 @@ public class LayerServiceImpl implements LayerService {
         if (!hasPermission) {
             throw new ForbiddenException("layer.update.forbidden");
         }
-        if (layerRequestDto.getIsDynamic() && layerRequestDto.getDynamicIdentityColumn() == null) {
-            throw new CustomException("layer.dynamic.without_identity_column");
-        }
         Layer layer = getEntityById(id);
         layer.setNameKk(layerRequestDto.getNameKk());
         layer.setNameRu(layerRequestDto.getNameRu());
@@ -102,12 +96,7 @@ public class LayerServiceImpl implements LayerService {
         layer.setDescriptionRu(layerRequestDto.getDescriptionRu());
         layer.setDescriptionEn(layerRequestDto.getDescriptionEn());
         layer.setUrl(layerRequestDto.getUrl());
-        layer.setBaseLayer(layerRequestDto.getBaseLayer());
-        layer.setCheckIntersection(layerRequestDto.getCheckIntersection());
-        layer.setIsBlockLayer(layerRequestDto.getIsBlockLayer());
-        layer.setIsDynamic(layerRequestDto.getIsDynamic());
         layer.setIsPublic(layerRequestDto.getIsPublic());
-        layer.setDynamicIdentityColumn(layerRequestDto.getDynamicIdentityColumn());
         layer.setFolders(folderMapper.toEntity(layerRequestDto.getFolders()));
         Layer updated = layerRepository.save(layer);
         historyService.saveLayer(updated.getId(), Action.UPDATE);

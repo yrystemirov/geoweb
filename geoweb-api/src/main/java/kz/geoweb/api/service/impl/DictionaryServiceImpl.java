@@ -66,6 +66,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         dictionary.setNameKk(dictionaryRequestDto.getNameKk());
         dictionary.setNameRu(dictionaryRequestDto.getNameRu());
         dictionary.setNameEn(dictionaryRequestDto.getNameEn());
+        dictionary.setType(dictionaryRequestDto.getType());
         Dictionary updated = dictionaryRepository.save(dictionary);
         return dictionaryMapper.toDto(updated);
     }

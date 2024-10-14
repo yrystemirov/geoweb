@@ -19,8 +19,6 @@ public class LayerAttr extends IdEntity {
     private String attrname;
     @Enumerated(EnumType.STRING)
     private AttrType attrType;
-    private Boolean shortInfo;
-    private Boolean fullInfo;
     @ManyToOne
     private Layer layer;
     private String dictionaryCode;

@@ -15,8 +15,6 @@ public class LayerAttrDto {
     @NotBlank
     private String attrname;
     private AttrType attrType;
-    private Boolean shortInfo;
-    private Boolean fullInfo;
     private LayerInfoDto layer;
     private String dictionaryCode;
     private Integer rank = 0;
