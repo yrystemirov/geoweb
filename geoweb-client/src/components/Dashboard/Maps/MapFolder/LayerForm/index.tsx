@@ -11,14 +11,16 @@ import { Loader } from '../../../../common/Loader';
 import { InfiniteScrollSelect } from '../../../../common/InfiniteScrollSelect';
 import { useTranslatedProp } from '../../../../../hooks/useTranslatedProp';
 import { useNotify } from '../../../../../hooks/useNotify';
+import { useNavigate, useParams } from 'react-router-dom';
 
 type LayerRequestForm = Omit<LayerRequestDto, 'folders'>;
 
 type Props = {
   editLayerId?: LayerDto['id']; // when editing layer
-  addFolderId?: string; // when adding new layer
+  addFolderId?: string; // when adding new layer to folder
   onSuccess?: () => void;
   onCancel?: () => void;
+  goBackPath?: string;
 };
 
 const INITIAL_VALUES: LayerRequestForm = {
@@ -39,7 +41,16 @@ const INITIAL_VALUES: LayerRequestForm = {
   isPublic: false,
 };
 
-export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCancel }) => {
+export const LayerForm: FC<Props> = ({
+  editLayerId: editLayerIdParam,
+  addFolderId,
+  onSuccess,
+  onCancel,
+  goBackPath,
+}) => {
+  const navigate = useNavigate();
+  const { layerId } = useParams();
+  const editLayerId = editLayerIdParam || layerId;
   const isEditing = Boolean(editLayerId);
   const isAdding = Boolean(addFolderId);
   const translatedNameProp = useTranslatedProp('name');
@@ -68,12 +79,13 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
       layersAPI
         .createLayer({
           ...layer,
-          folders: [{ id: addFolderId! } as FolderDto],
+          folders: addFolderId ? [{ id: addFolderId } as FolderDto] : [],
         })
         .then((res) => res.data),
     onSuccess: () => {
       onSuccess?.();
       showSuccess();
+      goBackPath && navigate(goBackPath);
     },
     onError,
   });
@@ -89,6 +101,7 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
     onSuccess: () => {
       onSuccess?.();
       showSuccess();
+      goBackPath && navigate(goBackPath);
     },
     onError,
   });
@@ -261,6 +274,7 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
           error={!!errors.layername}
           helperText={errors.layername?.message}
           required
+          disabled={isEditing}
         />
         <Box display="flex" gap={2} sx={{ width: '100%' }}>
           <TextField
@@ -272,6 +286,7 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
             helperText={errors.geometryType?.message}
             value={methods.watch('geometryType')}
             required
+            disabled={isEditing}
           >
             {Object.values(GeometryType).map((value) => (
               <MenuItem key={value} value={value}>
@@ -288,6 +303,7 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
             helperText={errors.layerType?.message}
             value={methods.watch('layerType')}
             required
+            disabled={isEditing}
           >
             {Object.values(LayerType).map((value) => (
               <MenuItem key={value} value={value}>
@@ -318,7 +334,14 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
           label={t('maps.isPublic')}
         />
         <Box display="flex" gap={2} sx={{ width: '100%' }} justifyContent="flex-end">
-          <Button onClick={onCancel} variant="text" type="button">
+          <Button
+            onClick={() => {
+              onCancel?.();
+              goBackPath && navigate(goBackPath);
+            }}
+            variant="text"
+            type="button"
+          >
             {t('cancel')}
           </Button>
           <Button type="submit" variant="contained">

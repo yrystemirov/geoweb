@@ -4,6 +4,7 @@ import {
   Settings as SettingsIcon,
   Group as GrouprIcon,
   AdminPanelSettings as RolesIcon,
+  Layers as LayersIcon,
 } from '@mui/icons-material';
 import { Dictionaries } from './Dictionaries';
 import { DictionaryEntries } from './Dictionaries/Entries';
@@ -20,6 +21,7 @@ import { GoBackButton } from '../common/GoBackButton';
 import { Box, CardHeader } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { LayerForm } from './Maps/MapFolder/LayerForm';
 
 export type DashboardRoute = {
   text?: string;
@@ -126,12 +128,12 @@ export const routes: DashboardRoute[] = [
   {
     text: 'layers',
     path: '/layers',
-    icon: <MapIcon />,
+    icon: <LayersIcon />,
     component: <Layers />,
     isMenuItem: true,
     children: [
       {
-        path: '/layers/:id/edit',
+        path: '/layers/:layerId/edit',
         component: (
           <ChildPageLayout
             backTitle={'backToList'}
@@ -139,7 +141,7 @@ export const routes: DashboardRoute[] = [
             title={'editProperties'}
             titleParams={{ name: '' }}
           >
-            {'edit-layer form'}
+            <LayerForm goBackPath={`${parentUrl}/layers`} />
           </ChildPageLayout>
         ),
       },
@@ -147,7 +149,7 @@ export const routes: DashboardRoute[] = [
         path: '/layers/add',
         component: (
           <ChildPageLayout backTitle={'backToList'} goBackPath={`${parentUrl}/layers`} title={'maps.addLayer'}>
-            {'add-layer form'}
+            <LayerForm goBackPath={`${parentUrl}/layers`} />
           </ChildPageLayout>
         ),
       },
