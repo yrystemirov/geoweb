@@ -244,6 +244,7 @@ export const LayerForm: FC<Props> = ({
         gap={2}
         flexWrap={'wrap'}
         sx={{ pt: 1 }}
+        maxWidth={1000}
       >
         <Box display="flex" gap={2} sx={{ width: '100%' }}>
           <TextField
@@ -267,15 +268,6 @@ export const LayerForm: FC<Props> = ({
         <TextField multiline {...register('descriptionRu')} label={t('descriptionRu')} fullWidth />
         <TextField multiline {...register('descriptionKk')} label={t('descriptionKk')} fullWidth />
         <TextField multiline {...register('descriptionEn')} label={t('descriptionEn')} fullWidth />
-        <TextField
-          {...register('layername')}
-          label={t('maps.layername')}
-          fullWidth
-          error={!!errors.layername}
-          helperText={errors.layername?.message}
-          required
-          disabled={isEditing}
-        />
         <Box display="flex" gap={2} sx={{ width: '100%' }}>
           <TextField
             select
@@ -312,6 +304,16 @@ export const LayerForm: FC<Props> = ({
             ))}
           </TextField>
         </Box>
+        <TextField
+          {...register('layername')}
+          label={t('maps.layername')}
+          fullWidth
+          error={!!errors.layername}
+          helperText={errors.layername?.message}
+          required
+          disabled={isEditing}
+          sx={{ flex: 0.5 }}
+        />
         <TextField {...register('url')} label={t('maps.url')} fullWidth />
         <FormControlLabel
           control={<Checkbox checked={methods.watch('baseLayer')} {...register('baseLayer')} />}

@@ -51,7 +51,7 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
         <MoreVert />
       </IconButton>
       <Menu
-        id="map-folder-menu"
+        id="map-menu"
         anchorEl={anchorEl}
         open={isOpen}
         onClose={handleClose}

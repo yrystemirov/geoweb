@@ -9,13 +9,14 @@ import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
 import { layersAPI } from '../../../api/layer';
 import { LayerDto } from '../../../api/types/mapFolders';
 import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
+import { LayerActionsMenu } from './ActionsMenu';
 
 export const Layers: FC = () => {
   const { dataGridLocale } = useMuiLocalization();
   const { t } = useTranslation();
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ['layers', pagination],
     queryFn: () => layersAPI.getLayers({ page: pagination.page, size: pagination.pageSize }).then((res) => res.data),
   });
@@ -26,6 +27,7 @@ export const Layers: FC = () => {
       field: 'name',
       headerName: t('name'),
       flex: 1,
+      minWidth: 300,
       renderCell: (params) => {
         return (
           <Link to={`/dashboard/layers/${params.row.id}/edit`} style={{ color: 'inherit', textDecoration: 'none' }}>
@@ -49,30 +51,33 @@ export const Layers: FC = () => {
     {
       field: 'geometryType',
       headerName: t('maps.geometryType'),
-      minWidth: 130,
+      minWidth: 140,
     },
     {
       field: 'layerType',
       headerName: t('maps.layerType'),
+      minWidth: 120,
     },
     {
       field: 'baseLayer',
       headerName: t('maps.baseLayerShort'),
       valueFormatter: (value) => (value ? t('yes') : t('no')),
+      minWidth: 100,
     },
     {
       field: 'isPublic',
       headerName: t('maps.isPublic'),
       valueFormatter: (value) => (value ? t('yes') : t('no')),
+      minWidth: 100,
     },
-    // {
-    //   field: 'actions',
-    //   headerName: t('actions'),
-    //   renderCell: (params) => {
-    //     return <ActionsMenu data={params.row} onRefresh={() => refetch()} />;
-    //   },
-    //   align: 'center',
-    // },
+    {
+      field: 'actions',
+      headerName: t('actions'),
+      renderCell: (params) => {
+        return <LayerActionsMenu data={params.row} onRefresh={() => refetch()} />;
+      },
+      align: 'center',
+    },
   ];
 
   return (

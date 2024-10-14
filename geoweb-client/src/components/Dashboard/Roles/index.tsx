@@ -24,9 +24,9 @@ export const Roles: FC = () => {
   });
 
   const columns: GridColDef<RoleDto>[] = [
-    { field: 'name', headerName: t('roles.name'), flex: 1 },
-    { field: 'code', headerName: t('roles.code'), flex: 1 },
-    { field: 'description', headerName: t('roles.description'), flex: 1 },
+    { field: 'name', headerName: t('roles.name'), flex: 1, minWidth: 300 },
+    { field: 'code', headerName: t('roles.code'), flex: 1, minWidth: 150 },
+    { field: 'description', headerName: t('roles.description'), flex: 1, minWidth: 200 },
     { field: 'id', headerName: 'ID' },
     {
       field: 'actions',

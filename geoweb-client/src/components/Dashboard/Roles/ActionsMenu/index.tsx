@@ -60,7 +60,7 @@ export const RoleActionsMenu: FC<Props> = ({ data, onRefresh }) => {
         <MoreVert />
       </IconButton>
       <Menu
-        id="map-folder-menu"
+        id="role-menu"
         anchorEl={anchorEl}
         open={isOpen}
         onClose={handleClose}
