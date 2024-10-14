@@ -13,7 +13,7 @@ type Props<T> = {
   name: string;
   fetchFn: (params: { page: number; size: number }) => Promise<AxiosResponse<Pages<T>>>;
   disabledFn?: (option: T) => boolean;
-  getOptionLabel: (option: T) => string;
+  getOptionLabel: (option: T) => string | undefined;
   getOptionValue: (option: T) => string;
   onChange?: (value: string, selectedOption: T | null) => void;
   searchKey?: string;

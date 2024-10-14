@@ -2,26 +2,32 @@ import { FC, MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { UserDto } from '../../../../api/types/user';
-import { userAPI } from '../../../../api/user';
 import ConfirmDialog from '../../../common/Confirm';
+import { roleAPI } from '../../../../api/roles';
+import { RoleDto } from '../../../../api/types/role';
+import { RoleForm } from '../Form';
+import { Dialog } from '../../../common/Dialog';
+import { useNotify } from '../../../../hooks/useNotify';
 
 type Props = {
-  data: UserDto;
+  data: RoleDto;
   onRefresh: () => void;
 };
 
-export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
+export const RoleActionsMenu: FC<Props> = ({ data, onRefresh }) => {
+  const { showSuccess, showError } = useNotify();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const onSuccess = () => {
+    showSuccess();
     onRefresh();
     handleClose();
+    setDeleteDialogOpen(false);
+    setEditDialogOpen(false);
   };
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -36,8 +42,11 @@ export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
   const isOpen = Boolean(anchorEl);
 
   const deleteMutation = useMutation({
-    mutationFn: () => userAPI.deleteUser(data.id).then((res) => res.data),
+    mutationFn: () => roleAPI.deleteRole(data.id),
     onSuccess,
+    onError: (error) => {
+      showError({ error });
+    },
   });
 
   return (
@@ -45,13 +54,13 @@ export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
       <IconButton
         aria-haspopup="true"
         onClick={handleClick}
-        aria-controls={anchorEl ? 'users-menu' : undefined}
+        aria-controls={anchorEl ? 'role-menu' : undefined}
         aria-expanded={!!anchorEl}
       >
         <MoreVert />
       </IconButton>
       <Menu
-        id="users-menu"
+        id="role-menu"
         anchorEl={anchorEl}
         open={isOpen}
         onClose={handleClose}
@@ -60,7 +69,12 @@ export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={() => navigate(`/dashboard/users/${data.id}/edit`)}>
+        <MenuItem
+          onClick={() => {
+            setEditDialogOpen(true);
+            handleClose();
+          }}
+        >
           <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
 
@@ -83,6 +97,9 @@ export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
       >
         {t('deleteConfirmDescription')}
       </ConfirmDialog>
+      <Dialog open={editDialogOpen} onClose={handleClose} title={t('editProperties', { name: `"${data.name}"` })}>
+        <RoleForm editData={data} onSuccess={onSuccess} onCancel={() => setEditDialogOpen(false)} />
+      </Dialog>
     </Box>
   );
 };

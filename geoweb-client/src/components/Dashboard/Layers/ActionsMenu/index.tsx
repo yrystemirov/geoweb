@@ -4,16 +4,18 @@ import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { UserDto } from '../../../../api/types/user';
-import { userAPI } from '../../../../api/user';
 import ConfirmDialog from '../../../common/Confirm';
+import { LayerDto } from '../../../../api/types/mapFolders';
+import { layersAPI } from '../../../../api/layer';
+import { useNotify } from '../../../../hooks/useNotify';
 
 type Props = {
-  data: UserDto;
+  data: LayerDto;
   onRefresh: () => void;
 };
 
-export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
+export const LayerActionsMenu: FC<Props> = ({ data, onRefresh }) => {
+  const { showSuccess, showError } = useNotify();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { t } = useTranslation();
@@ -22,6 +24,7 @@ export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
   const onSuccess = () => {
     onRefresh();
     handleClose();
+    showSuccess();
   };
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -36,8 +39,9 @@ export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
   const isOpen = Boolean(anchorEl);
 
   const deleteMutation = useMutation({
-    mutationFn: () => userAPI.deleteUser(data.id).then((res) => res.data),
+    mutationFn: () => layersAPI.deleteLayer(data.id).then((res) => res.data),
     onSuccess,
+    onError: (error) => showError({ error }),
   });
 
   return (
@@ -45,13 +49,13 @@ export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
       <IconButton
         aria-haspopup="true"
         onClick={handleClick}
-        aria-controls={anchorEl ? 'users-menu' : undefined}
+        aria-controls={anchorEl ? 'layers-menu' : undefined}
         aria-expanded={!!anchorEl}
       >
         <MoreVert />
       </IconButton>
       <Menu
-        id="users-menu"
+        id="layers-menu"
         anchorEl={anchorEl}
         open={isOpen}
         onClose={handleClose}
@@ -60,7 +64,7 @@ export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={() => navigate(`/dashboard/users/${data.id}/edit`)}>
+        <MenuItem onClick={() => navigate(`/dashboard/layers/${data.id}/edit`)}>
           <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
 

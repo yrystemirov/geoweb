@@ -86,7 +86,7 @@
   }
 }
 
-.MuiDataGrid-cell:empty::after {
+.MuiDataGrid-cell:empty::after, .empty-placeholder:empty::after {
   content: "—";
   opacity: 0.5;
 }

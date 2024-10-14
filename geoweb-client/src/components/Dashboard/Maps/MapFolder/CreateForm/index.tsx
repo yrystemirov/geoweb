@@ -8,6 +8,7 @@ import { FolderDto } from '../../../../../api/types/mapFolders';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
 import { boolean, number, NumberSchema, object, string } from 'yup';
 import { useNotify } from '../../../../../hooks/useNotify';
+import { useNavigate } from 'react-router-dom';
 
 type CreateFolderRequest = Partial<FolderDto> & { nameRu: string };
 
@@ -26,9 +27,11 @@ type Props = {
   parentId?: string;
   onSuccess?: () => void;
   onCancel?: () => void;
+  goBackPath?: string;
 };
 
-export const MapFolderCreateForm: FC<Props> = ({ parentId, onCancel, onSuccess }) => {
+export const MapFolderCreateForm: FC<Props> = ({ goBackPath, parentId, onCancel, onSuccess }) => {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { showSuccess, showError } = useNotify();
   const createMutation = useMutation<FolderDto, any, CreateFolderRequest>({
@@ -39,9 +42,10 @@ export const MapFolderCreateForm: FC<Props> = ({ parentId, onCancel, onSuccess }
     onSuccess: () => {
       onSuccess?.();
       showSuccess();
+      goBackPath && navigate(goBackPath);
     },
     onError: (error) => {
-      showError({ text: error?.response?.data?.message })
+      showError({ text: error?.response?.data?.message });
     },
   });
 
@@ -162,6 +166,7 @@ export const MapFolderCreateForm: FC<Props> = ({ parentId, onCancel, onSuccess }
         onClick={() => {
           onCancel?.();
           methods.reset();
+          goBackPath && navigate(goBackPath);
         }}
       >
         {t('cancel')}

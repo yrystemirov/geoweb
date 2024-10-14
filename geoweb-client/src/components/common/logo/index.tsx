@@ -1,4 +1,3 @@
-import Typography from '@mui/material/Typography';
 import { SxProps } from '@mui/system';
 import Box from '@mui/material/Box';
 import { Link } from 'react-router-dom';

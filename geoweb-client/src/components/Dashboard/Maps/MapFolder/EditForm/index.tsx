@@ -6,7 +6,7 @@ import { FolderDto } from '../../../../../api/types/mapFolders';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, Checkbox, FormControlLabel, TextField } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as yup from 'yup';
 import { useNotify } from '../../../../../hooks/useNotify';
 
@@ -27,9 +27,11 @@ type Props = {
   id?: string;
   onSuccess?: () => void;
   onCancel?: () => void;
+  goBackPath?: string;
 };
 
-export const MapFolderEditForm: FC<Props> = ({ id: idProp, onSuccess, onCancel }) => {
+export const MapFolderEditForm: FC<Props> = ({ goBackPath, id: idProp, onSuccess, onCancel }) => {
+  const navigate = useNavigate();
   const { showSuccess } = useNotify();
   const { t } = useTranslation();
   const { id: idParam } = useParams();
@@ -45,6 +47,7 @@ export const MapFolderEditForm: FC<Props> = ({ id: idProp, onSuccess, onCancel }
     onSuccess(data, variables, context) {
       onSuccess?.();
       showSuccess();
+      goBackPath && navigate(goBackPath);
     },
   });
 
@@ -167,6 +170,7 @@ export const MapFolderEditForm: FC<Props> = ({ id: idProp, onSuccess, onCancel }
         onClick={() => {
           onCancel?.();
           methods.reset(data || INITIAL_VALUES);
+          goBackPath && navigate(goBackPath);
         }}
       >
         {t('cancel')}

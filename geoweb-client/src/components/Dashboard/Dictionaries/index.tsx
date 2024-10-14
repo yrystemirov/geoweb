@@ -9,7 +9,7 @@ import {
   GridEventListener,
   GridRowId,
   GridActionsCellItem,
-  GridToolbarContainer,
+  GridToolbarContainer
 } from '@mui/x-data-grid';
 import { LinearProgress, Button, CardHeader, Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -22,7 +22,6 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { dictionariesAPI } from '../../../api/dictioanries';
 import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
 import { fieldIsRequiredProps } from './Entries/utils';
-import i18n from '../../../i18n';
 import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
 import ConfirmDialog from '../../common/Confirm';
 import { useNotify } from '../../../hooks/useNotify';
@@ -54,9 +53,7 @@ export const Dictionaries: FC = () => {
   });
 
   const onEditError = (error: any) => {
-    const hasTranslation = i18n.exists(error?.response?.data?.message);
-    const message = hasTranslation ? t(error.response.data.message) : t('errorOccurred');
-    showError({ text: message });
+    showError({ error });
   };
 
   const addMutation = useMutation({
