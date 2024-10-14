@@ -8,6 +8,7 @@ import kz.geoweb.api.service.EntryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -35,5 +36,11 @@ public class EntryController {
     @DeleteMapping("/{id}")
     public void deleteEntry(@PathVariable UUID id) {
         entryService.deleteEntry(id);
+    }
+
+    @GetMapping
+    public List<EntryDto> getEntriesByDictionaryCode(@RequestParam String dictionaryCode,
+                                                     @RequestParam(required = false) String search) {
+        return entryService.getEntriesByDictionaryCode(dictionaryCode, search);
     }
 }
