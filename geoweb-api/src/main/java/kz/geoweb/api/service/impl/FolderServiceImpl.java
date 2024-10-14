@@ -132,22 +132,22 @@ public class FolderServiceImpl implements FolderService {
                 childrenToRemove.add(child);
             } else {
                 removeNotPublic(child);
-                Set<Layer> layersToRemove = new HashSet<>();
-                log.info("folder: {}", child.getNameRu());
-                log.info("all layers" + child.getLayers().stream().map(Layer::getNameRu).collect(Collectors.joining(",")));
-                for (Layer layer : child.getLayers()) {
-                    log.info("layer: {}", layer.getNameRu());
-                    if (!layer.getIsPublic()) {
-                        log.info("layer not public: {}", layer.getNameRu());
-                        layersToRemove.add(layer);
-                    }
-                }
-                log.info("layers to remove" + layersToRemove.stream().map(Layer::getNameRu).collect(Collectors.joining(",")));
-                child.getLayers().removeAll(layersToRemove);
-                log.info("rest layers" + child.getLayers().stream().map(Layer::getNameRu).collect(Collectors.joining(",")));
             }
         }
         children.removeAll(childrenToRemove);
+        Set<Layer> layersToRemove = new HashSet<>();
+        log.info("folder: {}", folder.getNameRu());
+        log.info("all layers" + folder.getLayers().stream().map(Layer::getNameRu).collect(Collectors.joining(",")));
+        for (Layer layer : folder.getLayers()) {
+            log.info("layer: {}", layer.getNameRu());
+            if (!layer.getIsPublic()) {
+                log.info("layer not public: {}", layer.getNameRu());
+                layersToRemove.add(layer);
+            }
+        }
+        log.info("layers to remove" + layersToRemove.stream().map(Layer::getNameRu).collect(Collectors.joining(",")));
+        folder.getLayers().removeAll(layersToRemove);
+        log.info("rest layers" + folder.getLayers().stream().map(Layer::getNameRu).collect(Collectors.joining(",")));
     }
 
     @Override
