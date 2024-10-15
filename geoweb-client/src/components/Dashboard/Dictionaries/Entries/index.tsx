@@ -8,11 +8,11 @@ import {
   GridEventListener,
   GridRowId,
   GridActionsCellItem,
-  GridToolbarContainer,
+  GridToolbarContainer
 } from '@mui/x-data-grid';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { LinearProgress, Button, CardHeader, Box } from '@mui/material';
+import { Button, CardHeader, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
@@ -224,7 +224,6 @@ export const DictionaryEntries = () => {
           processRowUpdate={processRowUpdate}
           slots={{
             noRowsOverlay: CustomNoRowsOverlay,
-            loadingOverlay: () => <LinearProgress />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Button
@@ -238,6 +237,12 @@ export const DictionaryEntries = () => {
               </GridToolbarContainer>
             ),
           }}
+          slotProps={{
+            loadingOverlay: {
+              variant: 'linear-progress',
+              noRowsVariant: 'linear-progress',
+            },
+          }}
           sx={{
             '& .Mui-error': {
               backgroundColor: 'rgb(126,10,15, 0.1)',
@@ -246,6 +251,7 @@ export const DictionaryEntries = () => {
             '& .MuiDataGrid-row--editing .MuiDataGrid-cell': {
               backgroundColor: 'rgb(24, 118, 210, 0.1)',
             },
+            minHeight: 200,
           }}
         />
         <ConfirmDialog

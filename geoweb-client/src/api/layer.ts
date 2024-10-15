@@ -1,5 +1,5 @@
 import instance from '../utils/axios/instance';
-import { LayerDto, LayerRequestDto } from './types/mapFolders';
+import { LayerAttrDto, LayerDto, LayerRequestDto } from './types/mapFolders';
 import { Pages, SearchablePaginationRequest } from './types/page';
 const LAYERS_URL = '/layers';
 
@@ -25,7 +25,12 @@ const deleteLayer = (id: string) => {
   return instance.delete<void>(`${LAYERS_URL}/${id}`);
 };
 
+const getLayerAttrs = (id: string) => {
+  return instance.get<LayerAttrDto[]>(`${LAYERS_URL}/${id}/attrs`);
+}
+
 export const layersAPI = {
+  getLayerAttrs,
   getLayers,
   getLayer,
   createLayer,

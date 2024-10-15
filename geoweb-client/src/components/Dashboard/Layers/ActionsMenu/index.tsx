@@ -1,7 +1,7 @@
 import { FC, MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
-import { DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
+import { ListAlt, DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import ConfirmDialog from '../../../common/Confirm';
@@ -64,6 +64,9 @@ export const LayerActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           horizontal: 'left',
         }}
       >
+        <MenuItem onClick={() => navigate(`/dashboard/layers/${data.id}/attrs`)}>
+          <ListAlt sx={{ marginRight: 1 }} /> {t('attrs.title', { name: '' })}
+        </MenuItem>
         <MenuItem onClick={() => navigate(`/dashboard/layers/${data.id}/edit`)}>
           <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>

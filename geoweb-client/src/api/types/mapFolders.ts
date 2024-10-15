@@ -85,13 +85,22 @@ export type LayerAttrDto = {
   nameRu: string;
   nameEn: string;
   attrname: string;
-  attrType: string;
+  attrType: AttrType;
   shortInfo: true;
   fullInfo: true;
   layer: LayerDto;
   dictionaryCode: string;
   rank: number;
 };
+
+export enum AttrType {
+  TEXT = 'TEXT',
+  BIGINT = 'BIGINT',
+  NUMERIC = 'NUMERIC',
+  TIMESTAMP = 'TIMESTAMP',
+  BOOLEAN = 'BOOLEAN',
+  DICTIONARY = 'DICTIONARY',
+}
 
 type NullableFields<T, K extends keyof T> = Omit<T, K> & {
   [P in K]: T[P] | null;
