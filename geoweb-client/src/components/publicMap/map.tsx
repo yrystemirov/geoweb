@@ -37,10 +37,9 @@ const MapComponent = () => {
   const [mapMouseOverCoord, setMapMouseOverCoord] = useState<string>('');
   const [mounted, setMounted] = useState<boolean>(false);
   const [mapDataLoaded, setMapDataLoaded] = useState<boolean>(false);
-  const [lyrTree, setLyrTree] = useState<any>([]);
-  
+  const [publicMaps, setPublicMaps] = useState<any>([]);
+
   const [lyrTreeInited, setLyrTreeinIted] = useState<boolean>(false);
-  
 
   useEffect(() => {
     setMounted(true);
@@ -52,9 +51,9 @@ const MapComponent = () => {
     mapOpenAPI.getOpenApiRootFolders().then((res: any) => {
       for (const lyrGroup of res.data) {
         mapOpenAPI.getOpenApiRootFoldertreeById(lyrGroup.id).then((response: any) => {
-          lyrTree.push(response.data);
-          setLyrTree(lyrTree);
-          if (lyrTree.length === res.data.length) {
+          publicMaps.push(response.data);
+          setPublicMaps(publicMaps);
+          if (publicMaps.length === res.data.length) {
             setMapDataLoaded(true);
           }
         });
@@ -144,7 +143,7 @@ const MapComponent = () => {
   const initLyrs = () => {
     console.log(mapDataLoaded);
     let mainGeoserverWmsUrl = 'http://77.240.39.93:8082/geoserver/geoweb/wms';
-    let alLayerNames = getLayerNames(lyrTree);
+    let alLayerNames = getLayerNames(publicMaps);
     //context.updateLayers(lyrTree);
     //context.updateUserLayers(alLayerNames);
     let layersToAddToMap_: any[] = [];
@@ -274,7 +273,7 @@ const MapComponent = () => {
           zIndex: 5000,
         }}
       >
-        {map && <LeftPanel color={systemThemeColor} />}
+        {map && <LeftPanel color={systemThemeColor} publicMaps={publicMaps} />}
       </Box>
       <Box
         display={'flex'}
