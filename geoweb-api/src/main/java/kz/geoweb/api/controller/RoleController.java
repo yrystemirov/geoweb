@@ -20,32 +20,32 @@ public class RoleController {
 
     @GetMapping("/{id}")
     public RoleDto getRoleById(@PathVariable UUID id) {
-        permissionService.hasAnyRole(RoleEnum.ADMIN);
+        permissionService.hasAnyRole(RoleEnum.SUPERADMIN, RoleEnum.ADMIN);
         return roleService.getRole(id);
     }
 
     @GetMapping
     public Page<RoleDto> getAllRoles(Pageable pageable) {
-        permissionService.hasAnyRole(RoleEnum.ADMIN);
+        permissionService.hasAnyRole(RoleEnum.SUPERADMIN, RoleEnum.ADMIN);
         return roleService.getRoles(pageable);
     }
 
     @PostMapping
     public RoleDto createRole(@RequestBody RoleDto roleDto) {
-        permissionService.hasAnyRole(RoleEnum.ADMIN);
+        permissionService.hasAnyRole(RoleEnum.SUPERADMIN, RoleEnum.ADMIN);
         return roleService.createRole(roleDto);
     }
 
     @PutMapping("/{id}")
     public RoleDto updateRole(@PathVariable UUID id,
                               @RequestBody RoleDto roleDto) {
-        permissionService.hasAnyRole(RoleEnum.ADMIN);
+        permissionService.hasAnyRole(RoleEnum.SUPERADMIN, RoleEnum.ADMIN);
         return roleService.updateRole(id, roleDto);
     }
 
     @DeleteMapping("/{id}")
     public void deleteRole(@PathVariable UUID id) {
-        permissionService.hasAnyRole(RoleEnum.ADMIN);
+        permissionService.hasAnyRole(RoleEnum.SUPERADMIN, RoleEnum.ADMIN);
         roleService.deleteRole(id);
     }
 }

@@ -9,9 +9,9 @@ import {
   GridEventListener,
   GridRowId,
   GridActionsCellItem,
-  GridToolbarContainer,
+  GridToolbarContainer
 } from '@mui/x-data-grid';
-import { LinearProgress, Button, CardHeader, Box, Typography } from '@mui/material';
+import { Button, CardHeader, Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
@@ -22,9 +22,8 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { dictionariesAPI } from '../../../api/dictioanries';
 import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
 import { fieldIsRequiredProps } from './Entries/utils';
-import i18n from '../../../i18n';
 import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
-import ConfirmDialog from '../../common/confirm';
+import ConfirmDialog from '../../common/Confirm';
 import { useNotify } from '../../../hooks/useNotify';
 import { AxiosError } from 'axios';
 
@@ -54,9 +53,7 @@ export const Dictionaries: FC = () => {
   });
 
   const onEditError = (error: any) => {
-    const hasTranslation = i18n.exists(error?.response?.data?.message);
-    const message = hasTranslation ? t(error.response.data.message) : t('errorOccurred');
-    showError({ text: message });
+    showError({ error });
   };
 
   const addMutation = useMutation({
@@ -240,7 +237,6 @@ export const Dictionaries: FC = () => {
           processRowUpdate={processRowUpdate}
           slots={{
             noRowsOverlay: CustomNoRowsOverlay,
-            loadingOverlay: () => <LinearProgress />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Button
@@ -254,6 +250,12 @@ export const Dictionaries: FC = () => {
               </GridToolbarContainer>
             ),
           }}
+          slotProps={{
+            loadingOverlay: {
+              variant: 'linear-progress',
+              noRowsVariant: 'linear-progress',
+            },
+          }}
           sx={{
             '& .Mui-error': {
               backgroundColor: 'rgb(126,10,15, 0.1)',
@@ -262,6 +264,7 @@ export const Dictionaries: FC = () => {
             '& .MuiDataGrid-row--editing .MuiDataGrid-cell': {
               backgroundColor: 'rgb(24, 118, 210, 0.1)',
             },
+            minHeight: 200,
           }}
         />
       </Box>

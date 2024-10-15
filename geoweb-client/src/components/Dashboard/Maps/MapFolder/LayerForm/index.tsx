@@ -7,18 +7,20 @@ import { useTranslation } from 'react-i18next';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, Checkbox, FormControlLabel, MenuItem, TextField } from '@mui/material';
-import { Loader } from '../../../../common/loader';
+import { Loader } from '../../../../common/Loader';
 import { InfiniteScrollSelect } from '../../../../common/InfiniteScrollSelect';
 import { useTranslatedProp } from '../../../../../hooks/useTranslatedProp';
 import { useNotify } from '../../../../../hooks/useNotify';
+import { useNavigate, useParams } from 'react-router-dom';
 
 type LayerRequestForm = Omit<LayerRequestDto, 'folders'>;
 
 type Props = {
   editLayerId?: LayerDto['id']; // when editing layer
-  addFolderId?: string; // when adding new layer
+  addFolderId?: string; // when adding new layer to folder
   onSuccess?: () => void;
   onCancel?: () => void;
+  goBackPath?: string;
 };
 
 const INITIAL_VALUES: LayerRequestForm = {
@@ -32,14 +34,19 @@ const INITIAL_VALUES: LayerRequestForm = {
   geometryType: GeometryType.POINT,
   layerType: LayerType.SIMPLE,
   url: '',
-  baseLayer: false,
-  checkIntersection: false,
-  isBlockLayer: false,
-  isDynamic: false,
   isPublic: false,
 };
 
-export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCancel }) => {
+export const LayerForm: FC<Props> = ({
+  editLayerId: editLayerIdParam,
+  addFolderId,
+  onSuccess,
+  onCancel,
+  goBackPath,
+}) => {
+  const navigate = useNavigate();
+  const { layerId } = useParams();
+  const editLayerId = editLayerIdParam || layerId;
   const isEditing = Boolean(editLayerId);
   const isAdding = Boolean(addFolderId);
   const translatedNameProp = useTranslatedProp('name');
@@ -68,12 +75,13 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
       layersAPI
         .createLayer({
           ...layer,
-          folders: [{ id: addFolderId! } as FolderDto],
+          folders: addFolderId ? [{ id: addFolderId } as FolderDto] : [],
         })
         .then((res) => res.data),
     onSuccess: () => {
       onSuccess?.();
       showSuccess();
+      goBackPath && navigate(goBackPath);
     },
     onError,
   });
@@ -89,6 +97,7 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
     onSuccess: () => {
       onSuccess?.();
       showSuccess();
+      goBackPath && navigate(goBackPath);
     },
     onError,
   });
@@ -119,10 +128,6 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
     geometryType: string<GeometryType>().required(t('requiredField')),
     layerType: string<LayerType>().required(t('requiredField')),
     url: string().nullable(),
-    baseLayer: boolean(),
-    checkIntersection: boolean(),
-    isBlockLayer: boolean(),
-    isDynamic: boolean(),
     isPublic: boolean(),
   });
 
@@ -174,7 +179,7 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
 
   if (useExistingLayer) {
     return (
-      <Box minWidth={550}>
+      <Box minWidth={'min(100%, 550px)'}>
         <FormControlLabel
           control={<Checkbox checked={useExistingLayer} onChange={(e) => setUseExistingLayer(e.target.checked)} />}
           label={t('maps.useExistingLayer')}
@@ -215,7 +220,7 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
   }
 
   return (
-    <Box minWidth={550}>
+    <Box minWidth={'min(100%, 550px)'}>
       {isAdding && (
         <FormControlLabel
           control={<Checkbox checked={useExistingLayer} onChange={(e) => setUseExistingLayer(e.target.checked)} />}
@@ -231,6 +236,7 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
         gap={2}
         flexWrap={'wrap'}
         sx={{ pt: 1 }}
+        maxWidth={1000}
       >
         <Box display="flex" gap={2} sx={{ width: '100%' }}>
           <TextField
@@ -254,14 +260,6 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
         <TextField multiline {...register('descriptionRu')} label={t('descriptionRu')} fullWidth />
         <TextField multiline {...register('descriptionKk')} label={t('descriptionKk')} fullWidth />
         <TextField multiline {...register('descriptionEn')} label={t('descriptionEn')} fullWidth />
-        <TextField
-          {...register('layername')}
-          label={t('maps.layername')}
-          fullWidth
-          error={!!errors.layername}
-          helperText={errors.layername?.message}
-          required
-        />
         <Box display="flex" gap={2} sx={{ width: '100%' }}>
           <TextField
             select
@@ -272,6 +270,7 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
             helperText={errors.geometryType?.message}
             value={methods.watch('geometryType')}
             required
+            disabled={isEditing}
           >
             {Object.values(GeometryType).map((value) => (
               <MenuItem key={value} value={value}>
@@ -288,6 +287,7 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
             helperText={errors.layerType?.message}
             value={methods.watch('layerType')}
             required
+            disabled={isEditing}
           >
             {Object.values(LayerType).map((value) => (
               <MenuItem key={value} value={value}>
@@ -296,29 +296,30 @@ export const LayerForm: FC<Props> = ({ editLayerId, addFolderId, onSuccess, onCa
             ))}
           </TextField>
         </Box>
+        <TextField
+          {...register('layername')}
+          label={t('maps.layername')}
+          fullWidth
+          error={!!errors.layername}
+          helperText={errors.layername?.message}
+          required
+          disabled={isEditing}
+          sx={{ flex: 0.5 }}
+        />
         <TextField {...register('url')} label={t('maps.url')} fullWidth />
-        <FormControlLabel
-          control={<Checkbox checked={methods.watch('baseLayer')} {...register('baseLayer')} />}
-          label={t('maps.baseLayer')}
-        />
-        <FormControlLabel
-          control={<Checkbox checked={methods.watch('checkIntersection')} {...register('checkIntersection')} />}
-          label={t('maps.checkIntersection')}
-        />
-        <FormControlLabel
-          control={<Checkbox checked={methods.watch('isBlockLayer')} {...register('isBlockLayer')} />}
-          label={t('maps.isBlockLayer')}
-        />
-        <FormControlLabel
-          control={<Checkbox checked={methods.watch('isDynamic')} {...register('isDynamic')} />}
-          label={t('maps.isDynamic')}
-        />
         <FormControlLabel
           control={<Checkbox checked={methods.watch('isPublic')} {...register('isPublic')} />}
           label={t('maps.isPublic')}
         />
         <Box display="flex" gap={2} sx={{ width: '100%' }} justifyContent="flex-end">
-          <Button onClick={onCancel} variant="text" type="button">
+          <Button
+            onClick={() => {
+              onCancel?.();
+              goBackPath && navigate(goBackPath);
+            }}
+            variant="text"
+            type="button"
+          >
             {t('cancel')}
           </Button>
           <Button type="submit" variant="contained">

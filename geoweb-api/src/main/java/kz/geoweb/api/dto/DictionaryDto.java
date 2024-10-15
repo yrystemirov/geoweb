@@ -1,5 +1,6 @@
 package kz.geoweb.api.dto;
 
+import kz.geoweb.api.enums.AttrType;
 import lombok.Data;
 
 import java.util.UUID;
@@ -11,4 +12,5 @@ public class DictionaryDto {
     private String nameKk;
     private String nameRu;
     private String nameEn;
+    private AttrType type;
 }

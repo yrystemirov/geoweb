@@ -25,11 +25,6 @@ public class LayerRequestDto {
     private LayerType layerType = LayerType.SIMPLE;
     private UUID styleId;
     private String url;
-    private Boolean baseLayer = false;
-    private Boolean checkIntersection = true;
-    private Boolean isBlockLayer = false;
-    private Boolean isDynamic = false;
     private Boolean isPublic = false;
-    private String dynamicIdentityColumn;
     private Set<FolderRequestDto> folders = new HashSet<>();
 }

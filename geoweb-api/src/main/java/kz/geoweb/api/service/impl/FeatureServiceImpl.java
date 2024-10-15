@@ -284,7 +284,7 @@ public class FeatureServiceImpl implements FeatureService {
                     layerAttrsList.add(new LayerLayerAttrsDto(layername, layer, layerAttrs));
                 }
                 IdentifyResponseDto identifyResponseDto = new IdentifyResponseDto();
-                Set<IdentifyAttrDto> identifyAttrDtoSet = new HashSet<>();
+                List<IdentifyAttrDto> identifyAttrDtoList = new ArrayList<>();
                 for (Map.Entry<String, Object> entry : feature.entrySet()) {
                     String key = entry.getKey();
                     if (key.equals(GID) || key.equals(GEOM)) continue;
@@ -301,14 +301,15 @@ public class FeatureServiceImpl implements FeatureService {
                                 } else {
                                     identifyAttrDto.setValue(value);
                                 }
-                                identifyAttrDtoSet.add(identifyAttrDto);
+                                identifyAttrDtoList.add(identifyAttrDto);
                             });
                 }
+                identifyAttrDtoList.sort(Comparator.comparingInt(e -> e.getAttr().getRank()));
                 String geom = feature.get(GEOM).toString();
                 identifyResponseDto.setGid(gid);
                 identifyResponseDto.setGeom(geom);
                 identifyResponseDto.setLayer(layer);
-                identifyResponseDto.setAttributes(identifyAttrDtoSet);
+                identifyResponseDto.setAttributes(identifyAttrDtoList);
                 identifyResponseDtoList.add(identifyResponseDto);
             } catch (Exception e) {
                 log.error("Error identifying feature: {}", e.getMessage());

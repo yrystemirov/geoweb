@@ -85,3 +85,12 @@
     cursor: default;
   }
 }
+
+.MuiDataGrid-cell:empty::after, .empty-placeholder:empty::after {
+  content: "—";
+  opacity: 0.5;
+}
+
+.MuiDataGrid-cell:focus, .MuiDataGrid-cell:focus-within {
+  outline: none;
+}

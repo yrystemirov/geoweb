@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useFormContext } from 'react-hook-form';
 import ClearIcon from '@mui/icons-material/Clear';
 import { AxiosResponse } from 'axios';
-import { Loader } from '../loader';
+import { Loader } from '../Loader';
 import { Pages } from '../../../api/types/page';
 import useDebounce from '../../../hooks/useDebounce';
 
@@ -13,7 +13,7 @@ type Props<T> = {
   name: string;
   fetchFn: (params: { page: number; size: number }) => Promise<AxiosResponse<Pages<T>>>;
   disabledFn?: (option: T) => boolean;
-  getOptionLabel: (option: T) => string;
+  getOptionLabel: (option: T) => string | undefined;
   getOptionValue: (option: T) => string;
   onChange?: (value: string, selectedOption: T | null) => void;
   searchKey?: string;
@@ -73,8 +73,6 @@ export const InfiniteScrollSelect = <T,>({
     initialPageParam: 0,
     queryKey: [infScrollSelectQueryKey, name, debouncedSearch],
     queryFn: ({ pageParam = 0 }) => {
-      console.log({ ...(searchIsEnabled ? { [searchKey]: debouncedSearch } : {}) });
-
       return fetchFn({
         page: pageParam as number,
         size: pageSize,

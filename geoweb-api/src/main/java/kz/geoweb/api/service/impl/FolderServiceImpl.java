@@ -18,14 +18,17 @@ import kz.geoweb.api.service.EntityPermissionService;
 import kz.geoweb.api.service.EntityUpdateHistoryService;
 import kz.geoweb.api.service.FolderService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FolderServiceImpl implements FolderService {
     private final FolderRepository folderRepository;
     private final FolderMapper folderMapper;
@@ -129,16 +132,16 @@ public class FolderServiceImpl implements FolderService {
                 childrenToRemove.add(child);
             } else {
                 removeNotPublic(child);
-                Set<Layer> layersToRemove = new HashSet<>();
-                for (Layer layer : child.getLayers()) {
-                    if (!layer.getIsPublic()) {
-                        layersToRemove.add(layer);
-                    }
-                }
-                child.getLayers().removeAll(layersToRemove);
             }
         }
         children.removeAll(childrenToRemove);
+        Set<Layer> layersToRemove = new HashSet<>();
+        for (Layer layer : folder.getLayers()) {
+            if (!layer.getIsPublic()) {
+                layersToRemove.add(layer);
+            }
+        }
+        folder.getLayers().removeAll(layersToRemove);
     }
 
     @Override

@@ -25,13 +25,8 @@ export type LayerDto = {
   layerType: LayerType;
   // styleId: string; // пока не используется
   url: string;
-  baseLayer: boolean;
-  checkIntersection: boolean;
-  isBlockLayer: boolean;
-  isDynamic: boolean;
   isPublic: boolean;
   folders: FolderDto[];
-  // dynamicIdentityColumn: string; // пока не используется
 };
 
 export type LayerRequestDto = NullableFields<
@@ -80,18 +75,25 @@ export type FolderTreeDto = {
 };
 
 export type LayerAttrDto = {
-  id: string;
-  nameKk: string;
-  nameRu: string;
-  nameEn: string;
+  id?: string;
+  nameKk?: string;
+  nameRu?: string;
+  nameEn?: string;
   attrname: string;
-  attrType: string;
-  shortInfo: true;
-  fullInfo: true;
-  layer: LayerDto;
-  dictionaryCode: string;
-  rank: number;
+  attrType?: AttrType;
+  layer?: LayerDto;
+  dictionaryCode?: string;
+  rank?: number;
 };
+
+export enum AttrType {
+  TEXT = 'TEXT',
+  BIGINT = 'BIGINT',
+  NUMERIC = 'NUMERIC',
+  TIMESTAMP = 'TIMESTAMP',
+  BOOLEAN = 'BOOLEAN',
+  DICTIONARY = 'DICTIONARY',
+}
 
 type NullableFields<T, K extends keyof T> = Omit<T, K> & {
   [P in K]: T[P] | null;

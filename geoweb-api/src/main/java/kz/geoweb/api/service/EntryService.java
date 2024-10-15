@@ -21,4 +21,6 @@ public interface EntryService {
     EntryDto updateEntry(UUID id, EntryUpdateDto entryUpdateDto);
 
     void deleteEntry(UUID id);
+
+    List<EntryDto> getEntriesByDictionaryCode(String dictionaryCode, String search);
 }

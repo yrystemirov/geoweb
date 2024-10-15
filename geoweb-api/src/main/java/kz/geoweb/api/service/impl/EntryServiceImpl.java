@@ -93,6 +93,13 @@ public class EntryServiceImpl implements EntryService {
         entryRepository.deleteById(id);
     }
 
+    @Override
+    public List<EntryDto> getEntriesByDictionaryCode(String dictionaryCode, String search) {
+        Dictionary dictionary = dictionaryRepository.findFirstByCode(dictionaryCode)
+                .orElseThrow(() -> new CustomException("dictionary.by_code.not_found", dictionaryCode));
+        return getEntries(dictionary.getId(), search);
+    }
+
     private void checkUniqueCode(UUID dictionaryId, String code) {
         entryRepository.findFirstByDictionaryIdAndCode(dictionaryId, code)
                 .ifPresent(entry -> {

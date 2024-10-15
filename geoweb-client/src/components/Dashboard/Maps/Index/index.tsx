@@ -1,6 +1,6 @@
-import { Box, Button, CardHeader, LinearProgress, Typography } from '@mui/material';
+import { Box, Button, CardHeader, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel, GridToolbarContainer } from '@mui/x-data-grid';
-import { useQuery} from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { mapFoldersAPI } from '../../../../api/mapFolders';
@@ -30,11 +30,18 @@ export const MapFolders: FC = () => {
       renderCell: (params) => {
         return (
           <Link to={`/dashboard/maps/${params.row.id}/edit`} style={{ color: 'inherit', textDecoration: 'none' }}>
-            <Box display={'flex'} alignItems="center" gap={1.5}>
+            <Box display={'flex'} alignItems="center" gap={2} my={1}>
               <MapIcon color="primary" />
               <Box>
-                <Typography color="primary">{params.row.nameKk}</Typography>
-                <Typography color="primary">{params.row.nameRu}</Typography>
+                <Typography variant="body2" color="primary" className="empty-placeholder" title={t('nameKk')}>
+                  {params.row.nameKk}
+                </Typography>
+                <Typography variant="body2" color="primary" className="empty-placeholder" title={t('nameRu')}>
+                  {params.row.nameRu}
+                </Typography>
+                <Typography variant="body2" color="primary" className="empty-placeholder" title={t('nameEn')}>
+                  {params.row.nameEn}
+                </Typography>
               </Box>
             </Box>
           </Link>
@@ -44,19 +51,13 @@ export const MapFolders: FC = () => {
     {
       field: 'isPublic',
       headerName: t('maps.isPublic'),
-      valueFormatter: (value) => {
-        console.log(value);
-        
-        return value ? t('yes') : t('no');
-      },
+      valueFormatter: (value) => (value ? t('yes') : t('no')),
     },
     {
       field: 'actions',
       headerName: t('actions'),
       renderCell: (params) => {
-        return (
-          <MapActionsMenu data={params.row} onRefresh={() => refetch()} />
-        );
+        return <MapActionsMenu data={params.row} onRefresh={() => refetch()} />;
       },
       align: 'center',
     },
@@ -79,7 +80,6 @@ export const MapFolders: FC = () => {
           disableColumnSorting
           slots={{
             noRowsOverlay: CustomNoRowsOverlay,
-            loadingOverlay: () => <LinearProgress />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Link to="/dashboard/maps/add">
@@ -89,6 +89,20 @@ export const MapFolders: FC = () => {
                 </Link>
               </GridToolbarContainer>
             ),
+          }}
+          slotProps={{
+            loadingOverlay: {
+              variant: 'linear-progress',
+              noRowsVariant: 'linear-progress',
+            },
+          }}
+          getRowHeight={() => 'auto'}
+          sx={{
+            '& .MuiDataGrid-cell': {
+              display: 'flex',
+              alignItems: 'center',
+            },
+            minHeight: 200,
           }}
         />
       </Box>

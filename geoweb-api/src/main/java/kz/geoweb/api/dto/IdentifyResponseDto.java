@@ -2,12 +2,12 @@ package kz.geoweb.api.dto;
 
 import lombok.Data;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 public class IdentifyResponseDto {
     private LayerInfoDto layer;
     private Integer gid;
     private String geom;
-    private Set<IdentifyAttrDto> attributes;
+    private List<IdentifyAttrDto> attributes;
 }

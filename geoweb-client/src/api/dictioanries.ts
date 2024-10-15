@@ -11,7 +11,7 @@ const getDictionary = (dictionaryId: string) => {
 
 const getDictionaries = (pagination?: PaginationRequest) => {
   return instance.get<Pages<DictionaryDto>>(DICTS_URL, {
-    data: pagination,
+    params: pagination,
   });
 };
 

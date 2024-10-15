@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import Header from './components/common/header';
 import Footer from './components/common/footer';
 ///import Footer from './components/Footer';
@@ -19,6 +18,8 @@ import './App.css';
 // import './styles/gis.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
+import { ThemeProvider } from '@mui/material';
+import theme from './config/theme';
 
 const queryClient = new QueryClient();
 
@@ -27,7 +28,6 @@ export enum FooterType {
   MINI,
 }
 const App: React.FC = () => {
-  const { t } = useTranslation();
   const { isLoading } = useLoading(); // Get loading state from context
   const [footerType, setFooterType] = useState<FooterType>(FooterType.BIG);
   return (
@@ -96,9 +96,11 @@ const App: React.FC = () => {
 export default function AppWrapper() {
   return (
     <QueryClientProvider client={queryClient}>
-      <LoadingProvider>
-        <App />
-      </LoadingProvider>
+      <ThemeProvider theme={theme}>
+        <LoadingProvider>
+          <App />
+        </LoadingProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

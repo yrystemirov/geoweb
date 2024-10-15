@@ -86,8 +86,6 @@ public class LayerAttrServiceImpl implements LayerAttrService {
         layerAttr.setNameKk(layerAttrDto.getNameKk());
         layerAttr.setNameRu(layerAttrDto.getNameRu());
         layerAttr.setNameEn(layerAttrDto.getNameEn());
-        layerAttr.setShortInfo(layerAttrDto.getShortInfo());
-        layerAttr.setFullInfo(layerAttrDto.getFullInfo());
         if (layerAttrDto.getAttrType() == AttrType.DICTIONARY) {
             layerAttr.setAttrType(AttrType.DICTIONARY);
         }

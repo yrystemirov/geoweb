@@ -13,7 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class Layer extends IdEntity {
+public class  Layer extends IdEntity {
     private String nameKk;
     private String nameRu;
     private String nameEn;
@@ -27,12 +27,7 @@ public class Layer extends IdEntity {
     private LayerType layerType;
     private UUID styleId;
     private String url;
-    private Boolean baseLayer;
-    private Boolean checkIntersection;
-    private Boolean isBlockLayer;
-    private Boolean isDynamic;
     private Boolean isPublic;
-    private String dynamicIdentityColumn;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "folder_layer",

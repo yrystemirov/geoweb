@@ -1,6 +1,7 @@
 package kz.geoweb.api.controller;
 
 import kz.geoweb.api.dto.*;
+import kz.geoweb.api.service.EntryService;
 import kz.geoweb.api.service.FeatureService;
 import kz.geoweb.api.service.FolderService;
 import kz.geoweb.api.service.LayerAttrService;
@@ -25,6 +26,7 @@ public class OpenApiController {
     private final FolderService folderService;
     private final FeatureService featureService;
     private final LayerAttrService layerAttrService;
+    private final EntryService entryService;
 
     @GetMapping("/folders/root")
     public Set<FolderInfoDto> getPublicRootFolders() {
@@ -64,5 +66,12 @@ public class OpenApiController {
     @GetMapping("/layers/{id}/attrs")
     public List<LayerAttrDto> getLayerAttrsPublic(@PathVariable UUID id) {
         return layerAttrService.getLayerAttrsPublic(id);
+    }
+
+
+    @GetMapping("/entries")
+    public List<EntryDto> getEntriesByDictionaryCode(@RequestParam String dictionaryCode,
+                                                     @RequestParam(required = false) String search) {
+        return entryService.getEntriesByDictionaryCode(dictionaryCode, search);
     }
 }

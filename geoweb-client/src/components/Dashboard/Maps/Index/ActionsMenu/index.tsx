@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { AccountTreeOutlined, DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import ConfirmDialog from '../../../../common/confirm';
+import ConfirmDialog from '../../../../common/Confirm';
 import { useMutation } from '@tanstack/react-query';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
 
@@ -45,13 +45,13 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
       <IconButton
         aria-haspopup="true"
         onClick={handleClick}
-        aria-controls={anchorEl ? 'disk-menu' : undefined}
+        aria-controls={anchorEl ? 'map-menu' : undefined}
         aria-expanded={!!anchorEl}
       >
         <MoreVert />
       </IconButton>
       <Menu
-        id="map-folder-menu"
+        id="map-menu"
         anchorEl={anchorEl}
         open={isOpen}
         onClose={handleClose}
@@ -68,7 +68,10 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           <AccountTreeOutlined sx={{ marginRight: 1 }} /> {t('maps.editStructure')}
         </MenuItem>
 
-        <MenuItem onClick={() => setDeleteDialogOpen(true)}>
+        <MenuItem onClick={() => {
+          setDeleteDialogOpen(true);
+          handleClose();
+        }}>
           <DeleteOutline sx={{ marginRight: 1 }} /> {t('delete')}
         </MenuItem>
       </Menu>
