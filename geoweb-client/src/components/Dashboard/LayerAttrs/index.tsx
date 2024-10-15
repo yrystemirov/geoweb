@@ -10,6 +10,7 @@ import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
 import { useTranslatedProp } from '../../../hooks/useTranslatedProp';
 import AddIcon from '@mui/icons-material/Add';
 import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
+import { LayerAttrActionsMenu } from './ActionsMenu';
 
 export const LayerAttrs: FC = () => {
   const { dataGridLocale } = useMuiLocalization();
@@ -17,7 +18,11 @@ export const LayerAttrs: FC = () => {
   const { layerId } = useParams();
   const nameProp = useTranslatedProp('name');
 
-  const { data: attrs = [], isLoading } = useQuery({
+  const {
+    data: attrs = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['layerAttrs', layerId],
     queryFn: () => layersAPI.getLayerAttrs(layerId!).then((res) => res.data),
     enabled: !!layerId,
@@ -66,18 +71,12 @@ export const LayerAttrs: FC = () => {
       flex: 1,
     },
     {
-      field: 'shortInfo',
-      headerName: t('attrs.shortInfo'),
-      minWidth: 100,
-      flex: 1,
-      valueFormatter: (value) => (value ? t('yes') : t('no')),
-    },
-    {
-      field: 'fullInfo',
-      headerName: t('attrs.fullInfo'),
-      minWidth: 100,
-      flex: 1,
-      valueFormatter: (value) => (value ? t('yes') : t('no')),
+      field: 'actions',
+      headerName: t('actions'),
+      renderCell: (params) => {
+        return <LayerAttrActionsMenu data={params.row} onRefresh={() => refetch()} />;
+      },
+      align: 'center',
     },
   ];
 
@@ -85,43 +84,43 @@ export const LayerAttrs: FC = () => {
     <>
       <CardHeader title={t('attrs.title', { name: layerName })} sx={{ textAlign: 'center' }} />
       <Box>
-      <DataGrid
-        disableColumnMenu
-        hideFooterPagination
-        hideFooter
-        rows={attrs}
-        rowCount={attrs.length}
-        columns={columns}
-        localeText={dataGridLocale}
-        loading={isLoading}
-        rowSelection={false}
-        getRowHeight={() => 'auto'}
-        sx={{
-          '& .MuiDataGrid-cell': {
-            display: 'flex',
-            alignItems: 'center',
-          },
-          minHeight: 200,
-        }}
-        slots={{
-          noRowsOverlay: CustomNoRowsOverlay,
-          toolbar: () => (
-            <GridToolbarContainer>
-              <Link to={`/dashboard/layers/${layerId}/attrs/add`}>
-                <Button color="primary" startIcon={<AddIcon />}>
-                  {t('add')}
-                </Button>
-              </Link>
-            </GridToolbarContainer>
-          ),
-        }}
-        slotProps={{
-          loadingOverlay: {
-            variant: 'linear-progress',
-            noRowsVariant: 'linear-progress',
-          },
-        }}
-      />
+        <DataGrid
+          disableColumnMenu
+          hideFooterPagination
+          hideFooter
+          rows={attrs}
+          rowCount={attrs.length}
+          columns={columns}
+          localeText={dataGridLocale}
+          loading={isLoading}
+          rowSelection={false}
+          getRowHeight={() => 'auto'}
+          sx={{
+            '& .MuiDataGrid-cell': {
+              display: 'flex',
+              alignItems: 'center',
+            },
+            minHeight: 200,
+          }}
+          slots={{
+            noRowsOverlay: CustomNoRowsOverlay,
+            toolbar: () => (
+              <GridToolbarContainer>
+                <Link to={`/dashboard/layers/${layerId}/attrs/add`}>
+                  <Button color="primary" startIcon={<AddIcon />}>
+                    {t('add')}
+                  </Button>
+                </Link>
+              </GridToolbarContainer>
+            ),
+          }}
+          slotProps={{
+            loadingOverlay: {
+              variant: 'linear-progress',
+              noRowsVariant: 'linear-progress',
+            },
+          }}
+        />
       </Box>
     </>
   );

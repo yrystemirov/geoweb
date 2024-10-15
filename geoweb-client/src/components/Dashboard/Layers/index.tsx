@@ -59,12 +59,6 @@ export const Layers: FC = () => {
       minWidth: 120,
     },
     {
-      field: 'baseLayer',
-      headerName: t('maps.baseLayerShort'),
-      valueFormatter: (value) => (value ? t('yes') : t('no')),
-      minWidth: 100,
-    },
-    {
       field: 'isPublic',
       headerName: t('maps.isPublic'),
       valueFormatter: (value) => (value ? t('yes') : t('no')),

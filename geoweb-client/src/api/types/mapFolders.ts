@@ -25,13 +25,8 @@ export type LayerDto = {
   layerType: LayerType;
   // styleId: string; // пока не используется
   url: string;
-  baseLayer: boolean;
-  checkIntersection: boolean;
-  isBlockLayer: boolean;
-  isDynamic: boolean;
   isPublic: boolean;
   folders: FolderDto[];
-  // dynamicIdentityColumn: string; // пока не используется
 };
 
 export type LayerRequestDto = NullableFields<
@@ -80,17 +75,15 @@ export type FolderTreeDto = {
 };
 
 export type LayerAttrDto = {
-  id: string;
-  nameKk: string;
-  nameRu: string;
-  nameEn: string;
+  id?: string;
+  nameKk?: string;
+  nameRu?: string;
+  nameEn?: string;
   attrname: string;
-  attrType: AttrType;
-  shortInfo: true;
-  fullInfo: true;
-  layer: LayerDto;
-  dictionaryCode: string;
-  rank: number;
+  attrType?: AttrType;
+  layer?: LayerDto;
+  dictionaryCode?: string;
+  rank?: number;
 };
 
 export enum AttrType {

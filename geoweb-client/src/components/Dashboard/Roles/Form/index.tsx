@@ -1,4 +1,4 @@
-import { FC} from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -48,8 +48,8 @@ export const RoleForm: FC<Props> = ({ editData, onCancel, onSuccess }) => {
   });
 
   const schema = object<RoleDto>({
-    name: string().required(t('fieldIsRequired')),
-    code: string().required(t('fieldIsRequired')),
+    name: string().required(t('requiredField')),
+    code: string().required(t('requiredField')),
     description: string(),
   });
 
@@ -72,7 +72,7 @@ export const RoleForm: FC<Props> = ({ editData, onCancel, onSuccess }) => {
   };
 
   return (
-    <Box onSubmit={handleSubmit(onSubmit)} noValidate component={'form'} sx={{ pt: 1 }} minWidth={550}>
+    <Box onSubmit={handleSubmit(onSubmit)} noValidate component={'form'} sx={{ pt: 1 }} minWidth={'min(100%, 550px)'}>
       <Box display="flex" gap={2} flexWrap={'wrap'} mb={2} flexDirection="column" width={{ xs: '100%', md: '70%' }}>
         <TextField
           label={t('roles.name')}
