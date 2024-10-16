@@ -7,7 +7,7 @@ import { Box, Button, TextField, MenuItem } from '@mui/material';
 import { object, string, number } from 'yup';
 import { useNotify } from '../../../../hooks/useNotify';
 import { layersAPI } from '../../../../api/layer';
-import { AttrType as LayerAttrType, LayerAttrDto, LayerDto } from '../../../../api/types/mapFolders';
+import { AttrType as LayerAttrType, LayerAttrDto, LayerDto, AttrType } from '../../../../api/types/mapFolders';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Loader } from '../../../common/Loader';
 import { InfiniteScrollSelect } from '../../../common/InfiniteScrollSelect';
@@ -79,7 +79,9 @@ export const LayerAttrForm: FC<Props> = ({ onCancel, onSuccess, shouldGoBackToLi
     nameEn: string(),
     attrname: string().required(t('requiredField')),
     attrType: string().required(t('requiredField')),
-    dictionaryCode: string(),
+    dictionaryCode: string().test('requiredIfDictionary', t('requiredField'), function (value) {
+      return this.parent.attrType === LayerAttrType.DICTIONARY ? !!value : true;
+    }),
     rank: number(),
   });
 
@@ -158,13 +160,17 @@ export const LayerAttrForm: FC<Props> = ({ onCancel, onSuccess, shouldGoBackToLi
             error={!!errors.attrType}
             helperText={errors.attrType?.message}
             value={methods.watch('attrType')}
-            disabled={isEditing}
+            disabled={isEditing && editData?.attrType === AttrType.DICTIONARY}
           >
             <MenuItem value="">
-              <em>None</em>
+              <em>--</em>
             </MenuItem>
             {Object.values(LayerAttrType).map((value) => (
-              <MenuItem key={value} value={value}>
+              <MenuItem
+                key={value}
+                value={value}
+                disabled={isEditing && value !== AttrType.DICTIONARY && editData?.attrType !== value}
+              >
                 {value}
               </MenuItem>
             ))}
