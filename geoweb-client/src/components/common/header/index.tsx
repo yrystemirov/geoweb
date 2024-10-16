@@ -24,6 +24,7 @@ const Header: React.FC = () => {
 
   const changeLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
+    localStorage.setItem('geoweb_current_lang',lang);
   };
 
   const pages = [

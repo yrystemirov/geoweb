@@ -44,7 +44,7 @@ export const BaseLayersTool: React.FC<Props> = ({ map, color, layers }) => {
     
 
     const handleButtonClick = () => {
-        setDialogOpen(true);
+        setDialogOpen(!dialogOpen);
     };
 
     const handleDialogClose = () => {

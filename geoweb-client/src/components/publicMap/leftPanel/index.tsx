@@ -78,7 +78,7 @@ export const LeftPanel: React.FC<Props> = ({ color, publicMaps }) => {
   }, [userLayers]);
 
   const handleButtonClick = () => {
-    setDialogOpen(true);
+    setDialogOpen(!dialogOpen);
   };
 
   const handleDialogClose = () => {
@@ -409,7 +409,7 @@ export const LeftPanel: React.FC<Props> = ({ color, publicMaps }) => {
           >
             {t('maps.title')}
           </Typography>
-          {/* {layerList.map((layerItem: any) => {
+          {layerList.map((layerItem: any) => {
             return (
               <div key={layerItem.layername}>
                 {layerItem.layername}
@@ -447,9 +447,9 @@ export const LeftPanel: React.FC<Props> = ({ color, publicMaps }) => {
                 </IconButton>
               </div>
             );
-          })} */}
+          })}
 
-          {treeLayerGroups.map((lyrGroup) => (
+          {/* {treeLayerGroups.map((lyrGroup) => (
             <div className="public-map" key={lyrGroup.id}>
               <Typography
                 sx={{
@@ -481,7 +481,7 @@ export const LeftPanel: React.FC<Props> = ({ color, publicMaps }) => {
                 iconsClass="fa5"
               />
             </div>
-          ))}
+          ))} */}
         </div>
       )}
     </>
