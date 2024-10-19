@@ -11,7 +11,7 @@ import {
   GridActionsCellItem,
   GridToolbarContainer
 } from '@mui/x-data-grid';
-import { LinearProgress, Button, CardHeader, Box, Typography } from '@mui/material';
+import { Button, CardHeader, Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
@@ -237,7 +237,6 @@ export const Dictionaries: FC = () => {
           processRowUpdate={processRowUpdate}
           slots={{
             noRowsOverlay: CustomNoRowsOverlay,
-            loadingOverlay: () => <LinearProgress />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Button
@@ -251,6 +250,12 @@ export const Dictionaries: FC = () => {
               </GridToolbarContainer>
             ),
           }}
+          slotProps={{
+            loadingOverlay: {
+              variant: 'linear-progress',
+              noRowsVariant: 'linear-progress',
+            },
+          }}
           sx={{
             '& .Mui-error': {
               backgroundColor: 'rgb(126,10,15, 0.1)',
@@ -259,6 +264,7 @@ export const Dictionaries: FC = () => {
             '& .MuiDataGrid-row--editing .MuiDataGrid-cell': {
               backgroundColor: 'rgb(24, 118, 210, 0.1)',
             },
+            minHeight: 200,
           }}
         />
       </Box>

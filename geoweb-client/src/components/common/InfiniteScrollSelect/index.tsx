@@ -73,8 +73,6 @@ export const InfiniteScrollSelect = <T,>({
     initialPageParam: 0,
     queryKey: [infScrollSelectQueryKey, name, debouncedSearch],
     queryFn: ({ pageParam = 0 }) => {
-      console.log({ ...(searchIsEnabled ? { [searchKey]: debouncedSearch } : {}) });
-
       return fetchFn({
         page: pageParam as number,
         size: pageSize,

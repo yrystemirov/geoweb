@@ -1,30 +1,31 @@
 import { FC, MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
-import { ListAlt, DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
 import { useMutation } from '@tanstack/react-query';
-import ConfirmDialog from '../../../common/Confirm';
-import { LayerDto } from '../../../../api/types/mapFolders';
-import { layersAPI } from '../../../../api/layer';
 import { useNotify } from '../../../../hooks/useNotify';
+import { layersAPI } from '../../../../api/layer';
+import { LayerAttrDto } from '../../../../api/types/mapFolders';
+import { useNavigate } from 'react-router-dom';
+import ConfirmDialog from '../../../common/Confirm';
 
 type Props = {
-  data: LayerDto;
+  data: LayerAttrDto;
   onRefresh: () => void;
 };
 
-export const LayerActionsMenu: FC<Props> = ({ data, onRefresh }) => {
+export const LayerAttrActionsMenu: FC<Props> = ({ data, onRefresh }) => {
+  const navigate = useNavigate();
   const { showSuccess, showError } = useNotify();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const onSuccess = () => {
+    showSuccess();
     onRefresh();
     handleClose();
-    showSuccess();
+    setDeleteDialogOpen(false);
   };
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -39,9 +40,11 @@ export const LayerActionsMenu: FC<Props> = ({ data, onRefresh }) => {
   const isOpen = Boolean(anchorEl);
 
   const deleteMutation = useMutation({
-    mutationFn: () => layersAPI.deleteLayer(data.id).then((res) => res.data),
+    mutationFn: () => layersAPI.deleteLayerAttr(data.id!),
     onSuccess,
-    onError: (error) => showError({ error }),
+    onError: (error) => {
+      showError({ error });
+    },
   });
 
   return (
@@ -49,13 +52,13 @@ export const LayerActionsMenu: FC<Props> = ({ data, onRefresh }) => {
       <IconButton
         aria-haspopup="true"
         onClick={handleClick}
-        aria-controls={anchorEl ? 'layers-menu' : undefined}
+        aria-controls={anchorEl ? 'layer-attr-menu' : undefined}
         aria-expanded={!!anchorEl}
       >
         <MoreVert />
       </IconButton>
       <Menu
-        id="layers-menu"
+        id="layer-attr-menu"
         anchorEl={anchorEl}
         open={isOpen}
         onClose={handleClose}
@@ -64,10 +67,12 @@ export const LayerActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={() => navigate(`/dashboard/layers/${data.id}/attrs`)}>
-          <ListAlt sx={{ marginRight: 1 }} /> {t('attrs.title', { name: '' })}
-        </MenuItem>
-        <MenuItem onClick={() => navigate(`/dashboard/layers/${data.id}/edit`)}>
+        <MenuItem
+          onClick={() => {
+            navigate(`/dashboard/layers/${data.layer!.id}/attrs/${data.id}/edit`);
+            handleClose();
+          }}
+        >
           <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
 

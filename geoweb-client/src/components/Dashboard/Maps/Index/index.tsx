@@ -1,4 +1,4 @@
-import { Box, Button, CardHeader, LinearProgress, Typography } from '@mui/material';
+import { Box, Button, CardHeader, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel, GridToolbarContainer } from '@mui/x-data-grid';
 import { useQuery } from '@tanstack/react-query';
 import { FC, useState } from 'react';
@@ -80,7 +80,6 @@ export const MapFolders: FC = () => {
           disableColumnSorting
           slots={{
             noRowsOverlay: CustomNoRowsOverlay,
-            loadingOverlay: () => <LinearProgress />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Link to="/dashboard/maps/add">
@@ -91,12 +90,19 @@ export const MapFolders: FC = () => {
               </GridToolbarContainer>
             ),
           }}
+          slotProps={{
+            loadingOverlay: {
+              variant: 'linear-progress',
+              noRowsVariant: 'linear-progress',
+            },
+          }}
           getRowHeight={() => 'auto'}
           sx={{
             '& .MuiDataGrid-cell': {
               display: 'flex',
               alignItems: 'center',
             },
+            minHeight: 200,
           }}
         />
       </Box>

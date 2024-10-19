@@ -1,7 +1,6 @@
 import {
   Dashboard as DashboardIcon,
   Map as MapIcon,
-  Settings as SettingsIcon,
   Group as GrouprIcon,
   AdminPanelSettings as RolesIcon,
   Layers as LayersIcon,
@@ -19,9 +18,11 @@ import { Roles } from './Roles';
 import { Layers } from './Layers';
 import { GoBackButton } from '../common/GoBackButton';
 import { Box, CardHeader } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Params, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LayerForm } from './Maps/MapFolder/LayerForm';
+import { LayerAttrs } from './LayerAttrs';
+import { LayerAttrForm } from './LayerAttrs/Form';
 
 export type DashboardRoute = {
   text?: string;
@@ -34,7 +35,7 @@ export type DashboardRoute = {
 
 type ChildPageLayoutProps = {
   backTitle: string;
-  goBackPath: string;
+  goBackPath: string | ((queryParams: Readonly<Params<string>>) => string);
   title: string;
   titleParams?: Record<string, string>;
   children: React.ReactNode;
@@ -43,10 +44,21 @@ type ChildPageLayoutProps = {
 const ChildPageLayout: React.FC<ChildPageLayoutProps> = ({ backTitle, goBackPath, title, titleParams, children }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const queryParams = useParams();
+  const onGoBakClick = () => {
+    switch (typeof goBackPath) {
+      case 'string':
+        navigate(goBackPath);
+        break;
+      case 'function':
+        navigate(goBackPath(queryParams));
+        break;
+    }
+  };
   return (
     <>
       <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
-        <GoBackButton text={t(backTitle)} onClick={() => navigate(goBackPath)} />
+        <GoBackButton text={t(backTitle)} onClick={onGoBakClick} />
         <CardHeader title={t(title, titleParams)} sx={{ textAlign: 'center', flex: 1 }} />
       </Box>
       {children}
@@ -133,6 +145,14 @@ export const routes: DashboardRoute[] = [
     isMenuItem: true,
     children: [
       {
+        path: '/layers/add',
+        component: (
+          <ChildPageLayout backTitle={'backToList'} goBackPath={`${parentUrl}/layers`} title={'maps.addLayer'}>
+            <LayerForm goBackPath={`${parentUrl}/layers`} />
+          </ChildPageLayout>
+        ),
+      },
+      {
         path: '/layers/:layerId/edit',
         component: (
           <ChildPageLayout
@@ -146,21 +166,35 @@ export const routes: DashboardRoute[] = [
         ),
       },
       {
-        path: '/layers/add',
+        path: '/layers/:layerId/attrs',
+        component: <LayerAttrs />,
+      },
+      {
+        path: '/layers/:layerId/attrs/add',
         component: (
-          <ChildPageLayout backTitle={'backToList'} goBackPath={`${parentUrl}/layers`} title={'maps.addLayer'}>
-            <LayerForm goBackPath={`${parentUrl}/layers`} />
+          <ChildPageLayout
+            backTitle={'backToList'}
+            goBackPath={(params) => `${parentUrl}/layers/${params.layerId}/attrs`}
+            title={'attrs.create'}
+          >
+            <LayerAttrForm shouldGoBackToList />
+          </ChildPageLayout>
+        ),
+      },
+      {
+        path: '/layers/:layerId/attrs/:attrId/edit',
+        component: (
+          <ChildPageLayout
+            backTitle={'backToList'}
+            goBackPath={(params) => `${parentUrl}/layers/${params.layerId}/attrs`}
+            title={'editProperties'}
+            titleParams={{ name: '' }}
+          >
+            <LayerAttrForm shouldGoBackToList />
           </ChildPageLayout>
         ),
       },
     ],
-  },
-  {
-    text: 'layerAttributes',
-    path: '/layerAttributes',
-    icon: <SettingsIcon />,
-    component: <>{'layerAttributes'}</>,
-    isMenuItem: true,
   },
   {
     text: 'dictionaries',

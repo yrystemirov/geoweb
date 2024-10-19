@@ -1,36 +1,46 @@
-import { Box, Button, CardHeader, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridPaginationModel, GridToolbarContainer } from '@mui/x-data-grid';
 import { useQuery } from '@tanstack/react-query';
-import { FC, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import AddIcon from '@mui/icons-material/Add';
-import { Link } from 'react-router-dom';
-import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
+import { FC } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { layersAPI } from '../../../api/layer';
-import { LayerDto } from '../../../api/types/mapFolders';
+import { LayerAttrDto } from '../../../api/types/mapFolders';
+import { DataGrid, GridColDef, GridToolbarContainer } from '@mui/x-data-grid';
+import { useTranslation } from 'react-i18next';
+import { Box, Button, CardHeader, Typography } from '@mui/material';
+import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
+import { useTranslatedProp } from '../../../hooks/useTranslatedProp';
+import AddIcon from '@mui/icons-material/Add';
 import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
-import { LayerActionsMenu } from './ActionsMenu';
+import { LayerAttrActionsMenu } from './ActionsMenu';
 
-export const Layers: FC = () => {
+export const LayerAttrs: FC = () => {
   const { dataGridLocale } = useMuiLocalization();
   const { t } = useTranslation();
-  const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
+  const { layerId } = useParams();
+  const nameProp = useTranslatedProp('name');
 
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ['layers', pagination],
-    queryFn: () => layersAPI.getLayers({ page: pagination.page, size: pagination.pageSize }).then((res) => res.data),
+  const {
+    data: attrs = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['layerAttrs', layerId],
+    queryFn: () => layersAPI.getLayerAttrs(layerId!).then((res) => res.data),
+    enabled: !!layerId,
   });
 
-  const layers = data?.content || [];
-  const columns: GridColDef<LayerDto>[] = [
+  const layer = attrs[0]?.layer;
+  const layerName = layer?.[nameProp] ? `"${layer?.[nameProp]}"` : '';
+  const columns: GridColDef<LayerAttrDto>[] = [
+    { field: 'rank', headerName: '№', width: 50 },
     {
+      sortable: false,
       field: 'name',
       headerName: t('name'),
       flex: 1,
       minWidth: 300,
       renderCell: (params) => {
         return (
-          <Link to={`/dashboard/layers/${params.row.id}/edit`} style={{ color: 'inherit', textDecoration: 'none' }}>
+          <Link to={`/dashboard/layerAttrs/${params.row.id}/edit`} style={{ color: 'inherit', textDecoration: 'none' }}>
             <Box display={'flex'} alignItems="center" gap={1.5}>
               <Box my={1}>
                 <Typography variant="body2" color="primary" className="empty-placeholder" title={t('nameKk')}>
@@ -49,26 +59,22 @@ export const Layers: FC = () => {
       },
     },
     {
-      field: 'geometryType',
-      headerName: t('maps.geometryType'),
+      field: 'attrname',
+      headerName: t('attrs.attrname'),
       minWidth: 140,
+      flex: 1,
     },
     {
-      field: 'layerType',
-      headerName: t('maps.layerType'),
+      field: 'attrType',
+      headerName: t('attrs.attrType'),
       minWidth: 120,
-    },
-    {
-      field: 'isPublic',
-      headerName: t('maps.isPublic'),
-      valueFormatter: (value) => (value ? t('yes') : t('no')),
-      minWidth: 100,
+      flex: 1,
     },
     {
       field: 'actions',
       headerName: t('actions'),
       renderCell: (params) => {
-        return <LayerActionsMenu data={params.row} onRefresh={() => refetch()} />;
+        return <LayerAttrActionsMenu data={params.row} onRefresh={() => refetch()} />;
       },
       align: 'center',
     },
@@ -76,26 +82,33 @@ export const Layers: FC = () => {
 
   return (
     <>
-      <CardHeader title={t('layers')} sx={{ textAlign: 'center' }} />
+      <CardHeader title={t('attrs.title', { name: layerName })} sx={{ textAlign: 'center' }} />
       <Box>
         <DataGrid
-          rows={layers}
-          rowCount={data?.totalElements || 0}
+          disableColumnMenu
+          hideFooterPagination
+          hideFooter
+          rows={attrs}
+          rowCount={attrs.length}
           columns={columns}
           localeText={dataGridLocale}
           loading={isLoading}
-          paginationModel={pagination}
-          onPaginationModelChange={(newPagination) => setPagination(newPagination)}
           rowSelection={false}
-          disableColumnMenu
-          disableColumnSorting
+          getRowHeight={() => 'auto'}
+          sx={{
+            '& .MuiDataGrid-cell': {
+              display: 'flex',
+              alignItems: 'center',
+            },
+            minHeight: 200,
+          }}
           slots={{
             noRowsOverlay: CustomNoRowsOverlay,
             toolbar: () => (
               <GridToolbarContainer>
-                <Link to="/dashboard/layers/add">
+                <Link to={`/dashboard/layers/${layerId}/attrs/add`}>
                   <Button color="primary" startIcon={<AddIcon />}>
-                    {t('create')}
+                    {t('add')}
                   </Button>
                 </Link>
               </GridToolbarContainer>
@@ -106,14 +119,6 @@ export const Layers: FC = () => {
               variant: 'linear-progress',
               noRowsVariant: 'linear-progress',
             },
-          }}
-          getRowHeight={() => 'auto'}
-          sx={{
-            '& .MuiDataGrid-cell': {
-              display: 'flex',
-              alignItems: 'center',
-            },
-            minHeight: 200,
           }}
         />
       </Box>

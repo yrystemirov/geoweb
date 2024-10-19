@@ -1,4 +1,4 @@
-import { Box, Button, CardHeader, LinearProgress } from '@mui/material';
+import { Box, Button, CardHeader } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel, GridToolbarContainer } from '@mui/x-data-grid';
 import { useQuery } from '@tanstack/react-query';
 import { FC, useState } from 'react';
@@ -55,7 +55,6 @@ export const Roles: FC = () => {
           disableColumnSorting
           slots={{
             noRowsOverlay: CustomNoRowsOverlay,
-            loadingOverlay: () => <LinearProgress />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Button color="primary" startIcon={<AddIcon />} onClick={() => setCreateDialogOpen(true)}>
@@ -64,6 +63,13 @@ export const Roles: FC = () => {
               </GridToolbarContainer>
             ),
           }}
+          slotProps={{
+            loadingOverlay: {
+              variant: 'linear-progress',
+              noRowsVariant: 'linear-progress',
+            },
+          }}
+          sx={{ minHeight: 200 }}
         />
         <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} title={t('roles.create')}>
           <RoleForm

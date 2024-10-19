@@ -23,6 +23,7 @@ async function refreshToken() {
 
 instance.interceptors.request.use(
   (config) => {
+    config.headers['Accept-Language'] = localStorage.getItem('geoweb_current_lang')?localStorage.getItem('geoweb_current_lang'):'ru';
     const isAuthUrl = config.url?.includes('/auth/token');
     const tokenData = getStoredToken();
     const token: TokenResponse = tokenData ? JSON.parse(tokenData) : null;

@@ -34,10 +34,6 @@ const INITIAL_VALUES: LayerRequestForm = {
   geometryType: GeometryType.POINT,
   layerType: LayerType.SIMPLE,
   url: '',
-  baseLayer: false,
-  checkIntersection: false,
-  isBlockLayer: false,
-  isDynamic: false,
   isPublic: false,
 };
 
@@ -132,10 +128,6 @@ export const LayerForm: FC<Props> = ({
     geometryType: string<GeometryType>().required(t('requiredField')),
     layerType: string<LayerType>().required(t('requiredField')),
     url: string().nullable(),
-    baseLayer: boolean(),
-    checkIntersection: boolean(),
-    isBlockLayer: boolean(),
-    isDynamic: boolean(),
     isPublic: boolean(),
   });
 
@@ -187,7 +179,7 @@ export const LayerForm: FC<Props> = ({
 
   if (useExistingLayer) {
     return (
-      <Box minWidth={550}>
+      <Box minWidth={'min(100%, 550px)'}>
         <FormControlLabel
           control={<Checkbox checked={useExistingLayer} onChange={(e) => setUseExistingLayer(e.target.checked)} />}
           label={t('maps.useExistingLayer')}
@@ -228,7 +220,7 @@ export const LayerForm: FC<Props> = ({
   }
 
   return (
-    <Box minWidth={550}>
+    <Box minWidth={'min(100%, 550px)'}>
       {isAdding && (
         <FormControlLabel
           control={<Checkbox checked={useExistingLayer} onChange={(e) => setUseExistingLayer(e.target.checked)} />}
@@ -315,22 +307,6 @@ export const LayerForm: FC<Props> = ({
           sx={{ flex: 0.5 }}
         />
         <TextField {...register('url')} label={t('maps.url')} fullWidth />
-        <FormControlLabel
-          control={<Checkbox checked={methods.watch('baseLayer')} {...register('baseLayer')} />}
-          label={t('maps.baseLayer')}
-        />
-        <FormControlLabel
-          control={<Checkbox checked={methods.watch('checkIntersection')} {...register('checkIntersection')} />}
-          label={t('maps.checkIntersection')}
-        />
-        <FormControlLabel
-          control={<Checkbox checked={methods.watch('isBlockLayer')} {...register('isBlockLayer')} />}
-          label={t('maps.isBlockLayer')}
-        />
-        <FormControlLabel
-          control={<Checkbox checked={methods.watch('isDynamic')} {...register('isDynamic')} />}
-          label={t('maps.isDynamic')}
-        />
         <FormControlLabel
           control={<Checkbox checked={methods.watch('isPublic')} {...register('isPublic')} />}
           label={t('maps.isPublic')}
