@@ -33,17 +33,15 @@ public class StyleController {
 
     @PostMapping
     public ResponseEntity<StyleResponseDto> createStyle(@RequestBody StyleRequestDto styleRequestDto,
-                                                        @RequestParam UUID layerId,
-                                                        @RequestParam(required = false, defaultValue = "false") Boolean sld) {
-        StyleResponseDto created = styleService.createStyle(styleRequestDto, layerId, sld);
+                                                        @RequestParam UUID layerId) {
+        StyleResponseDto created = styleService.createStyle(styleRequestDto, layerId);
         return ResponseEntity.ok(created);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<StyleResponseDto> updateStyle(@PathVariable UUID id,
-                                                        @RequestBody StyleRequestDto styleRequestDto,
-                                                        @RequestParam(required = false, defaultValue = "false") Boolean sld) {
-        StyleResponseDto updated = styleService.updateStyle(id, styleRequestDto, sld);
+                                                        @RequestBody StyleRequestDto styleRequestDto) {
+        StyleResponseDto updated = styleService.updateStyle(id, styleRequestDto);
         return ResponseEntity.ok(updated);
     }
 

@@ -11,4 +11,6 @@ import lombok.Setter;
 public class Style extends IdEntity {
     private String styleName;
     private String styleJson;
+    private Boolean isSld;
+    private String sld;
 }

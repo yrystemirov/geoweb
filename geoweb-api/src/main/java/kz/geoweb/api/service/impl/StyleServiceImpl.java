@@ -54,13 +54,8 @@ public class StyleServiceImpl implements StyleService {
     }
 
     @Override
-    public StyleResponseDto createStyle(StyleRequestDto styleRequestDto, UUID layerId, Boolean sld) {
-        String xml;
-        if (sld) {
-            xml = styleRequestDto.getSld();
-        } else {
-            xml = generateStyleXml(styleRequestDto);
-        }
+    public StyleResponseDto createStyle(StyleRequestDto styleRequestDto, UUID layerId) {
+        String xml = getSldOrRulesXml(styleRequestDto);
         geoserverService.createStyle(xml);
         Style style = styleMapper.requestToEntity(styleRequestDto);
         Style created = styleRepository.save(style);
@@ -69,13 +64,8 @@ public class StyleServiceImpl implements StyleService {
     }
 
     @Override
-    public StyleResponseDto updateStyle(UUID styleId, StyleRequestDto styleRequestDto, Boolean sld) {
-        String xml;
-        if (sld) {
-            xml = styleRequestDto.getSld();
-        } else {
-            xml = generateStyleXml(styleRequestDto);
-        }
+    public StyleResponseDto updateStyle(UUID styleId, StyleRequestDto styleRequestDto) {
+        String xml = getSldOrRulesXml(styleRequestDto);
         geoserverService.updateStyle(styleRequestDto.getName(), xml);
         Style requeststyle = styleMapper.requestToEntity(styleRequestDto);
         Style dbstyle = getEntityById(styleId);
@@ -83,6 +73,22 @@ public class StyleServiceImpl implements StyleService {
         dbstyle.setStyleJson(requeststyle.getStyleJson());
         Style updated = styleRepository.save(dbstyle);
         return styleMapper.entityToResponse(updated);
+    }
+
+    private String getSldOrRulesXml(StyleRequestDto styleRequestDto) {
+        String xml;
+        if (styleRequestDto.getIsSld()) {
+            if (!styleRequestDto.getRules().isEmpty()) {
+                throw new CustomException("style.rules.not_null");
+            }
+            xml = styleRequestDto.getSld();
+        } else {
+            if (styleRequestDto.getSld() != null) {
+                throw new CustomException("style.sld.not_null");
+            }
+            xml = generateStyleXml(styleRequestDto);
+        }
+        return xml;
     }
 
     @Override

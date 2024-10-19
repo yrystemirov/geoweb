@@ -8,6 +8,7 @@ import kz.geoweb.api.dto.StyleResponseDto;
 import kz.geoweb.api.dto.StyleResponseFullDto;
 import kz.geoweb.api.entity.Style;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class StyleMapper {
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
@@ -44,13 +46,15 @@ public class StyleMapper {
         StyleResponseFullDto styleResponseFullDto = new StyleResponseFullDto();
         styleResponseFullDto.setId(styleEntity.getId());
         styleResponseFullDto.setName(styleEntity.getStyleName());
+        styleResponseFullDto.setIsSld(styleEntity.getIsSld());
+        styleResponseFullDto.setSld(styleEntity.getSld());
         try {
             StyleRequestDto styleRequestDtoFromDb = objectMapper.readValue(styleEntity.getStyleJson(), StyleRequestDto.class);
             styleResponseFullDto.setGeomType(styleRequestDtoFromDb.getGeomType());
             styleResponseFullDto.setRules(styleRequestDtoFromDb.getRules());
             return styleResponseFullDto;
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.info("Error while parsing styleJson to StyleRequestDto: {}", e.getMessage());
         }
         return styleResponseFullDto;
     }
@@ -58,22 +62,24 @@ public class StyleMapper {
     public Style requestToEntity(StyleRequestDto styleRequestDto) {
         Style styleEntity = new Style();
         styleEntity.setStyleName(styleRequestDto.getName());
+        styleEntity.setIsSld(styleRequestDto.getIsSld());
+        styleEntity.setSld(styleRequestDto.getSld());
         try {
             String styleJson = objectMapper.writeValueAsString(styleRequestDto);
             styleEntity.setStyleJson(styleJson);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.info("Error while parsing StyleRequestDto to styleJson: {}", e.getMessage());
         }
         return styleEntity;
     }
 
-    public StyleRequestDto entityToRequestDto(Style styleEntity) {
-        StyleRequestDto styleRequestDto = new StyleRequestDto();
-        try {
-            styleRequestDto = objectMapper.readValue(styleEntity.getStyleJson(), StyleRequestDto.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return styleRequestDto;
-    }
+//    public StyleRequestDto entityToRequestDto(Style styleEntity) {
+//        StyleRequestDto styleRequestDto = new StyleRequestDto();
+//        try {
+//            styleRequestDto = objectMapper.readValue(styleEntity.getStyleJson(), StyleRequestDto.class);
+//        } catch (JsonProcessingException e) {
+//            log.info("Error while parsing styleJson to StyleRequestDto: {}", e.getMessage());
+//        }
+//        return styleRequestDto;
+//    }
 }

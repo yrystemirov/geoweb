@@ -12,4 +12,6 @@ public class StyleResponseFullDto {
     private String name;
     private GeometryType geomType;
     private List<StyleRuleDto> rules;
+    private Boolean isSld;
+    private String sld;
 }
