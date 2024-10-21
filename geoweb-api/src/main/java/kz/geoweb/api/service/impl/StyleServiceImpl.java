@@ -68,10 +68,12 @@ public class StyleServiceImpl implements StyleService {
         String xml = getSldOrRulesXml(styleRequestDto);
         geoserverService.updateStyle(styleRequestDto.getName(), xml);
         Style requeststyle = styleMapper.requestToEntity(styleRequestDto);
-        Style dbstyle = getEntityById(styleId);
-        dbstyle.setStyleName(requeststyle.getStyleName());
-        dbstyle.setStyleJson(requeststyle.getStyleJson());
-        Style updated = styleRepository.save(dbstyle);
+        Style dbStyle = getEntityById(styleId);
+        dbStyle.setStyleName(requeststyle.getStyleName());
+        dbStyle.setStyleJson(requeststyle.getStyleJson());
+        dbStyle.setIsSld(requeststyle.getIsSld());
+        dbStyle.setSld(requeststyle.getSld());
+        Style updated = styleRepository.save(dbStyle);
         return styleMapper.entityToResponse(updated);
     }
 
