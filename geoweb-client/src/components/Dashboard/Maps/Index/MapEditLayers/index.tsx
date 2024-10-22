@@ -15,7 +15,7 @@ import ConfirmDialog from '../../../../common/Confirm';
 import { Dialog } from '../../../../common/Dialog';
 import { MapFolderEditForm } from '../../MapFolder/EditForm';
 import { MapFolderCreateForm } from '../../MapFolder/CreateForm';
-import { LayerForm } from '../../MapFolder/LayerForm';
+import { LayerForm } from '../../../Layers/Form';
 import { layersAPI } from '../../../../../api/layer';
 import { uuidv4 } from '../../../../../utils/uidv4';
 import { useNotify } from '../../../../../hooks/useNotify';

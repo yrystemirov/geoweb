@@ -7,6 +7,9 @@ const theme = createTheme({
     primary: {
       main: '#37a141',
     },
+    secondary: {
+      main: '#196fa6',
+    },
     error: {
       main: red.A400,
     },
@@ -32,6 +35,15 @@ const theme = createTheme({
           },
           [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]: {
             outline: 'none',
+          },
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        root: {
+          '& .MuiDialog-paper': {
+            minWidth: '480px',
           },
         },
       },

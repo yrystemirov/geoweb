@@ -9,7 +9,7 @@ type Props = {
 
 export const GoBackButton: FC<Props> = ({ onClick, text }) => {
   return (
-    <Button variant="outlined" color="primary" onClick={onClick}>
+    <Button variant="text" color="primary" onClick={onClick}>
       <ChevronLeft />
       {text}
     </Button>

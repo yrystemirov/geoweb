@@ -1,16 +1,16 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { FC, useEffect, useState } from 'react';
-import { layersAPI } from '../../../../../api/layer';
-import { FolderDto, GeometryType, LayerDto, LayerRequestDto, LayerType } from '../../../../../api/types/mapFolders';
+import { layersAPI } from '../../../../api/layer';
+import { FolderDto, GeometryType, LayerDto, LayerRequestDto, LayerType } from '../../../../api/types/mapFolders';
 import { boolean, object, string } from 'yup';
 import { useTranslation } from 'react-i18next';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, Checkbox, FormControlLabel, MenuItem, TextField } from '@mui/material';
-import { Loader } from '../../../../common/Loader';
-import { InfiniteScrollSelect } from '../../../../common/InfiniteScrollSelect';
-import { useTranslatedProp } from '../../../../../hooks/useTranslatedProp';
-import { useNotify } from '../../../../../hooks/useNotify';
+import { Loader } from '../../../common/Loader';
+import { InfiniteScrollSelect } from '../../../common/InfiniteScrollSelect';
+import { useTranslatedProp } from '../../../../hooks/useTranslatedProp';
+import { useNotify } from '../../../../hooks/useNotify';
 import { useNavigate, useParams } from 'react-router-dom';
 
 type LayerRequestForm = Omit<LayerRequestDto, 'folders'>;

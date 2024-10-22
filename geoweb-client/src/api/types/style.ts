@@ -1,71 +1,114 @@
 import { AttrType, GeometryType } from './mapFolders';
 
-export type StyleRequestDto = {
-  name: string;
-  geomType: GeometryType;
-  rules: StyleRuleDto[];
-  sld: string;
+export type StyleResponseFullDto = {
+  id?: string;
+  name?: string;
+  geomType?: GeometryType;
+  rules?: StyleRule.Dto[];
+  sld?: string | null;
+  isSld?: boolean;
 };
 
-export type StyleRuleDto = {
-  name: string; // common
-  strokeWidth: number; // for line, polygon
-  strokeColor: string; // for line, polygon
-  strokeColorOpacity: number; // for line, polygon
-  fillColor: string; // for point, polygon
-  fillColorOpacity: number; // for point, polygon
-  pointShape: string; // for point
-  pointRadius: number; // for point
-  scaleMin: number; // common
-  scaleMax: number; // common
-  imgFormat: string; // for point
-  imgSrc: string; // for point
-  dashedLine: boolean; // for line
-  dashLineLength: number; // for line
-  dashLinePoint: number; // for line
-  filter: StyleFilterDto; // for point, line, polygon
-  rasterColors: StyleRasterColorDto[]; // for raster
+export type StyleRequestDto = Omit<StyleResponseFullDto, 'id'>;
+export type StyleResponseDto = Pick<StyleResponseFullDto, 'id' | 'name'>;
 
-  hasTextSymbolizer: boolean; // for point, line, polygon
-  // if hasTextSymbolizer is true group start
-  textSymbolizerAttrName: string;
-  textSymbolizerDisplacementX: number;
-  textSymbolizerDisplacementY: number;
-  textSymbolizerRotation: number;
-  textSymbolizerFillColor: string;
-  textSymbolizerFillColorOpacity: number;
-  anchorpointX: number;
-  anchorpointY: number;
-  fontFamily: string;
-  fontSize: number;
-  fontStyle: string;
-  fontWeight: string;
-  // if hasTextSymbolizer is true group end
+export namespace StyleRule {
+  // Общие свойства
+  export type Common = {
+    name: string;
+    scaleMin: number;
+    scaleMax: number;
+    id?: string; // NOTE: на бэке поля нет, только для фронта, для редактирования существующих правил
+  };
 
-  cluster: boolean; // for point only
-  // if cluster is true group start
-  clusterTitle: string;
-  clusterGreaterThanOrEqual: number;
-  clusterLessThanOrEqual: number;
-  clusterPointSize: number;
-  clusterTextType: string;
-  clusterTextSize: number;
-  clusterTextWeight: string;
-  clusterTextColor: string;
-  clusterTextColorOpacity: number;
-  clusterAnchorPointX: number;
-  clusterAnchorPointY: number;
-  clusterTextHaloRadius: number;
-  clusterTextHaloFillColor: string;
-  clusterTextHaloFillOpacityWeight: string;
-  // if cluster is true group end
+  // Свойства для точек
+  export type Point = {
+    fillColor: string;
+    fillColorOpacity: number;
+    pointShape: string;
+    pointRadius: number;
+    imgFormat: string;
+    imgSrc: string;
+  };
 
-  dashed: boolean; // for line, polygon
-  // if dashed is true group start
-  strokeDashLength: number;
-  strokeSpaceLength: number;
-  // if dashed is true group end
-};
+  // Свойства для линий
+  type Line = {
+    strokeWidth: number;
+    strokeColor: string;
+    strokeColorOpacity: number;
+  };
+
+  // Свойства для полигонов
+  type Polygon = {
+    strokeWidth: number;
+    strokeColor: string;
+    strokeColorOpacity: number;
+    fillColor: string;
+    fillColorOpacity: number;
+  };
+
+  // Свойства для растровых данных
+  type Raster = {
+    rasterColors: StyleRasterColorDto[];
+  };
+
+  // Свойства для текста. Применимы для точек, линий и полигонов. Если hasTextSymbolizer = true, то группа свойств присутствует
+  export type TextSymbolizer = {
+    hasTextSymbolizer: boolean;
+    // if hasTextSymbolizer = true
+    textSymbolizerAttrName: string;
+    textSymbolizerDisplacementX: number;
+    textSymbolizerDisplacementY: number;
+    textSymbolizerRotation: number;
+    textSymbolizerFillColor: string;
+    textSymbolizerFillColorOpacity: number;
+    anchorpointX: number;
+    anchorpointY: number;
+    fontFamily: string;
+    fontSize: number;
+    fontStyle: string;
+    fontWeight: string;
+  };
+
+  // Свойства для фильтрации. Применимы для точек, линий и полигонов
+  export type Filter = {
+    filter: StyleFilterDto | null;
+  };
+
+  // Свойства для кластеризации. Применимы для точек. Если cluster = true, то группа свойств присутствует
+  export type Cluster = {
+    cluster: boolean;
+    // if cluster = true
+    clusterTitle: string;
+    clusterGreaterThanOrEqual: number;
+    clusterLessThanOrEqual: number;
+    clusterPointSize: number;
+    clusterTextType: string;
+    clusterTextSize: number;
+    clusterTextWeight: string;
+    clusterTextColor: string;
+    clusterTextColorOpacity: number;
+    clusterAnchorPointX: number;
+    clusterAnchorPointY: number;
+    clusterTextHaloRadius: number;
+    clusterTextHaloFillColor: string;
+    clusterTextHaloFillOpacityWeight: number; // в сваггере неправильно?
+  };
+  
+  // Свойства для пунктирных линий. Применимы для линий и полигонов. Если dashed = true, то группа свойств присутствует
+  type Dashed = {
+    dashed: boolean;
+  } & (
+    | {
+        dashed: boolean; // true
+        strokeDashLength: number;
+        strokeSpaceLength: number;
+      }
+    | { dashed: false }
+  );
+
+  export type Dto = Partial<Common & Point & Line & Polygon & Raster & TextSymbolizer & Filter & Cluster & Dashed>;
+}
 
 export type StyleFilterDto = {
   column: StyleFilterColumnDto;
