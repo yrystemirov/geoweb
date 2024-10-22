@@ -27,6 +27,7 @@ const resources = {
       cancel: 'Бас тарту',
       confirm: 'Растау',
       delete: 'Жою',
+      cancelDeletion: 'Жоюды болдырмау',
       deleteConfirm: 'Жоюды растау',
       deleteConfirmDescription: 'Жоюды растаңыз, әрекет қайтарылмайды',
       signIn: 'Кіру',
@@ -117,10 +118,11 @@ const resources = {
         sldPlaceholder: 'SLD XML кодын енгізіңіз',
         geometryType: 'Геометрия түрі: {{type}}',
       },
-      rulesTable: {
+      styleRules: {
         title: 'Стильдің ережелері',
         name: 'Атауы',
         create: 'Ереже қосу',
+        edit: 'Ереже өңдеу',
       },
       yes: 'Ия',
       no: 'Жоқ',
@@ -154,6 +156,7 @@ const resources = {
       cancel: 'Отмена',
       confirm: 'Подтвердить',
       delete: 'Удалить',
+      cancelDeletion: 'Отменить удаление',
       deleteConfirm: 'Подтверждение удаления',
       deleteConfirmDescription: 'Подтвердите удаление, действие необратимо',
       signIn: 'Войти',
@@ -241,10 +244,11 @@ const resources = {
         sldPlaceholder: 'Введите XML код SLD',
         geometryType: 'Тип геометрии: {{type}}',
       },
-      rulesTable: {
+      styleRules: {
         title: 'Правила стиля',
         name: 'Наименование',
         create: 'Создать правило',
+        edit: 'Редактировать правило',
       },
       yes: 'Да',
       no: 'Нет',

@@ -27,6 +27,7 @@ const DEFAULT_VALUES: Partial<PointFormDataType> = {
 
 export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
   const { t } = useTranslation();
+  const isEdit = !!editData;
 
   const schema = object<PointFormDataType>({
     name: string().required(t('required')),
@@ -43,15 +44,15 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
       .min(0, t('minValue', { value: 0 })),
-    pointShape: string(),
+    pointShape: string().nullable(),
     pointRadius: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
       .min(0, t('minValue', { value: 0 })),
-    imgFormat: string(),
-    imgSrc: string(),
+    imgFormat: string().nullable(),
+    imgSrc: string().nullable(),
     hasTextSymbolizer: boolean(),
-    textSymbolizerAttrName: string(),
+    textSymbolizerAttrName: string().nullable(),
     textSymbolizerDisplacementX: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable(),
@@ -61,7 +62,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
     textSymbolizerRotation: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable(),
-    textSymbolizerFillColor: string(),
+    textSymbolizerFillColor: string().nullable(),
     textSymbolizerFillColorOpacity: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
@@ -74,21 +75,21 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
       .min(0, t('minValue', { value: 0 })),
-    fontFamily: string(),
+    fontFamily: string().nullable(),
     fontSize: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
       .min(0, t('minValue', { value: 0 })),
-    fontStyle: string(),
-    fontWeight: string(),
+    fontStyle: string().nullable(),
+    fontWeight: string().nullable(),
     cluster: boolean(),
-    clusterTitle: string(),
-    clusterStrokeColor: string(),
+    clusterTitle: string().nullable(),
+    clusterStrokeColor: string().nullable(),
     clusterStrokeWidth: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
       .min(0, t('minValue', { value: 0 })),
-    clusterFillColor: string(),
+    clusterFillColor: string().nullable(),
     clusterGreaterThanOrEqual: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
@@ -101,13 +102,13 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
       .min(0, t('minValue', { value: 0 })),
-    clusterTextType: string(),
+    clusterTextType: string().nullable(),
     clusterTextSize: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
       .min(0, t('minValue', { value: 0 })),
-    clusterTextWeight: string(),
-    clusterTextColor: string(),
+    clusterTextWeight: string().nullable(),
+    clusterTextColor: string().nullable(),
     clusterTextColorOpacity: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
@@ -124,8 +125,8 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
       .min(0, t('minValue', { value: 0 })),
-    clusterTextHaloFillColor: string(),
-    clusterTextHaloFillOpacityWeight: string(),
+    clusterTextHaloFillColor: string().nullable(),
+    clusterTextHaloFillOpacityWeight: string().nullable(),
   });
 
   const methods = useForm<PointFormDataType>({
@@ -137,6 +138,8 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
   useEffect(() => {
     methods.reset();
   }, [methods]);
+
+  console.log('errors', methods.formState.errors);
 
   return (
     <Box
@@ -285,7 +288,9 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         }
       >
         <FormControlLabel
-          control={<Checkbox {...methods.register('hasTextSymbolizer')} />}
+          control={
+            <Checkbox {...methods.register('hasTextSymbolizer')} defaultChecked={methods.watch('hasTextSymbolizer')} />
+          }
           label={t('hasTextSymbolizer')}
         />
         {methods.watch('hasTextSymbolizer') && (
@@ -448,7 +453,10 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
             : {}
         }
       >
-        <FormControlLabel control={<Checkbox {...methods.register('cluster')} />} label={t('cluster')} />
+        <FormControlLabel
+          control={<Checkbox {...methods.register('cluster')} defaultChecked={methods.watch('cluster')} />}
+          label={t('cluster')}
+        />
 
         {methods.watch('cluster') && (
           <Box display="flex" gap={1} flexDirection="column">
@@ -645,7 +653,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
           {t('cancel')}
         </Button>
         <Button type="submit" variant="contained" color="primary">
-          {t('add')}
+          {isEdit ? t('save') : t('add')}
         </Button>
       </Box>
     </Box>

@@ -9,9 +9,10 @@ import { Box, Button, FormControlLabel, Switch, TextField, Typography } from '@m
 import { FormProvider, useForm } from 'react-hook-form';
 import { StyleRequestDto, StyleResponseFullDto, StyleRule } from '../../../../api/types/style';
 import { useNotify } from '../../../../hooks/useNotify';
-import { RulesTable } from './Rules/RulesTable';
+import { RulesTable } from './Rules/Table';
 import { useTranslation } from 'react-i18next';
-import { CreateRuleDialog } from './Rules/CreateDialog';
+import { RuleDialog } from './Rules/Dialog';
+import { uuidv4 } from '../../../../utils/uidv4';
 
 const DEFAULT_VALUES: StyleRequestDto = {
   sld: '',
@@ -37,8 +38,6 @@ export const LayerStyleEditor: FC = () => {
   const { data: styleData, isLoading } = useQuery({
     queryKey: ['style', layerId],
     queryFn: () => styleAPI.getStyle(layerData!.styleId!).then((res) => res.data),
-    // сэтим айдишники правилам, чтобы они могли быть отредактированы
-    // select: (data) => ({ ...data, rules: data.rules?.map((r) => ({ ...r, id: uuidv4() })) || [] }),
     enabled: !!layerData?.styleId,
   });
 
@@ -47,10 +46,13 @@ export const LayerStyleEditor: FC = () => {
   });
 
   const createMutation = useMutation<StyleRequestDto, any, StyleRequestDto>({
-    mutationFn: (style) => styleAPI.createStyle(style, layerId!).then((res) => res.data),
+    mutationFn: (style) => {
+      return styleAPI.createStyle(style, layerId!).then((res) => res.data);
+    },
     onSuccess: () => {
       showSuccess();
       setAddDialogOpen(false);
+      navigate(`/dashboard/layers`);
     },
     onError: (error) => {
       showError({ error });
@@ -76,7 +78,7 @@ export const LayerStyleEditor: FC = () => {
       geomType: layerData!.geometryType,
       isSld: isSldStyle,
       sld: isSldStyle ? data.sld : null,
-      rules: isSldStyle ? [] : data.rules,
+      rules: isSldStyle ? [] : data.rules?.filter((r) => !r.isDeleted) || [],
     };
     if (styleData) {
       const { id, ...rest } = requestData;
@@ -88,7 +90,11 @@ export const LayerStyleEditor: FC = () => {
 
   useEffect(() => {
     if (styleData) {
-      methods.reset(styleData);
+      const dataWithUuid = {
+        ...styleData,
+        rules: styleData.rules?.map((r) => ({ ...r, id: uuidv4() })),
+      };
+      methods.reset(dataWithUuid);
       setIsSldStyle(!!styleData!.isSld);
     }
   }, [styleData]);
@@ -119,8 +125,22 @@ export const LayerStyleEditor: FC = () => {
           ) : (
             <RulesTable
               rules={methods.watch('rules')}
-              onAddRule={() => setAddDialogOpen(true)}
-              onEditRule={(rule) => setEditDialog({ open: true, rule })}
+              onAdd={() => setAddDialogOpen(true)}
+              onEdit={(rule) => setEditDialog({ open: true, rule })}
+              onDelete={(rule) => {
+                methods.setValue(
+                  'rules',
+                  methods.watch('rules')!.map((r: StyleRule.Dto) => (r.id === rule.id ? { ...r, isDeleted: true } : r)),
+                );
+              }}
+              onCancelDeletion={(rule) => {
+                methods.setValue(
+                  'rules',
+                  methods
+                    .watch('rules')!
+                    .map((r: StyleRule.Dto) => (r.id === rule.id ? { ...r, isDeleted: false } : r)),
+                );
+              }}
             />
           )}
           <Box display={'flex'} justifyContent={'flex-end'} mt={2}>
@@ -139,7 +159,7 @@ export const LayerStyleEditor: FC = () => {
             </Button>
           </Box>
         </Box>
-        <CreateRuleDialog
+        <RuleDialog
           open={addDialogOpen}
           onClose={() => setAddDialogOpen(false)}
           geometryType={layerData?.geometryType!}
@@ -149,7 +169,7 @@ export const LayerStyleEditor: FC = () => {
             setAddDialogOpen(false);
           }}
         />
-        <CreateRuleDialog
+        <RuleDialog
           open={!!editDialog?.open}
           editData={editDialog?.rule}
           onClose={() => setEditDialog({ open: false })}

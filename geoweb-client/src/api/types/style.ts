@@ -19,6 +19,7 @@ export namespace StyleRule {
     scaleMin: number;
     scaleMax: number;
     id?: string; // NOTE: на бэке поля нет, только для фронта, для редактирования существующих правил
+    isDeleted?: boolean; // NOTE: на бэке поля нет, только для фронта, для помечания правил на удаление
   };
 
   // Свойства для точек
