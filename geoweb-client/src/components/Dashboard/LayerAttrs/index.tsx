@@ -5,12 +5,13 @@ import { layersAPI } from '../../../api/layer';
 import { LayerAttrDto } from '../../../api/types/mapFolders';
 import { DataGrid, GridColDef, GridToolbarContainer } from '@mui/x-data-grid';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, CardHeader, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
 import { useTranslatedProp } from '../../../hooks/useTranslatedProp';
 import AddIcon from '@mui/icons-material/Add';
 import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
 import { LayerAttrActionsMenu } from './ActionsMenu';
+import { ChildPageLayout, dashboardUrl } from '../routes';
 
 export const LayerAttrs: FC = () => {
   const { dataGridLocale } = useMuiLocalization();
@@ -40,7 +41,7 @@ export const LayerAttrs: FC = () => {
       minWidth: 300,
       renderCell: (params) => {
         return (
-          <Link to={`/dashboard/layerAttrs/${params.row.id}/edit`} style={{ color: 'inherit', textDecoration: 'none' }}>
+          <Link to={`${dashboardUrl}/layerAttrs/${params.row.id}/edit`} style={{ color: 'inherit', textDecoration: 'none' }}>
             <Box display={'flex'} alignItems="center" gap={1.5}>
               <Box my={1}>
                 <Typography variant="body2" color="primary" className="empty-placeholder" title={t('nameKk')}>
@@ -81,8 +82,11 @@ export const LayerAttrs: FC = () => {
   ];
 
   return (
-    <>
-      <CardHeader title={t('attrs.title', { name: layerName })} sx={{ textAlign: 'center' }} />
+    <ChildPageLayout
+      goBackPath={`${dashboardUrl}/layers`}
+      title={'attrs.title'}
+      titleParams={{ name: layerName }}
+    >
       <Box>
         <DataGrid
           disableColumnMenu
@@ -106,7 +110,7 @@ export const LayerAttrs: FC = () => {
             noRowsOverlay: CustomNoRowsOverlay,
             toolbar: () => (
               <GridToolbarContainer>
-                <Link to={`/dashboard/layers/${layerId}/attrs/add`}>
+                <Link to={`${dashboardUrl}/layers/${layerId}/attrs/add`}>
                   <Button color="primary" startIcon={<AddIcon />}>
                     {t('add')}
                   </Button>
@@ -122,6 +126,6 @@ export const LayerAttrs: FC = () => {
           }}
         />
       </Box>
-    </>
+    </ChildPageLayout>
   );
 };

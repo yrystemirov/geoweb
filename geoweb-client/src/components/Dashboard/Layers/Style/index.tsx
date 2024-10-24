@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { layersAPI } from '../../../../api/layer';
 import { styleAPI } from '../../../../api/style';
-import { ChildPageLayout } from '../../routes';
+import { ChildPageLayout, dashboardUrl } from '../../routes';
 import { useTranslatedProp } from '../../../../hooks/useTranslatedProp';
 import { Box, Button, FormControlLabel, Switch, TextField, Typography } from '@mui/material';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -52,7 +52,7 @@ export const LayerStyleEditor: FC = () => {
     onSuccess: () => {
       showSuccess();
       setAddDialogOpen(false);
-      navigate(`/dashboard/layers`);
+      navigate(`${dashboardUrl}/layers`);
     },
     onError: (error) => {
       showError({ error });
@@ -64,7 +64,7 @@ export const LayerStyleEditor: FC = () => {
     onSuccess: () => {
       showSuccess();
       setAddDialogOpen(false);
-      navigate(`/dashboard/layers`);
+      navigate(`${dashboardUrl}/layers`);
     },
     onError: (error) => {
       showError({ error });
@@ -100,7 +100,11 @@ export const LayerStyleEditor: FC = () => {
   }, [styleData]);
 
   return (
-    <ChildPageLayout title={'styles.title'} titleParams={{ name: layerDisplayName }} goBackPath={`/dashboard/layers`}>
+    <ChildPageLayout
+      title={'styles.title'}
+      titleParams={{ name: layerDisplayName }}
+      goBackPath={`${dashboardUrl}/layers`}
+    >
       <Box display={'flex'} justifyContent={'space-between'} gap={2} mb={2} alignItems={'center'}>
         <FormControlLabel
           control={<Switch checked={isSldStyle} onChange={() => setIsSldStyle(!isSldStyle)} />}
@@ -148,7 +152,7 @@ export const LayerStyleEditor: FC = () => {
               variant={'text'}
               onClick={() => {
                 methods.reset(DEFAULT_VALUES);
-                navigate(`/dashboard/layers`);
+                navigate(`${dashboardUrl}/layers`);
               }}
               size="large"
             >

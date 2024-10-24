@@ -73,7 +73,7 @@ export const ChildPageLayout: React.FC<ChildPageLayoutProps> = ({
   );
 };
 
-export const parentUrl = '/dashboard';
+export const dashboardUrl = '/dashboard';
 
 export const routes: DashboardRoute[] = [
   {
@@ -93,8 +93,8 @@ export const routes: DashboardRoute[] = [
       {
         path: '/users/add',
         component: (
-          <ChildPageLayout  goBackPath={`${parentUrl}/users`} title={'users.create'}>
-            <UserCreateForm goBackPath={`${parentUrl}/users`} />
+          <ChildPageLayout  goBackPath={`${dashboardUrl}/users`} title={'users.create'}>
+            <UserCreateForm goBackPath={`${dashboardUrl}/users`} />
           </ChildPageLayout>
         ),
       },
@@ -103,11 +103,11 @@ export const routes: DashboardRoute[] = [
         component: (
           <ChildPageLayout
             
-            goBackPath={`${parentUrl}/users`}
+            goBackPath={`${dashboardUrl}/users`}
             title={'editProperties'}
             titleParams={{ name: '' }}
           >
-            <UserEditForm goBackPath={`${parentUrl}/users`} />
+            <UserEditForm goBackPath={`${dashboardUrl}/users`} />
           </ChildPageLayout>
         ),
       },
@@ -123,8 +123,8 @@ export const routes: DashboardRoute[] = [
       {
         path: '/maps/add',
         component: (
-          <ChildPageLayout  goBackPath={`${parentUrl}/maps`} title={'maps.addMap'}>
-            <MapFolderCreateForm goBackPath={`${parentUrl}/maps`} />
+          <ChildPageLayout  goBackPath={`${dashboardUrl}/maps`} title={'maps.addMap'}>
+            <MapFolderCreateForm goBackPath={`${dashboardUrl}/maps`} />
           </ChildPageLayout>
         ),
       },
@@ -133,11 +133,11 @@ export const routes: DashboardRoute[] = [
         component: (
           <ChildPageLayout
             
-            goBackPath={`${parentUrl}/maps`}
+            goBackPath={`${dashboardUrl}/maps`}
             title={'editProperties'}
             titleParams={{ name: '' }}
           >
-            <MapFolderEditForm goBackPath={`${parentUrl}/maps`} />
+            <MapFolderEditForm goBackPath={`${dashboardUrl}/maps`} />
           </ChildPageLayout>
         ),
       },
@@ -154,8 +154,8 @@ export const routes: DashboardRoute[] = [
       {
         path: '/layers/add',
         component: (
-          <ChildPageLayout  goBackPath={`${parentUrl}/layers`} title={'maps.addLayer'}>
-            <LayerForm goBackPath={`${parentUrl}/layers`} />
+          <ChildPageLayout  goBackPath={`${dashboardUrl}/layers`} title={'maps.addLayer'}>
+            <LayerForm goBackPath={`${dashboardUrl}/layers`} />
           </ChildPageLayout>
         ),
       },
@@ -164,11 +164,11 @@ export const routes: DashboardRoute[] = [
         component: (
           <ChildPageLayout
             
-            goBackPath={`${parentUrl}/layers`}
+            goBackPath={`${dashboardUrl}/layers`}
             title={'editProperties'}
             titleParams={{ name: '' }}
           >
-            <LayerForm goBackPath={`${parentUrl}/layers`} />
+            <LayerForm goBackPath={`${dashboardUrl}/layers`} />
           </ChildPageLayout>
         ),
       },
@@ -185,7 +185,7 @@ export const routes: DashboardRoute[] = [
         component: (
           <ChildPageLayout
             
-            goBackPath={(params) => `${parentUrl}/layers/${params.layerId}/attrs`}
+            goBackPath={(params) => `${dashboardUrl}/layers/${params.layerId}/attrs`}
             title={'attrs.create'}
           >
             <LayerAttrForm shouldGoBackToList />
@@ -197,7 +197,7 @@ export const routes: DashboardRoute[] = [
         component: (
           <ChildPageLayout
             
-            goBackPath={(params) => `${parentUrl}/layers/${params.layerId}/attrs`}
+            goBackPath={(params) => `${dashboardUrl}/layers/${params.layerId}/attrs`}
             title={'editProperties'}
             titleParams={{ name: '' }}
           >

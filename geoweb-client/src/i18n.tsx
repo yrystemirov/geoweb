@@ -117,6 +117,14 @@ const resources = {
         useSld: 'SLD пайдалану',
         sldPlaceholder: 'SLD XML кодын енгізіңіз',
         geometryType: 'Геометрия түрі: {{type}}',
+        pointShapes: {
+          circle: 'Дөңгелек',
+          square: 'Шаршы',
+          triangle: 'Үшбұрыш',
+          star: 'Жұлдызша',
+          cross: 'Айқыш',
+          x: 'X',
+        },
       },
       styleRules: {
         title: 'Стильдің ережелері',
@@ -243,6 +251,14 @@ const resources = {
         useSld: 'Использовать SLD',
         sldPlaceholder: 'Введите XML код SLD',
         geometryType: 'Тип геометрии: {{type}}',
+        pointShapes: {
+          circle: 'Круг',
+          square: 'Квадрат',
+          triangle: 'Треугольник',
+          star: 'Звездочка',
+          cross: 'Крест',
+          x: 'X',
+        },
       },
       styleRules: {
         title: 'Правила стиля',

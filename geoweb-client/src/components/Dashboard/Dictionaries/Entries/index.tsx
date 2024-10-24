@@ -28,6 +28,7 @@ import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
 import { GoBackButton } from '../../../common/GoBackButton';
 import ConfirmDialog from '../../../common/Confirm';
 import { useTranslatedProp } from '../../../../hooks/useTranslatedProp';
+import { dashboardUrl } from '../../routes';
 
 export type EntryDtoRow = EntryDto & { isNew?: boolean };
 
@@ -200,7 +201,7 @@ export const DictionaryEntries = () => {
   return (
     <>
       <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
-        <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/dictionaries')} />
+        <GoBackButton text={t('backToList')} onClick={() => navigate(`${dashboardUrl}/dictionaries`)} />
         <CardHeader title={t('dictionaryEntries', { dicName })} sx={{ textAlign: 'center', flex: 1 }} />
       </Box>
       <Box>

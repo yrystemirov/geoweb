@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../../../common/Confirm';
 import { useMutation } from '@tanstack/react-query';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
+import { dashboardUrl } from '../../../routes';
 
 type Props = {
   data: FolderDto;
@@ -60,11 +61,11 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={() => navigate(`/dashboard/maps/${data.id}/edit`)}>
+        <MenuItem onClick={() => navigate(`${dashboardUrl}/maps/${data.id}/edit`)}>
           <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
 
-        <MenuItem onClick={() => navigate(`/dashboard/maps/${data.id}/edit-layers`)}>
+        <MenuItem onClick={() => navigate(`${dashboardUrl}/maps/${data.id}/edit-layers`)}>
           <AccountTreeOutlined sx={{ marginRight: 1 }} /> {t('maps.editStructure')}
         </MenuItem>
 

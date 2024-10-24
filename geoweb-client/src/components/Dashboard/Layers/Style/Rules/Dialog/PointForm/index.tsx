@@ -1,10 +1,14 @@
 import { FC, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleRule } from '../../../../../../../api/types/style';
-import { Box, Button, Checkbox, FormControlLabel, Slider, TextField, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, MenuItem, Slider, TextField, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { boolean, number, object, string } from 'yup';
+import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
+import { layersAPI } from '../../../../../../../api/layer';
+import { useTranslatedProp } from '../../../../../../../hooks/useTranslatedProp';
 
 export type PointFormDataType = StyleRule.Point &
   StyleRule.Common &
@@ -26,11 +30,19 @@ const DEFAULT_VALUES: Partial<PointFormDataType> = {
 };
 
 export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
+  const { layerId } = useParams();
   const { t } = useTranslation();
+  const nameProp = useTranslatedProp('name');
   const isEdit = !!editData;
 
+  const { data: attrs = [], isLoading: isAttrsLoading } = useQuery({
+    queryKey: ['layerAttrs', layerId],
+    queryFn: () => layersAPI.getLayerAttrs(layerId!).then((res) => res.data),
+    enabled: !!layerId,
+  });
+
   const schema = object<PointFormDataType>({
-    name: string().required(t('required')),
+    name: string().required(t('requiredField')),
     scaleMin: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
@@ -39,12 +51,12 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
       .min(0, t('minValue', { value: 0 })),
-    fillColor: string().required(t('required')),
+    fillColor: string().required(t('requiredField')),
     fillColorOpacity: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
       .min(0, t('minValue', { value: 0 })),
-    pointShape: string().nullable(),
+    pointShape: string<StyleRule.PointShape>().nullable(),
     pointRadius: number()
       .transform((value) => (isNaN(value) ? undefined : value))
       .nullable()
@@ -156,6 +168,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         fullWidth
         error={!!methods.formState.errors.name}
         helperText={methods.formState.errors.name?.message}
+        required
       />
       <Box display="flex" gap={2} sx={{ width: '50%' }}>
         <TextField
@@ -218,6 +231,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               },
             },
           }}
+          required
         />
         <Controller
           name="fillColorOpacity"
@@ -236,7 +250,15 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
           fullWidth
           error={!!methods.formState.errors.pointShape}
           helperText={methods.formState.errors.pointShape?.message}
-        />
+          select
+          value={methods.watch('pointShape')}
+        >
+          {Object.values(StyleRule.PointShape).map((shape) => (
+            <MenuItem key={shape} value={shape}>
+              {t(`styles.pointShapes.${shape}`)}
+            </MenuItem>
+          ))}
+        </TextField>
         <TextField
           margin="dense"
           {...methods.register('pointRadius')}
@@ -303,7 +325,18 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               fullWidth
               error={!!methods.formState.errors.textSymbolizerAttrName}
               helperText={methods.formState.errors.textSymbolizerAttrName?.message}
-            />
+              select
+              value={methods.watch('textSymbolizerAttrName')}
+              disabled={isAttrsLoading}
+            >
+              {attrs.map((attr) => (
+                <MenuItem key={attr.id} value={attr.attrname}>
+                  {attr[nameProp]}
+                </MenuItem>
+              ))}
+              {/* if no attrs */}
+              {attrs.length === 0 && <MenuItem disabled>{t('noData')}</MenuItem>}
+            </TextField>
             <Box display="flex" gap={2}>
               <TextField
                 margin="dense"

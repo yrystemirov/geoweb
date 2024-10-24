@@ -13,6 +13,7 @@ import { Loader } from '../../../common/Loader';
 import { InfiniteScrollSelect } from '../../../common/InfiniteScrollSelect';
 import { dictionariesAPI } from '../../../../api/dictioanries';
 import { useTranslatedProp } from '../../../../hooks/useTranslatedProp';
+import { dashboardUrl } from '../../routes';
 
 const INITIAL_VALUES: LayerAttrDto = {
   nameKk: '',
@@ -54,7 +55,7 @@ export const LayerAttrForm: FC<Props> = ({ onCancel, onSuccess, shouldGoBackToLi
     onSuccess: () => {
       onSuccess?.();
       showSuccess();
-      shouldGoBackToList && navigate(`/dashboard/layers/${layerId}/attrs`);
+      shouldGoBackToList && navigate(`${dashboardUrl}/layers/${layerId}/attrs`);
     },
     onError: (error) => {
       showError({ error });
@@ -66,7 +67,7 @@ export const LayerAttrForm: FC<Props> = ({ onCancel, onSuccess, shouldGoBackToLi
     onSuccess: () => {
       onSuccess?.();
       showSuccess();
-      shouldGoBackToList && navigate(`/dashboard/layers/${layerId}/attrs`);
+      shouldGoBackToList && navigate(`${dashboardUrl}/layers/${layerId}/attrs`);
     },
     onError: (error) => {
       showError({ error });
@@ -216,7 +217,7 @@ export const LayerAttrForm: FC<Props> = ({ onCancel, onSuccess, shouldGoBackToLi
           onClick={() => {
             onCancel?.();
             methods.reset();
-            shouldGoBackToList && navigate(`/dashboard/layers/${layerId}/attrs`);
+            shouldGoBackToList && navigate(`${dashboardUrl}/layers/${layerId}/attrs`);
           }}
         >
           {t('cancel')}

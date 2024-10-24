@@ -7,6 +7,7 @@ import { authAPI } from '../api/auth';
 import { useForm, Controller } from 'react-hook-form';
 import { useLoading } from '../components/common/loadingBar/loadingContext';
 import { useAuth } from '../hooks/useAuth';
+import { dashboardUrl } from '../components/Dashboard/routes';
 
 interface FormValues {
   username: string;
@@ -22,7 +23,7 @@ const Login: React.FC = () => {
   const { mutate: getToken, isPending } = useMutation({
     mutationFn: (data: FormValues) => authAPI.getToken(data.username, data.password).then((res) => res.data),
     onSuccess: (tokenData) => {
-      navigate('/dashboard');
+      navigate(dashboardUrl);
       setToken(tokenData);
     },
     onError: (error) => {

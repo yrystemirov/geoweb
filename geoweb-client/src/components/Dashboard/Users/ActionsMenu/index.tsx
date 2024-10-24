@@ -7,6 +7,7 @@ import { useMutation } from '@tanstack/react-query';
 import { UserDto } from '../../../../api/types/user';
 import { userAPI } from '../../../../api/user';
 import ConfirmDialog from '../../../common/Confirm';
+import { dashboardUrl } from '../../routes';
 
 type Props = {
   data: UserDto;
@@ -60,7 +61,7 @@ export const UserActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={() => navigate(`/dashboard/users/${data.id}/edit`)}>
+        <MenuItem onClick={() => navigate(`${dashboardUrl}/users/${data.id}/edit`)}>
           <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
 

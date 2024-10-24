@@ -8,6 +8,7 @@ import ConfirmDialog from '../../../common/Confirm';
 import { LayerDto } from '../../../../api/types/mapFolders';
 import { layersAPI } from '../../../../api/layer';
 import { useNotify } from '../../../../hooks/useNotify';
+import { dashboardUrl } from '../../routes';
 
 type Props = {
   data: LayerDto;
@@ -65,13 +66,13 @@ export const LayerActionsMenu: FC<Props> = ({ data, onRefresh }) => {
         }}
       >
         {/* редактор стилей */}
-        <MenuItem onClick={() => navigate(`/dashboard/layers/${data.id}/style`)}>
+        <MenuItem onClick={() => navigate(`${dashboardUrl}/layers/${data.id}/style`)}>
           <SettingsSuggest sx={{ marginRight: 1 }} /> {t('styles.title', { name: '' })}
         </MenuItem>
-        <MenuItem onClick={() => navigate(`/dashboard/layers/${data.id}/attrs`)}>
+        <MenuItem onClick={() => navigate(`${dashboardUrl}/layers/${data.id}/attrs`)}>
           <ListAlt sx={{ marginRight: 1 }} /> {t('attrs.title', { name: '' })}
         </MenuItem>
-        <MenuItem onClick={() => navigate(`/dashboard/layers/${data.id}/edit`)}>
+        <MenuItem onClick={() => navigate(`${dashboardUrl}/layers/${data.id}/edit`)}>
           <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
 

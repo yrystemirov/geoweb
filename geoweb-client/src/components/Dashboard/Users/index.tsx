@@ -11,6 +11,7 @@ import { userAPI } from '../../../api/user';
 import { UserDto } from '../../../api/types/user';
 import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
 import { UserActionsMenu } from './ActionsMenu';
+import { dashboardUrl } from '../routes';
 
 export const Users: FC = () => {
   const { dataGridLocale } = useMuiLocalization();
@@ -31,7 +32,7 @@ export const Users: FC = () => {
       renderCell: (params) => {
         return (
           <Link
-            to={`/dashboard/users/${params.row.id}/edit`}
+            to={`${dashboardUrl}/users/${params.row.id}/edit`}
             style={{ color: 'inherit', textDecoration: 'none', display: 'flex', height: '100%', alignItems: 'center' }}
           >
             <Box display={'flex'} alignItems="center" gap={1.5}>
@@ -82,7 +83,7 @@ export const Users: FC = () => {
             noRowsOverlay: CustomNoRowsOverlay,
             toolbar: () => (
               <GridToolbarContainer>
-                <Link to="/dashboard/users/add">
+                <Link to={`${dashboardUrl}/users/add`}>
                   <Button color="primary" startIcon={<AddIcon />}>
                     {t('add')}
                   </Button>

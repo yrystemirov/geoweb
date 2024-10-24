@@ -26,11 +26,19 @@ export namespace StyleRule {
   export type Point = {
     fillColor: string;
     fillColorOpacity: number;
-    pointShape: string;
+    pointShape: PointShape;
     pointRadius: number;
     imgFormat: string;
     imgSrc: string;
   };
+  export enum PointShape {
+    CIRCLE = 'circle',
+    SQUARE = 'square',
+    TRIANGLE = 'triangle',
+    STAR = 'star',
+    CROSS = 'cross',
+    X = 'x',
+  }
 
   // Свойства для линий
   type Line = {

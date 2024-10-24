@@ -19,6 +19,7 @@ import { LayerForm } from '../../../Layers/Form';
 import { layersAPI } from '../../../../../api/layer';
 import { uuidv4 } from '../../../../../utils/uidv4';
 import { useNotify } from '../../../../../hooks/useNotify';
+import { dashboardUrl } from '../../../routes';
 
 enum DialogType {
   none = '',
@@ -174,7 +175,7 @@ export const MapFolderEditLayers: FC = () => {
   return (
     <>
       <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
-        <GoBackButton text={t('backToList')} onClick={() => navigate('/dashboard/maps')} />
+        <GoBackButton text={t('backToList')} onClick={() => navigate(`${dashboardUrl}/maps`)} />
         <CardHeader title={t('maps.editStructure')} sx={{ textAlign: 'center', flex: 1 }} />
       </Box>
       <Box className="edit-layers-tree">
