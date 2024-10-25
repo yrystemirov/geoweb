@@ -11,13 +11,18 @@ import { Link } from 'react-router-dom';
 import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
 import CustomNoRowsOverlay from '../../../common/NoRows/DataGrid';
 import { MapActionsMenu } from './ActionsMenu';
+import { dashboardUrl } from '../../routes';
 
 export const MapFolders: FC = () => {
   const { dataGridLocale } = useMuiLocalization();
   const { t } = useTranslation();
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
 
-  const { data = [], isLoading, refetch } = useQuery({
+  const {
+    data = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['maps'],
     queryFn: () => mapFoldersAPI.getRootFolders().then((res) => res.data),
   });
@@ -29,7 +34,7 @@ export const MapFolders: FC = () => {
       flex: 1,
       renderCell: (params) => {
         return (
-          <Link to={`/dashboard/maps/${params.row.id}/edit`} style={{ color: 'inherit', textDecoration: 'none' }}>
+          <Link to={`${dashboardUrl}/maps/${params.row.id}/edit`} style={{ color: 'inherit', textDecoration: 'none' }}>
             <Box display={'flex'} alignItems="center" gap={2} my={1}>
               <MapIcon color="primary" />
               <Box>
@@ -82,7 +87,7 @@ export const MapFolders: FC = () => {
             noRowsOverlay: CustomNoRowsOverlay,
             toolbar: () => (
               <GridToolbarContainer>
-                <Link to="/dashboard/maps/add">
+                <Link to={`${dashboardUrl}/maps/add`}>
                   <Button color="primary" startIcon={<AddIcon />}>
                     {t('maps.addMap')}
                   </Button>

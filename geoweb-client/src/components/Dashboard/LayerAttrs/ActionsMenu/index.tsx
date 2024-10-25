@@ -8,6 +8,7 @@ import { layersAPI } from '../../../../api/layer';
 import { LayerAttrDto } from '../../../../api/types/mapFolders';
 import { useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../../common/Confirm';
+import { dashboardUrl } from '../../routes';
 
 type Props = {
   data: LayerAttrDto;
@@ -69,7 +70,7 @@ export const LayerAttrActionsMenu: FC<Props> = ({ data, onRefresh }) => {
       >
         <MenuItem
           onClick={() => {
-            navigate(`/dashboard/layers/${data.layer!.id}/attrs/${data.id}/edit`);
+            navigate(`${dashboardUrl}/layers/${data.layer!.id}/attrs/${data.id}/edit`);
             handleClose();
           }}
         >

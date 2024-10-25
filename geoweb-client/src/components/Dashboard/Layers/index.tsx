@@ -10,6 +10,7 @@ import { layersAPI } from '../../../api/layer';
 import { LayerDto } from '../../../api/types/mapFolders';
 import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
 import { LayerActionsMenu } from './ActionsMenu';
+import { dashboardUrl } from '../routes';
 
 export const Layers: FC = () => {
   const { dataGridLocale } = useMuiLocalization();
@@ -30,7 +31,10 @@ export const Layers: FC = () => {
       minWidth: 300,
       renderCell: (params) => {
         return (
-          <Link to={`/dashboard/layers/${params.row.id}/edit`} style={{ color: 'inherit', textDecoration: 'none' }}>
+          <Link
+            to={`${dashboardUrl}/layers/${params.row.id}/edit`}
+            style={{ color: 'inherit', textDecoration: 'none' }}
+          >
             <Box display={'flex'} alignItems="center" gap={1.5}>
               <Box my={1}>
                 <Typography variant="body2" color="primary" className="empty-placeholder" title={t('nameKk')}>
@@ -93,7 +97,7 @@ export const Layers: FC = () => {
             noRowsOverlay: CustomNoRowsOverlay,
             toolbar: () => (
               <GridToolbarContainer>
-                <Link to="/dashboard/layers/add">
+                <Link to={`${dashboardUrl}/layers/add`}>
                   <Button color="primary" startIcon={<AddIcon />}>
                     {t('create')}
                   </Button>

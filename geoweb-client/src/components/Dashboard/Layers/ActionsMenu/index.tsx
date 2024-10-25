@@ -1,13 +1,14 @@
 import { FC, MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
-import { ListAlt, DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
+import { ListAlt, DeleteOutline, EditOutlined, MoreVert, SettingsSuggest } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import ConfirmDialog from '../../../common/Confirm';
 import { LayerDto } from '../../../../api/types/mapFolders';
 import { layersAPI } from '../../../../api/layer';
 import { useNotify } from '../../../../hooks/useNotify';
+import { dashboardUrl } from '../../routes';
 
 type Props = {
   data: LayerDto;
@@ -64,10 +65,14 @@ export const LayerActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={() => navigate(`/dashboard/layers/${data.id}/attrs`)}>
+        {/* редактор стилей */}
+        <MenuItem onClick={() => navigate(`${dashboardUrl}/layers/${data.id}/style`)}>
+          <SettingsSuggest sx={{ marginRight: 1 }} /> {t('styles.title', { name: '' })}
+        </MenuItem>
+        <MenuItem onClick={() => navigate(`${dashboardUrl}/layers/${data.id}/attrs`)}>
           <ListAlt sx={{ marginRight: 1 }} /> {t('attrs.title', { name: '' })}
         </MenuItem>
-        <MenuItem onClick={() => navigate(`/dashboard/layers/${data.id}/edit`)}>
+        <MenuItem onClick={() => navigate(`${dashboardUrl}/layers/${data.id}/edit`)}>
           <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
 

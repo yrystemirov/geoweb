@@ -20,9 +20,10 @@ import { GoBackButton } from '../common/GoBackButton';
 import { Box, CardHeader } from '@mui/material';
 import { Params, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayerForm } from './Maps/MapFolder/LayerForm';
+import { LayerForm } from './Layers/Form';
 import { LayerAttrs } from './LayerAttrs';
 import { LayerAttrForm } from './LayerAttrs/Form';
+import { LayerStyleEditor } from './Layers/Style';
 
 export type DashboardRoute = {
   text?: string;
@@ -34,14 +35,20 @@ export type DashboardRoute = {
 };
 
 type ChildPageLayoutProps = {
-  backTitle: string;
+  backTitle?: string;
   goBackPath: string | ((queryParams: Readonly<Params<string>>) => string);
   title: string;
   titleParams?: Record<string, string>;
   children: React.ReactNode;
 };
 
-const ChildPageLayout: React.FC<ChildPageLayoutProps> = ({ backTitle, goBackPath, title, titleParams, children }) => {
+export const ChildPageLayout: React.FC<ChildPageLayoutProps> = ({
+  backTitle = 'backToList',
+  goBackPath,
+  title,
+  titleParams,
+  children,
+}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryParams = useParams();
@@ -66,7 +73,7 @@ const ChildPageLayout: React.FC<ChildPageLayoutProps> = ({ backTitle, goBackPath
   );
 };
 
-export const parentUrl = '/dashboard';
+export const dashboardUrl = '/dashboard';
 
 export const routes: DashboardRoute[] = [
   {
@@ -86,8 +93,8 @@ export const routes: DashboardRoute[] = [
       {
         path: '/users/add',
         component: (
-          <ChildPageLayout backTitle={'backToList'} goBackPath={`${parentUrl}/users`} title={'users.create'}>
-            <UserCreateForm goBackPath={`${parentUrl}/users`} />
+          <ChildPageLayout  goBackPath={`${dashboardUrl}/users`} title={'users.create'}>
+            <UserCreateForm goBackPath={`${dashboardUrl}/users`} />
           </ChildPageLayout>
         ),
       },
@@ -95,12 +102,12 @@ export const routes: DashboardRoute[] = [
         path: '/users/:id/edit',
         component: (
           <ChildPageLayout
-            backTitle={'backToList'}
-            goBackPath={`${parentUrl}/users`}
+            
+            goBackPath={`${dashboardUrl}/users`}
             title={'editProperties'}
             titleParams={{ name: '' }}
           >
-            <UserEditForm goBackPath={`${parentUrl}/users`} />
+            <UserEditForm goBackPath={`${dashboardUrl}/users`} />
           </ChildPageLayout>
         ),
       },
@@ -116,8 +123,8 @@ export const routes: DashboardRoute[] = [
       {
         path: '/maps/add',
         component: (
-          <ChildPageLayout backTitle={'backToList'} goBackPath={`${parentUrl}/maps`} title={'maps.addMap'}>
-            <MapFolderCreateForm goBackPath={`${parentUrl}/maps`} />
+          <ChildPageLayout  goBackPath={`${dashboardUrl}/maps`} title={'maps.addMap'}>
+            <MapFolderCreateForm goBackPath={`${dashboardUrl}/maps`} />
           </ChildPageLayout>
         ),
       },
@@ -125,12 +132,12 @@ export const routes: DashboardRoute[] = [
         path: '/maps/:id/edit',
         component: (
           <ChildPageLayout
-            backTitle={'backToList'}
-            goBackPath={`${parentUrl}/maps`}
+            
+            goBackPath={`${dashboardUrl}/maps`}
             title={'editProperties'}
             titleParams={{ name: '' }}
           >
-            <MapFolderEditForm goBackPath={`${parentUrl}/maps`} />
+            <MapFolderEditForm goBackPath={`${dashboardUrl}/maps`} />
           </ChildPageLayout>
         ),
       },
@@ -147,8 +154,8 @@ export const routes: DashboardRoute[] = [
       {
         path: '/layers/add',
         component: (
-          <ChildPageLayout backTitle={'backToList'} goBackPath={`${parentUrl}/layers`} title={'maps.addLayer'}>
-            <LayerForm goBackPath={`${parentUrl}/layers`} />
+          <ChildPageLayout  goBackPath={`${dashboardUrl}/layers`} title={'maps.addLayer'}>
+            <LayerForm goBackPath={`${dashboardUrl}/layers`} />
           </ChildPageLayout>
         ),
       },
@@ -156,12 +163,12 @@ export const routes: DashboardRoute[] = [
         path: '/layers/:layerId/edit',
         component: (
           <ChildPageLayout
-            backTitle={'backToList'}
-            goBackPath={`${parentUrl}/layers`}
+            
+            goBackPath={`${dashboardUrl}/layers`}
             title={'editProperties'}
             titleParams={{ name: '' }}
           >
-            <LayerForm goBackPath={`${parentUrl}/layers`} />
+            <LayerForm goBackPath={`${dashboardUrl}/layers`} />
           </ChildPageLayout>
         ),
       },
@@ -170,11 +177,15 @@ export const routes: DashboardRoute[] = [
         component: <LayerAttrs />,
       },
       {
+        path: '/layers/:layerId/style',
+        component: <LayerStyleEditor />,
+      },
+      {
         path: '/layers/:layerId/attrs/add',
         component: (
           <ChildPageLayout
-            backTitle={'backToList'}
-            goBackPath={(params) => `${parentUrl}/layers/${params.layerId}/attrs`}
+            
+            goBackPath={(params) => `${dashboardUrl}/layers/${params.layerId}/attrs`}
             title={'attrs.create'}
           >
             <LayerAttrForm shouldGoBackToList />
@@ -185,8 +196,8 @@ export const routes: DashboardRoute[] = [
         path: '/layers/:layerId/attrs/:attrId/edit',
         component: (
           <ChildPageLayout
-            backTitle={'backToList'}
-            goBackPath={(params) => `${parentUrl}/layers/${params.layerId}/attrs`}
+            
+            goBackPath={(params) => `${dashboardUrl}/layers/${params.layerId}/attrs`}
             title={'editProperties'}
             titleParams={{ name: '' }}
           >

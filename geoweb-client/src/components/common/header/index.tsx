@@ -15,6 +15,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Person as UserIcon } from '@mui/icons-material';
 import { useAuth } from '../../../hooks/useAuth';
+import { dashboardUrl } from '../../Dashboard/routes';
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -210,7 +211,7 @@ const Header: React.FC = () => {
                       onClose={handleCloseUserMenu}
                     >
                       <MenuItem>
-                        <Link to="/dashboard/maps" style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <Link to={`${dashboardUrl}/maps`} style={{ color: 'inherit', textDecoration: 'none' }}>
                           <Typography textAlign="center">{t('dashboard')}</Typography>
                         </Link>
                       </MenuItem>

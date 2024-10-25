@@ -2,7 +2,7 @@ import React, { Fragment, useEffect } from 'react';
 import { Link, Route, Routes, useLocation} from 'react-router-dom';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useLoading } from '../common/loadingBar/loadingContext';
-import { DashboardRoute, parentUrl, routes } from './routes';
+import { DashboardRoute, dashboardUrl, routes } from './routes';
 import { useTranslation } from 'react-i18next';
 
 const Dashboard: React.FC = () => {
@@ -41,8 +41,8 @@ const Dashboard: React.FC = () => {
               <ListItem disablePadding>
                 <ListItemButton
                   component={Link}
-                  to={`${parentUrl}${item.path}`}
-                  selected={location.pathname === `${parentUrl}${item.path}`}
+                  to={`${dashboardUrl}${item.path}`}
+                  selected={location.pathname === `${dashboardUrl}${item.path}`}
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={t(item.text!)} />
@@ -55,8 +55,8 @@ const Dashboard: React.FC = () => {
                       <ListItem key={child.text} disablePadding sx={{ pl: 4 }}>
                         <ListItemButton
                           component={Link}
-                          to={`${parentUrl}${child.path}`}
-                          selected={window.location.pathname === `${parentUrl}${child.path}`}
+                          to={`${dashboardUrl}${child.path}`}
+                          selected={window.location.pathname === `${dashboardUrl}${child.path}`}
                         >
                           <ListItemIcon>{child.icon}</ListItemIcon>
                           <ListItemText primary={t(child.text!)} />

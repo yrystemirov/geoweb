@@ -9,7 +9,7 @@ import {
   GridEventListener,
   GridRowId,
   GridActionsCellItem,
-  GridToolbarContainer
+  GridToolbarContainer,
 } from '@mui/x-data-grid';
 import { Button, CardHeader, Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -26,6 +26,7 @@ import { useMuiLocalization } from '../../../hooks/useMuiLocalization';
 import ConfirmDialog from '../../common/Confirm';
 import { useNotify } from '../../../hooks/useNotify';
 import { AxiosError } from 'axios';
+import { dashboardUrl } from '../routes';
 
 export type DictionaryRow = {
   id: string;
@@ -193,7 +194,7 @@ export const Dictionaries: FC = () => {
       headerName: t('nameRu'),
       width: 300,
       renderCell: (params) => (
-        <Link to={`/dashboard/dictionaries/${params.row.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+        <Link to={`${dashboardUrl}/dictionaries/${params.row.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
           <Typography color="primary" component="span" variant="body2">
             {params.value}
           </Typography>

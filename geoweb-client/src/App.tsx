@@ -20,6 +20,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
 import { ThemeProvider } from '@mui/material';
 import theme from './config/theme';
+import { dashboardUrl } from './components/Dashboard/routes';
 
 const queryClient = new QueryClient();
 
@@ -58,9 +59,9 @@ const App: React.FC = () => {
                 <Route path="/contacts" element={<Contacts />} />
                 <Route path="/documentation" element={<Documentation />} />
                 <Route
-                  path="/dashboard*"
+                  path={`${dashboardUrl}*`}
                   element={
-                    <PrivateRoute path="/dashboard">
+                    <PrivateRoute path={dashboardUrl}>
                       <Dashboard />
                     </PrivateRoute>
                   }
