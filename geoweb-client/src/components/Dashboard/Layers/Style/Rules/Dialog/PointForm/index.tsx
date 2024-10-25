@@ -163,18 +163,18 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
       <TextField
         margin="dense"
         {...methods.register('name')}
-        label={t('name')}
+        label={t('styleRules.name')}
         variant="outlined"
         fullWidth
         error={!!methods.formState.errors.name}
         helperText={methods.formState.errors.name?.message}
         required
       />
-      <Box display="flex" gap={2} sx={{ width: '50%' }}>
+      <Box display="flex" gap={2} sx={{ width: '66%' }}>
         <TextField
           margin="dense"
           {...methods.register('scaleMin')}
-          label={t('scaleMin')}
+          label={t('styleRules.scaleMin')}
           variant="outlined"
           fullWidth
           error={!!methods.formState.errors.scaleMin}
@@ -191,7 +191,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         <TextField
           margin="dense"
           {...methods.register('scaleMax')}
-          label={t('scaleMax')}
+          label={t('styleRules.scaleMax')}
           variant="outlined"
           fullWidth
           error={!!methods.formState.errors.scaleMax}
@@ -207,7 +207,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         />
       </Box>
       <Box display="flex" gap={2} alignItems={'center'}>
-        <Typography>{t('fillColor')}</Typography>
+        <Typography>{t('styleRules.fillColor')}</Typography>
         <TextField
           margin="dense"
           {...methods.register('fillColor')}
@@ -245,7 +245,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         <TextField
           margin="dense"
           {...methods.register('pointShape')}
-          label={t('pointShape')}
+          label={t('styleRules.pointShape')}
           variant="outlined"
           fullWidth
           error={!!methods.formState.errors.pointShape}
@@ -255,14 +255,14 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         >
           {Object.values(StyleRule.PointShape).map((shape) => (
             <MenuItem key={shape} value={shape}>
-              {t(`styles.pointShapes.${shape}`)}
+              {t(`styleRules.pointShapes.${shape}`)}
             </MenuItem>
           ))}
         </TextField>
         <TextField
           margin="dense"
           {...methods.register('pointRadius')}
-          label={t('pointRadius')}
+          label={t('styleRules.pointRadius')}
           variant="outlined"
           fullWidth
           error={!!methods.formState.errors.pointRadius}
@@ -281,7 +281,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         <TextField
           margin="dense"
           {...methods.register('imgFormat')}
-          label={t('imgFormat')}
+          label={t('styleRules.imgFormat')}
           variant="outlined"
           fullWidth
           error={!!methods.formState.errors.imgFormat}
@@ -290,7 +290,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         <TextField
           margin="dense"
           {...methods.register('imgSrc')}
-          label={t('imgSrc')}
+          label={t('styleRules.imgSrc')}
           variant="outlined"
           fullWidth
           error={!!methods.formState.errors.imgSrc}
@@ -313,14 +313,14 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
           control={
             <Checkbox {...methods.register('hasTextSymbolizer')} defaultChecked={methods.watch('hasTextSymbolizer')} />
           }
-          label={t('hasTextSymbolizer')}
+          label={t('styleRules.hasTextSymbolizer')}
         />
         {methods.watch('hasTextSymbolizer') && (
           <Box display="flex" gap={1} flexDirection="column">
             <TextField
               margin="dense"
               {...methods.register('textSymbolizerAttrName')}
-              label={t('textSymbolizerAttrName')}
+              label={t('styleRules.textSymbolizerAttrName')}
               variant="outlined"
               fullWidth
               error={!!methods.formState.errors.textSymbolizerAttrName}
@@ -341,7 +341,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('textSymbolizerDisplacementX')}
-                label={t('textSymbolizerDisplacementX')}
+                label={t('styleRules.textSymbolizerDisplacementX')}
                 variant="outlined"
                 //   fullWidth
                 error={!!methods.formState.errors.textSymbolizerDisplacementX}
@@ -351,7 +351,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('textSymbolizerDisplacementY')}
-                label={t('textSymbolizerDisplacementY')}
+                label={t('styleRules.textSymbolizerDisplacementY')}
                 variant="outlined"
                 //   fullWidth
                 error={!!methods.formState.errors.textSymbolizerDisplacementY}
@@ -361,7 +361,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('textSymbolizerRotation')}
-                label={t('textSymbolizerRotation')}
+                label={t('styleRules.textSymbolizerRotation')}
                 variant="outlined"
                 //   fullWidth
                 error={!!methods.formState.errors.textSymbolizerRotation}
@@ -370,7 +370,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               />
             </Box>
             <Box display="flex" gap={2} alignItems={'center'}>
-              <Typography>{t('textSymbolizerFillColor')}</Typography>
+              <Typography>{t('styleRules.textSymbolizerFillColor')}</Typography>
               <TextField
                 margin="dense"
                 {...methods.register('textSymbolizerFillColor')}
@@ -414,7 +414,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('anchorpointX')}
-                label={t('anchorpointX')}
+                label={t('styleRules.anchorpointX')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.anchorpointX}
@@ -424,7 +424,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('anchorpointY')}
-                label={t('anchorpointY')}
+                label={t('styleRules.anchorpointY')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.anchorpointY}
@@ -436,7 +436,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('fontFamily')}
-                label={t('fontFamily')}
+                label={t('styleRules.fontFamily')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.fontFamily}
@@ -445,7 +445,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('fontSize')}
-                label={t('fontSize')}
+                label={t('styleRules.fontSize')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.fontSize}
@@ -455,7 +455,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('fontStyle')}
-                label={t('fontStyle')}
+                label={t('styleRules.fontStyle')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.fontStyle}
@@ -464,7 +464,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('fontWeight')}
-                label={t('fontWeight')}
+                label={t('styleRules.fontWeight')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.fontWeight}
@@ -488,7 +488,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
       >
         <FormControlLabel
           control={<Checkbox {...methods.register('cluster')} defaultChecked={methods.watch('cluster')} />}
-          label={t('cluster')}
+          label={t('styleRules.cluster')}
         />
 
         {methods.watch('cluster') && (
@@ -496,7 +496,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
             <TextField
               margin="dense"
               {...methods.register('clusterTitle')}
-              label={t('clusterTitle')}
+              label={t('styleRules.clusterTitle')}
               variant="outlined"
               fullWidth
               error={!!methods.formState.errors.clusterTitle}
@@ -506,7 +506,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('clusterGreaterThanOrEqual')}
-                label={t('clusterGreaterThanOrEqual')}
+                label={t('styleRules.clusterGreaterThanOrEqual')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.clusterGreaterThanOrEqual}
@@ -516,7 +516,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('clusterLessThanOrEqual')}
-                label={t('clusterLessThanOrEqual')}
+                label={t('styleRules.clusterLessThanOrEqual')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.clusterLessThanOrEqual}
@@ -528,7 +528,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('clusterPointSize')}
-                label={t('clusterPointSize')}
+                label={t('styleRules.clusterPointSize')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.clusterPointSize}
@@ -538,7 +538,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('clusterTextType')}
-                label={t('clusterTextType')}
+                label={t('styleRules.clusterTextType')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.clusterTextType}
@@ -547,7 +547,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('clusterTextSize')}
-                label={t('clusterTextSize')}
+                label={t('styleRules.clusterTextSize')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.clusterTextSize}
@@ -557,7 +557,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('clusterTextWeight')}
-                label={t('clusterTextWeight')}
+                label={t('styleRules.clusterTextWeight')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.clusterTextWeight}
@@ -565,7 +565,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               />
             </Box>
             <Box display="flex" gap={2} alignItems={'center'}>
-              <Typography>{t('clusterTextColor')}</Typography>
+              <Typography>{t('styleRules.clusterTextColor')}</Typography>
               <TextField
                 margin="dense"
                 {...methods.register('clusterTextColor')}
@@ -609,7 +609,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('clusterAnchorPointX')}
-                label={t('clusterAnchorPointX')}
+                label={t('styleRules.clusterAnchorPointX')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.clusterAnchorPointX}
@@ -619,7 +619,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('clusterAnchorPointY')}
-                label={t('clusterAnchorPointY')}
+                label={t('styleRules.clusterAnchorPointY')}
                 variant="outlined"
                 fullWidth
                 error={!!methods.formState.errors.clusterAnchorPointY}
@@ -628,11 +628,10 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               />
             </Box>
             <Box display="flex" gap={2} alignItems={'center'}>
-              <Typography>{t('clusterTextHalo')}</Typography>
+              <Typography>{t('styleRules.clusterTextHaloFillColor')}</Typography>
               <TextField
                 margin="dense"
                 {...methods.register('clusterTextHaloFillColor')}
-                label={t('clusterTextHaloFillColor')}
                 variant="outlined"
                 error={!!methods.formState.errors.clusterTextHaloFillColor}
                 helperText={methods.formState.errors.clusterTextHaloFillColor?.message}
@@ -671,7 +670,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <TextField
                 margin="dense"
                 {...methods.register('clusterTextHaloRadius')}
-                label={t('clusterTextHaloRadius')}
+                label={t('styleRules.clusterTextHaloRadius')}
                 variant="outlined"
                 error={!!methods.formState.errors.clusterTextHaloRadius}
                 helperText={methods.formState.errors.clusterTextHaloRadius?.message}

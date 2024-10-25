@@ -41,7 +41,10 @@ export const LayerAttrs: FC = () => {
       minWidth: 300,
       renderCell: (params) => {
         return (
-          <Link to={`${dashboardUrl}/layerAttrs/${params.row.id}/edit`} style={{ color: 'inherit', textDecoration: 'none' }}>
+          <Link
+            to={`${dashboardUrl}/layers/${layerId}/attrs/${params.row.id}/edit`}
+            style={{ color: 'inherit', textDecoration: 'none' }}
+          >
             <Box display={'flex'} alignItems="center" gap={1.5}>
               <Box my={1}>
                 <Typography variant="body2" color="primary" className="empty-placeholder" title={t('nameKk')}>
@@ -82,11 +85,7 @@ export const LayerAttrs: FC = () => {
   ];
 
   return (
-    <ChildPageLayout
-      goBackPath={`${dashboardUrl}/layers`}
-      title={'attrs.title'}
-      titleParams={{ name: layerName }}
-    >
+    <ChildPageLayout goBackPath={`${dashboardUrl}/layers`} title={'attrs.title'} titleParams={{ name: layerName }}>
       <Box>
         <DataGrid
           disableColumnMenu

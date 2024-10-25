@@ -122,13 +122,12 @@ export namespace StyleRule {
 export type StyleFilterDto = {
   column: StyleFilterColumnDto;
   operator: OperatorType;
-  value: any;
+  value: string;
 };
 
 export enum OperatorType {
-  EQUAL = 'EQUAL', // ==
-  NOT_EQUAL = 'NOT_EQUAL', // !=
-  CONTAINS = 'CONTAINS', // *=
+  EQUAL = '==',
+  NOT_EQUAL = '!=',
 }
 
 export type StyleFilterColumnDto = {
