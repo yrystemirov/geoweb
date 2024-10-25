@@ -66,7 +66,7 @@ public class StyleController {
             }
 
             // Создаем файл в директории images
-            File destinationFile = new File(IMAGES_DIRECTORY + file.getOriginalFilename());
+            File destinationFile = new File(IMAGES_DIRECTORY + "/" + file.getOriginalFilename());
 
             // Сохраняем файл
             file.transferTo(destinationFile);
