@@ -114,7 +114,7 @@ public class StyleServiceImpl implements StyleService {
     @Override
     public String generateStyleXml(StyleRequestDto styleRequestDto) throws CustomException {
         String xml = """
-                <?xml version="1.0" encoding="ISO-8859-1"?>
+                <?xml version="1.0" encoding="UTF-8"?>
                 <StyledLayerDescriptor version="1.0.0"
                     xsi:schemaLocation="http://www.opengis.net/sld StyledLayerDescriptor.xsd"
                     xmlns="http://www.opengis.net/sld"
@@ -171,6 +171,12 @@ public class StyleServiceImpl implements StyleService {
                 validateRule(rule, styleRequestDto.getGeomType());
                 xml += "<Rule>";
                 xml += "<Name>" + rule.getName() + "</Name>";
+
+                // TODO: localized titles
+                //          <Title>rule.getName()
+                //            <Localized lang="en">Лиственные деревья (Здоровое)</Localized>
+                //            <Localized lang="it">Жапырақты ағаш (Сау өсімдік)</Localized>
+                //          </Title>
 
                 if (rule.getScaleMin() != null) {
                     xml += "<MinScaleDenominator>" + rule.getScaleMin() + "</MinScaleDenominator>";
