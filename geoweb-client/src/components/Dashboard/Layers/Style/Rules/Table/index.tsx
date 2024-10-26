@@ -10,6 +10,7 @@ import { uuidv4 } from '../../../../../../utils/uidv4';
 import { useFormContext } from 'react-hook-form';
 import { FilterDialog } from '../FilterDIalog';
 import { useTranslatedProp } from '../../../../../../hooks/useTranslatedProp';
+import { AttrType } from '../../../../../../api/types/mapFolders';
 
 type Props = {
   rules?: StyleRule.Dto[];
@@ -34,7 +35,14 @@ export const RulesTable: FC<Props> = ({ rules = [], onAdd, onEdit, onDelete, onC
       width: 150,
       flex: 1,
       valueFormatter: (value: StyleFilterDto) =>
-        value ? `[${value.column[nameProp]}] ${value.operator} "${value.value}"` : '',
+        value
+          ? [
+              `[${value.column[nameProp]}]`,
+              value.operator,
+              `"${value.value}"`,
+              value.column.attrtype === AttrType.DICTIONARY ? `(${t('attrs.dictionaryCode')})` : '',
+            ].join(' ') // TODO: move logic to separate component
+          : '',
     },
     {
       field: 'actions',

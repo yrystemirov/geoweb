@@ -126,6 +126,7 @@ export const LayerAttrForm: FC<Props> = ({ onCancel, onSuccess, shouldGoBackToLi
             fullWidth
             error={!!errors.nameKk}
             helperText={errors.nameKk?.message}
+            required
           />
           <TextField
             {...methods.register('nameRu')}
@@ -134,6 +135,7 @@ export const LayerAttrForm: FC<Props> = ({ onCancel, onSuccess, shouldGoBackToLi
             fullWidth
             error={!!errors.nameRu}
             helperText={errors.nameRu?.message}
+            required
           />
           <TextField
             {...methods.register('nameEn')}
@@ -151,6 +153,7 @@ export const LayerAttrForm: FC<Props> = ({ onCancel, onSuccess, shouldGoBackToLi
             error={!!errors.attrname}
             helperText={errors.attrname?.message}
             disabled={isEditing}
+            required
           />
           <TextField
             {...methods.register('attrType')}
@@ -162,6 +165,7 @@ export const LayerAttrForm: FC<Props> = ({ onCancel, onSuccess, shouldGoBackToLi
             helperText={errors.attrType?.message}
             value={methods.watch('attrType')}
             disabled={isEditing && editData?.attrType === AttrType.DICTIONARY}
+            required
           >
             <MenuItem value="">
               <em>--</em>
@@ -186,6 +190,7 @@ export const LayerAttrForm: FC<Props> = ({ onCancel, onSuccess, shouldGoBackToLi
               searchIsEnabled
               pageSize={1000}
               fullWidth
+              required
             />
           )}
 

@@ -31,6 +31,12 @@ const getEntries = (dictionaryId: string, params?: PaginationRequest) => {
   return instance.get<Pages<EntryDto>>(`${DICTS_URL}/${dictionaryId}/entries/page`, { params });
 };
 
+const getAllEntriesByDicCode = (dictionaryCode: string, search?: string) => {
+  return instance.get<EntryDto[]>(ENTRIES_URL, {
+    params: { dictionaryCode, search },
+  });
+}
+
 const addEntry = (entry: Partial<EntryRequestDto>) => {
   return instance.post<EntryDto>(ENTRIES_URL, entry);
 };
@@ -48,6 +54,7 @@ export const dictionariesAPI = {
   addEntry,
   deleteDictionary,
   deleteEntry,
+  getAllEntriesByDicCode,
   getDictionaries,
   getDictionary,
   getEntries,

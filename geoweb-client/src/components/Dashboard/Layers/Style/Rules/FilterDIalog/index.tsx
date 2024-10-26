@@ -9,6 +9,8 @@ import { useTranslation } from 'react-i18next';
 import { useTranslatedProp } from '../../../../../../hooks/useTranslatedProp';
 import { object, string } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { AttrType } from '../../../../../../api/types/mapFolders';
+import { dictionariesAPI } from '../../../../../../api/dictioanries';
 
 type Props = {
   open?: boolean;
@@ -31,6 +33,8 @@ const INITIAL_VALUES: StyleFilterForm = {
 
 export const FilterDialog: FC<Props> = ({ open, onClose, onSubmit, rule }) => {
   const nameProp = useTranslatedProp('name');
+  const entryNameProp = useTranslatedProp('', true);
+
   const { t } = useTranslation();
   const { layerId } = useParams();
   const editData = rule?.filter;
@@ -62,26 +66,50 @@ export const FilterDialog: FC<Props> = ({ open, onClose, onSubmit, rule }) => {
     defaultValues,
   });
 
-  useEffect(() => {
-    methods.reset(defaultValues);
-  }, [defaultValues]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    reset,
+  } = methods;
 
-  const onSubmitHandler = methods.handleSubmit((data) => {
-    const attr = attrs.find((attr) => attr.attrname === data.column);
+  const formValues = watch();
 
+  const selectedAttr = useMemo(() => attrs.find((attr) => attr.attrname === formValues.column), [formValues.column]);
+
+  const { data: entries, isLoading: isEntriesLoading } = useQuery({
+    queryKey: ['dictionaryEntries', selectedAttr?.dictionaryCode],
+    queryFn: () => dictionariesAPI.getAllEntriesByDicCode(selectedAttr?.dictionaryCode!).then((res) => res.data),
+    enabled: selectedAttr?.attrType === AttrType.DICTIONARY,
+  });
+
+  const onSubmitHandler = handleSubmit((data) => {
     onSubmit({
       ...data,
       column: {
-        nameKk: attr!.nameKk,
-        nameRu: attr!.nameRu,
-        nameEn: attr!.nameEn,
-        attrname: attr!.attrname,
-        attrtype: attr!.attrType,
-        dictionaryCode: attr!.dictionaryCode,
+        nameKk: selectedAttr?.nameKk,
+        nameRu: selectedAttr?.nameRu,
+        nameEn: selectedAttr?.nameEn,
+        attrname: selectedAttr?.attrname,
+        attrtype: selectedAttr?.attrType,
+        dictionaryCode: selectedAttr?.dictionaryCode,
       },
     } as StyleFilterDto);
     onClose();
   });
+
+  useEffect(() => {
+    reset(defaultValues);
+  }, [defaultValues]);
+
+  useEffect(() => {
+    // TODO: move logic to separate component with processing all types of attributes
+    if (selectedAttr?.dictionaryCode !== attrs.find((attr) => attr.attrname === formValues.column)?.dictionaryCode) {
+      // если дикшнари код сменился, то нужно сбросить значение
+      reset({ ...formValues, value: '' });
+    }
+  }, [entries]);
 
   return (
     <Dialog open={!!open} onClose={onClose}>
@@ -90,16 +118,17 @@ export const FilterDialog: FC<Props> = ({ open, onClose, onSubmit, rule }) => {
         <DialogContent>
           <Box>
             <TextField
-              {...methods.register('column')}
+              {...register('column')}
               label={t('styleRules.filterName')}
               fullWidth
               margin="dense"
               variant="outlined"
-              error={!!methods.formState.errors.column}
-              helperText={methods.formState.errors.column?.message}
+              error={!!errors.column}
+              helperText={errors.column?.message}
               select
-              value={methods.watch('column')}
+              value={formValues.column}
               required
+              disabled={isAttrsLoading}
             >
               {attrs.map((attr) => (
                 <MenuItem key={attr.id} value={attr.attrname}>
@@ -109,15 +138,15 @@ export const FilterDialog: FC<Props> = ({ open, onClose, onSubmit, rule }) => {
               {attrs.length === 0 && <MenuItem disabled>{t('noData')}</MenuItem>}
             </TextField>
             <TextField
-              {...methods.register('operator')}
+              {...register('operator')}
               label={t('styleRules.operator')}
               fullWidth
               margin="dense"
               variant="outlined"
-              error={!!methods.formState.errors.operator}
-              helperText={methods.formState.errors.operator?.message}
+              error={!!errors.operator}
+              helperText={errors.operator?.message}
               select
-              value={methods.watch('operator')}
+              value={formValues.operator}
               required
             >
               {Object.values(OperatorType).map((operator) => (
@@ -126,15 +155,38 @@ export const FilterDialog: FC<Props> = ({ open, onClose, onSubmit, rule }) => {
                 </MenuItem>
               ))}
             </TextField>
-            <TextField
-              {...methods.register('value')}
-              label={t('styleRules.value')}
-              fullWidth
-              margin="dense"
-              variant="outlined"
-              error={!!methods.formState.errors.value}
-              helperText={methods.formState.errors.value?.message}
-            />
+            {selectedAttr?.attrType === AttrType.DICTIONARY ? (
+              // TODO: move logic to separate component with processing all types of attributes
+              <TextField
+                {...register('value')}
+                label={t('styleRules.value')}
+                fullWidth
+                margin="dense"
+                variant="outlined"
+                error={!!errors.value}
+                helperText={errors.value?.message}
+                select
+                value={formValues.value}
+                disabled={isEntriesLoading}
+              >
+                {entries?.map((entry) => (
+                  <MenuItem key={entry.id} value={entry.code}>
+                    {entry[entryNameProp]}
+                  </MenuItem>
+                ))}
+                {entries?.length === 0 && <MenuItem disabled>{t('noData')}</MenuItem>}
+              </TextField>
+            ) : (
+              <TextField
+                {...register('value')}
+                label={t('styleRules.value')}
+                fullWidth
+                margin="dense"
+                variant="outlined"
+                error={!!errors.value}
+                helperText={errors.value?.message}
+              />
+            )}
           </Box>
         </DialogContent>
         <DialogActions>
