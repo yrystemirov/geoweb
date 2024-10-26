@@ -41,14 +41,14 @@ export namespace StyleRule {
   }
 
   // Свойства для линий
-  type Line = {
+  export type Line = {
     strokeWidth: number;
     strokeColor: string;
     strokeColorOpacity: number;
   };
 
   // Свойства для полигонов
-  type Polygon = {
+  export type Polygon = {
     strokeWidth: number;
     strokeColor: string;
     strokeColorOpacity: number;
@@ -103,18 +103,14 @@ export namespace StyleRule {
     clusterTextHaloFillColor: string;
     clusterTextHaloFillOpacityWeight: number; // в сваггере неправильно?
   };
-  
+
   // Свойства для пунктирных линий. Применимы для линий и полигонов. Если dashed = true, то группа свойств присутствует
-  type Dashed = {
-    dashed: boolean;
-  } & (
-    | {
-        dashed: boolean; // true
-        strokeDashLength: number;
-        strokeSpaceLength: number;
-      }
-    | { dashed: false }
-  );
+  export type Dashed = {
+    dashed: boolean; // true
+    // if dashed = true
+    strokeDashLength: number;
+    strokeSpaceLength: number;
+  };
 
   export type Dto = Partial<Common & Point & Line & Polygon & Raster & TextSymbolizer & Filter & Cluster & Dashed>;
 }

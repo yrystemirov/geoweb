@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, UseFormReturn } from 'react-hook-form';
 import { StyleRule } from '../../../../../../../api/types/style';
 import { Box, Button, Checkbox, FormControlLabel, MenuItem, Slider, TextField, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { layersAPI } from '../../../../../../../api/layer';
 import { useTranslatedProp } from '../../../../../../../hooks/useTranslatedProp';
+import { TextSymbolizerFields } from '../TextSymbolizerFields';
+import { LineFormDataType } from '../LineForm';
 
 export type PointFormDataType = StyleRule.Point &
   StyleRule.Common &
@@ -147,38 +149,47 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
     resolver: yupResolver(schema),
   });
 
-  useEffect(() => {
-    methods.reset();
-  }, [methods]);
+  const {
+    handleSubmit,
+    formState: { errors },
+    register,
+    reset,
+    control,
+    watch,
+  } = methods;
 
-  console.log('errors', methods.formState.errors);
+  const formValues = watch();
+
+  useEffect(() => {
+    reset();
+  }, [methods]);
 
   return (
     <Box
       component={'form'}
       sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, maxWidth: 500 }}
-      onSubmit={methods.handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit)}
       noValidate
     >
       <TextField
         margin="dense"
-        {...methods.register('name')}
+        {...register('name')}
         label={t('styleRules.name')}
         variant="outlined"
         fullWidth
-        error={!!methods.formState.errors.name}
-        helperText={methods.formState.errors.name?.message}
+        error={!!errors.name}
+        helperText={errors.name?.message}
         required
       />
       <Box display="flex" gap={2} sx={{ width: '66%' }}>
         <TextField
           margin="dense"
-          {...methods.register('scaleMin')}
+          {...register('scaleMin')}
           label={t('styleRules.scaleMin')}
           variant="outlined"
           fullWidth
-          error={!!methods.formState.errors.scaleMin}
-          helperText={methods.formState.errors.scaleMin?.message}
+          error={!!errors.scaleMin}
+          helperText={errors.scaleMin?.message}
           type="number"
           slotProps={{
             input: {
@@ -190,12 +201,12 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         />
         <TextField
           margin="dense"
-          {...methods.register('scaleMax')}
+          {...register('scaleMax')}
           label={t('styleRules.scaleMax')}
           variant="outlined"
           fullWidth
-          error={!!methods.formState.errors.scaleMax}
-          helperText={methods.formState.errors.scaleMax?.message}
+          error={!!errors.scaleMax}
+          helperText={errors.scaleMax?.message}
           type="number"
           slotProps={{
             input: {
@@ -210,10 +221,10 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         <Typography>{t('styleRules.fillColor')}</Typography>
         <TextField
           margin="dense"
-          {...methods.register('fillColor')}
+          {...register('fillColor')}
           variant="outlined"
-          error={!!methods.formState.errors.fillColor}
-          helperText={methods.formState.errors.fillColor?.message}
+          error={!!errors.fillColor}
+          helperText={errors.fillColor?.message}
           type="color"
           sx={{ minWidth: 40 }}
           slotProps={{
@@ -225,7 +236,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
                   height: 40,
                   '::-webkit-color-swatch-wrapper': {
                     p: 1,
-                    opacity: methods.watch('fillColorOpacity'),
+                    opacity: formValues.fillColorOpacity,
                   },
                 },
               },
@@ -235,7 +246,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         />
         <Controller
           name="fillColorOpacity"
-          control={methods.control}
+          control={control}
           render={({ field }) => (
             <Slider {...field} min={0} max={1} step={0.01} valueLabelDisplay="auto" sx={{ mr: 2, width: '100px' }} />
           )}
@@ -244,14 +255,14 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
       <Box display="flex" gap={2}>
         <TextField
           margin="dense"
-          {...methods.register('pointShape')}
+          {...register('pointShape')}
           label={t('styleRules.pointShape')}
           variant="outlined"
           fullWidth
-          error={!!methods.formState.errors.pointShape}
-          helperText={methods.formState.errors.pointShape?.message}
+          error={!!errors.pointShape}
+          helperText={errors.pointShape?.message}
           select
-          value={methods.watch('pointShape')}
+          value={formValues.pointShape}
         >
           {Object.values(StyleRule.PointShape).map((shape) => (
             <MenuItem key={shape} value={shape}>
@@ -261,12 +272,12 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         </TextField>
         <TextField
           margin="dense"
-          {...methods.register('pointRadius')}
+          {...register('pointRadius')}
           label={t('styleRules.pointRadius')}
           variant="outlined"
           fullWidth
-          error={!!methods.formState.errors.pointRadius}
-          helperText={methods.formState.errors.pointRadius?.message}
+          error={!!errors.pointRadius}
+          helperText={errors.pointRadius?.message}
           type="number"
           slotProps={{
             input: {
@@ -280,26 +291,26 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
       <Box display="flex" gap={2}>
         <TextField
           margin="dense"
-          {...methods.register('imgFormat')}
+          {...register('imgFormat')}
           label={t('styleRules.imgFormat')}
           variant="outlined"
           fullWidth
-          error={!!methods.formState.errors.imgFormat}
-          helperText={methods.formState.errors.imgFormat?.message}
+          error={!!errors.imgFormat}
+          helperText={errors.imgFormat?.message}
         />
         <TextField
           margin="dense"
-          {...methods.register('imgSrc')}
+          {...register('imgSrc')}
           label={t('styleRules.imgSrc')}
           variant="outlined"
           fullWidth
-          error={!!methods.formState.errors.imgSrc}
-          helperText={methods.formState.errors.imgSrc?.message}
+          error={!!errors.imgSrc}
+          helperText={errors.imgSrc?.message}
         />
       </Box>
       <Box
         sx={
-          methods.watch('hasTextSymbolizer')
+          formValues.hasTextSymbolizer
             ? {
                 border: '1px solid #e0e0e0',
                 p: 2,
@@ -310,173 +321,21 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         }
       >
         <FormControlLabel
-          control={
-            <Checkbox {...methods.register('hasTextSymbolizer')} defaultChecked={methods.watch('hasTextSymbolizer')} />
-          }
+          control={<Checkbox {...register('hasTextSymbolizer')} defaultChecked={formValues.hasTextSymbolizer} />}
           label={t('styleRules.hasTextSymbolizer')}
         />
-        {methods.watch('hasTextSymbolizer') && (
-          <Box display="flex" gap={1} flexDirection="column">
-            <TextField
-              margin="dense"
-              {...methods.register('textSymbolizerAttrName')}
-              label={t('styleRules.textSymbolizerAttrName')}
-              variant="outlined"
-              fullWidth
-              error={!!methods.formState.errors.textSymbolizerAttrName}
-              helperText={methods.formState.errors.textSymbolizerAttrName?.message}
-              select
-              value={methods.watch('textSymbolizerAttrName')}
-              disabled={isAttrsLoading}
-            >
-              {attrs.map((attr) => (
-                <MenuItem key={attr.id} value={attr.attrname}>
-                  {attr[nameProp]}
-                </MenuItem>
-              ))}
-              {/* if no attrs */}
-              {attrs.length === 0 && <MenuItem disabled>{t('noData')}</MenuItem>}
-            </TextField>
-            <Box display="flex" gap={2}>
-              <TextField
-                margin="dense"
-                {...methods.register('textSymbolizerDisplacementX')}
-                label={t('styleRules.textSymbolizerDisplacementX')}
-                variant="outlined"
-                //   fullWidth
-                error={!!methods.formState.errors.textSymbolizerDisplacementX}
-                helperText={methods.formState.errors.textSymbolizerDisplacementX?.message}
-                type="number"
-              />
-              <TextField
-                margin="dense"
-                {...methods.register('textSymbolizerDisplacementY')}
-                label={t('styleRules.textSymbolizerDisplacementY')}
-                variant="outlined"
-                //   fullWidth
-                error={!!methods.formState.errors.textSymbolizerDisplacementY}
-                helperText={methods.formState.errors.textSymbolizerDisplacementY?.message}
-                type="number"
-              />
-              <TextField
-                margin="dense"
-                {...methods.register('textSymbolizerRotation')}
-                label={t('styleRules.textSymbolizerRotation')}
-                variant="outlined"
-                //   fullWidth
-                error={!!methods.formState.errors.textSymbolizerRotation}
-                helperText={methods.formState.errors.textSymbolizerRotation?.message}
-                type="number"
-              />
-            </Box>
-            <Box display="flex" gap={2} alignItems={'center'}>
-              <Typography>{t('styleRules.textSymbolizerFillColor')}</Typography>
-              <TextField
-                margin="dense"
-                {...methods.register('textSymbolizerFillColor')}
-                variant="outlined"
-                error={!!methods.formState.errors.textSymbolizerFillColor}
-                helperText={methods.formState.errors.textSymbolizerFillColor?.message}
-                type="color"
-                sx={{ minWidth: 40 }}
-                slotProps={{
-                  input: {
-                    inputProps: {
-                      sx: {
-                        padding: 0,
-                        width: 40,
-                        height: 40,
-                        '::-webkit-color-swatch-wrapper': {
-                          p: 1,
-                          opacity: methods.watch('textSymbolizerFillColorOpacity'),
-                        },
-                      },
-                    },
-                  },
-                }}
-              />
-              <Controller
-                name="textSymbolizerFillColorOpacity"
-                control={methods.control}
-                render={({ field }) => (
-                  <Slider
-                    {...field}
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    valueLabelDisplay="auto"
-                    sx={{ mr: 2, width: '100px' }}
-                  />
-                )}
-              />
-            </Box>
-            <Box display="flex" gap={2}>
-              <TextField
-                margin="dense"
-                {...methods.register('anchorpointX')}
-                label={t('styleRules.anchorpointX')}
-                variant="outlined"
-                fullWidth
-                error={!!methods.formState.errors.anchorpointX}
-                helperText={methods.formState.errors.anchorpointX?.message}
-                type="number"
-              />
-              <TextField
-                margin="dense"
-                {...methods.register('anchorpointY')}
-                label={t('styleRules.anchorpointY')}
-                variant="outlined"
-                fullWidth
-                error={!!methods.formState.errors.anchorpointY}
-                helperText={methods.formState.errors.anchorpointY?.message}
-                type="number"
-              />
-            </Box>
-            <Box display="flex" gap={2}>
-              <TextField
-                margin="dense"
-                {...methods.register('fontFamily')}
-                label={t('styleRules.fontFamily')}
-                variant="outlined"
-                fullWidth
-                error={!!methods.formState.errors.fontFamily}
-                helperText={methods.formState.errors.fontFamily?.message}
-              />
-              <TextField
-                margin="dense"
-                {...methods.register('fontSize')}
-                label={t('styleRules.fontSize')}
-                variant="outlined"
-                fullWidth
-                error={!!methods.formState.errors.fontSize}
-                helperText={methods.formState.errors.fontSize?.message}
-                type="number"
-              />
-              <TextField
-                margin="dense"
-                {...methods.register('fontStyle')}
-                label={t('styleRules.fontStyle')}
-                variant="outlined"
-                fullWidth
-                error={!!methods.formState.errors.fontStyle}
-                helperText={methods.formState.errors.fontStyle?.message}
-              />
-              <TextField
-                margin="dense"
-                {...methods.register('fontWeight')}
-                label={t('styleRules.fontWeight')}
-                variant="outlined"
-                fullWidth
-                error={!!methods.formState.errors.fontWeight}
-                helperText={methods.formState.errors.fontWeight?.message}
-              />
-            </Box>
-          </Box>
+        {formValues.hasTextSymbolizer && (
+          <TextSymbolizerFields
+            methods={methods as UseFormReturn<LineFormDataType | PointFormDataType>}
+            attrs={attrs}
+            isAttrsLoading={isAttrsLoading}
+            nameProp={nameProp}
+          />
         )}
       </Box>
       <Box
         sx={
-          methods.watch('cluster')
+          formValues.cluster
             ? {
                 border: '1px solid #e0e0e0',
                 p: 2,
@@ -487,91 +346,91 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         }
       >
         <FormControlLabel
-          control={<Checkbox {...methods.register('cluster')} defaultChecked={methods.watch('cluster')} />}
+          control={<Checkbox {...register('cluster')} defaultChecked={formValues.cluster} />}
           label={t('styleRules.cluster')}
         />
 
-        {methods.watch('cluster') && (
+        {formValues.cluster && (
           <Box display="flex" gap={1} flexDirection="column">
             <TextField
               margin="dense"
-              {...methods.register('clusterTitle')}
+              {...register('clusterTitle')}
               label={t('styleRules.clusterTitle')}
               variant="outlined"
               fullWidth
-              error={!!methods.formState.errors.clusterTitle}
-              helperText={methods.formState.errors.clusterTitle?.message}
+              error={!!errors.clusterTitle}
+              helperText={errors.clusterTitle?.message}
             />
             <Box display="flex" gap={2}>
               <TextField
                 margin="dense"
-                {...methods.register('clusterGreaterThanOrEqual')}
+                {...register('clusterGreaterThanOrEqual')}
                 label={t('styleRules.clusterGreaterThanOrEqual')}
                 variant="outlined"
                 fullWidth
-                error={!!methods.formState.errors.clusterGreaterThanOrEqual}
-                helperText={methods.formState.errors.clusterGreaterThanOrEqual?.message}
+                error={!!errors.clusterGreaterThanOrEqual}
+                helperText={errors.clusterGreaterThanOrEqual?.message}
                 type="number"
               />
               <TextField
                 margin="dense"
-                {...methods.register('clusterLessThanOrEqual')}
+                {...register('clusterLessThanOrEqual')}
                 label={t('styleRules.clusterLessThanOrEqual')}
                 variant="outlined"
                 fullWidth
-                error={!!methods.formState.errors.clusterLessThanOrEqual}
-                helperText={methods.formState.errors.clusterLessThanOrEqual?.message}
+                error={!!errors.clusterLessThanOrEqual}
+                helperText={errors.clusterLessThanOrEqual?.message}
                 type="number"
               />
             </Box>
             <Box display="flex" gap={2}>
               <TextField
                 margin="dense"
-                {...methods.register('clusterPointSize')}
+                {...register('clusterPointSize')}
                 label={t('styleRules.clusterPointSize')}
                 variant="outlined"
                 fullWidth
-                error={!!methods.formState.errors.clusterPointSize}
-                helperText={methods.formState.errors.clusterPointSize?.message}
+                error={!!errors.clusterPointSize}
+                helperText={errors.clusterPointSize?.message}
                 type="number"
               />
               <TextField
                 margin="dense"
-                {...methods.register('clusterTextType')}
+                {...register('clusterTextType')}
                 label={t('styleRules.clusterTextType')}
                 variant="outlined"
                 fullWidth
-                error={!!methods.formState.errors.clusterTextType}
-                helperText={methods.formState.errors.clusterTextType?.message}
+                error={!!errors.clusterTextType}
+                helperText={errors.clusterTextType?.message}
               />
               <TextField
                 margin="dense"
-                {...methods.register('clusterTextSize')}
+                {...register('clusterTextSize')}
                 label={t('styleRules.clusterTextSize')}
                 variant="outlined"
                 fullWidth
-                error={!!methods.formState.errors.clusterTextSize}
-                helperText={methods.formState.errors.clusterTextSize?.message}
+                error={!!errors.clusterTextSize}
+                helperText={errors.clusterTextSize?.message}
                 type="number"
               />
               <TextField
                 margin="dense"
-                {...methods.register('clusterTextWeight')}
+                {...register('clusterTextWeight')}
                 label={t('styleRules.clusterTextWeight')}
                 variant="outlined"
                 fullWidth
-                error={!!methods.formState.errors.clusterTextWeight}
-                helperText={methods.formState.errors.clusterTextWeight?.message}
+                error={!!errors.clusterTextWeight}
+                helperText={errors.clusterTextWeight?.message}
               />
             </Box>
             <Box display="flex" gap={2} alignItems={'center'}>
               <Typography>{t('styleRules.clusterTextColor')}</Typography>
               <TextField
                 margin="dense"
-                {...methods.register('clusterTextColor')}
+                {...register('clusterTextColor')}
                 variant="outlined"
-                error={!!methods.formState.errors.clusterTextColor}
-                helperText={methods.formState.errors.clusterTextColor?.message}
+                error={!!errors.clusterTextColor}
+                helperText={errors.clusterTextColor?.message}
                 type="color"
                 sx={{ minWidth: 40 }}
                 slotProps={{
@@ -583,7 +442,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
                         height: 40,
                         '::-webkit-color-swatch-wrapper': {
                           p: 1,
-                          opacity: methods.watch('clusterTextColorOpacity'),
+                          opacity: formValues.clusterTextColorOpacity,
                         },
                       },
                     },
@@ -592,7 +451,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               />
               <Controller
                 name="clusterTextColorOpacity"
-                control={methods.control}
+                control={control}
                 render={({ field }) => (
                   <Slider
                     {...field}
@@ -608,22 +467,22 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
             <Box display="flex" gap={2}>
               <TextField
                 margin="dense"
-                {...methods.register('clusterAnchorPointX')}
+                {...register('clusterAnchorPointX')}
                 label={t('styleRules.clusterAnchorPointX')}
                 variant="outlined"
                 fullWidth
-                error={!!methods.formState.errors.clusterAnchorPointX}
-                helperText={methods.formState.errors.clusterAnchorPointX?.message}
+                error={!!errors.clusterAnchorPointX}
+                helperText={errors.clusterAnchorPointX?.message}
                 type="number"
               />
               <TextField
                 margin="dense"
-                {...methods.register('clusterAnchorPointY')}
+                {...register('clusterAnchorPointY')}
                 label={t('styleRules.clusterAnchorPointY')}
                 variant="outlined"
                 fullWidth
-                error={!!methods.formState.errors.clusterAnchorPointY}
-                helperText={methods.formState.errors.clusterAnchorPointY?.message}
+                error={!!errors.clusterAnchorPointY}
+                helperText={errors.clusterAnchorPointY?.message}
                 type="number"
               />
             </Box>
@@ -631,10 +490,10 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               <Typography>{t('styleRules.clusterTextHaloFillColor')}</Typography>
               <TextField
                 margin="dense"
-                {...methods.register('clusterTextHaloFillColor')}
+                {...register('clusterTextHaloFillColor')}
                 variant="outlined"
-                error={!!methods.formState.errors.clusterTextHaloFillColor}
-                helperText={methods.formState.errors.clusterTextHaloFillColor?.message}
+                error={!!errors.clusterTextHaloFillColor}
+                helperText={errors.clusterTextHaloFillColor?.message}
                 type="color"
                 sx={{ minWidth: 40 }}
                 slotProps={{
@@ -646,7 +505,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
                         height: 40,
                         '::-webkit-color-swatch-wrapper': {
                           p: 1,
-                          opacity: methods.watch('clusterTextHaloFillOpacityWeight'),
+                          opacity: formValues.clusterTextHaloFillOpacityWeight,
                         },
                       },
                     },
@@ -655,7 +514,7 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               />
               <Controller
                 name="clusterTextHaloFillOpacityWeight"
-                control={methods.control}
+                control={control}
                 render={({ field }) => (
                   <Slider
                     {...field}
@@ -669,11 +528,11 @@ export const PointForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
               />
               <TextField
                 margin="dense"
-                {...methods.register('clusterTextHaloRadius')}
+                {...register('clusterTextHaloRadius')}
                 label={t('styleRules.clusterTextHaloRadius')}
                 variant="outlined"
-                error={!!methods.formState.errors.clusterTextHaloRadius}
-                helperText={methods.formState.errors.clusterTextHaloRadius?.message}
+                error={!!errors.clusterTextHaloRadius}
+                helperText={errors.clusterTextHaloRadius?.message}
                 type="number"
               />
             </Box>

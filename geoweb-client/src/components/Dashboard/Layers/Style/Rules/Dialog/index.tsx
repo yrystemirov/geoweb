@@ -4,6 +4,8 @@ import { FC } from 'react';
 import { StyleRule } from '../../../../../../api/types/style';
 import { GeometryType } from '../../../../../../api/types/mapFolders';
 import { PointForm, PointFormDataType } from './PointForm';
+import { LineForm, LineFormDataType } from './LineForm';
+import { PolygonForm, PolygonFormDataType } from './PolygonForm';
 
 type Props = {
   open: boolean;
@@ -20,10 +22,10 @@ export const RuleDialog: FC<Props> = ({ geometryType, editData, open, onClose, o
   const RuleFormComponents: Record<GeometryType, JSX.Element> = {
     [GeometryType.POINT]: <PointForm onSubmit={onSubmit} onClose={onClose} editData={editData as PointFormDataType} />,
     [GeometryType.MULTIPOINT]: <PointForm onSubmit={onSubmit} onClose={onClose} editData={editData as PointFormDataType} />,
-    [GeometryType.LINESTRING]: <div>Форма для создания правила для линейного слоя (в разработке)</div>,
-    [GeometryType.MULTILINESTRING]: <div>Форма для создания правила для линейного слоя (в разработке)</div>,
-    [GeometryType.POLYGON]: <div>Форма для создания правила для полигонального слоя (в разработке)</div>,
-    [GeometryType.MULTIPOLYGON]: <div>Форма для создания правила для полигонального слоя (в разработке)</div>,
+    [GeometryType.LINESTRING]: <LineForm onSubmit={onSubmit} onClose={onClose} editData={editData as LineFormDataType} />,
+    [GeometryType.MULTILINESTRING]: <LineForm onSubmit={onSubmit} onClose={onClose} editData={editData as LineFormDataType} />,
+    [GeometryType.POLYGON]: <PolygonForm onSubmit={onSubmit} onClose={onClose} editData={editData as PolygonFormDataType} />,
+    [GeometryType.MULTIPOLYGON]: <PolygonForm onSubmit={onSubmit} onClose={onClose} editData={editData as PolygonFormDataType} />,
     [GeometryType.RASTER]: <div>Форма для создания правила для растрового слоя (в разработке)</div>,
   };
 
