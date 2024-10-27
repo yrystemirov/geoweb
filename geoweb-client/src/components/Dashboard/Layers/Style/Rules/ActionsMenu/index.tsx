@@ -64,28 +64,53 @@ export const RuleActionsMenu: FC<Props> = ({
           </MenuItem>
         ) : (
           <>
-            <MenuItem onClick={() => onEdit(rule)}>
+            <MenuItem
+              onClick={() => {
+                onEdit(rule);
+                handleClose();
+              }}
+            >
               <EditOutlined sx={iconSx} /> {t('edit')}
             </MenuItem>
-            <MenuItem onClick={() => onDelete(rule)}>
+            <MenuItem
+              onClick={() => {
+                onDelete(rule);
+                handleClose();
+              }}
+            >
               <DeleteOutline sx={iconSx} />
               {t('delete')}
             </MenuItem>
             <Divider />
             {!!rule.filter && (
-              <MenuItem onClick={() => onEditFilter()}>
+              <MenuItem
+                onClick={() => {
+                  onEditFilter();
+                  handleClose();
+                }}
+              >
                 <FilterList sx={iconSx} />
                 {t('styleRules.editFilter')}
               </MenuItem>
             )}
             {!!rule.filter && (
-              <MenuItem onClick={() => onDeleteFilter()}>
+              <MenuItem
+                onClick={() => {
+                  onDeleteFilter();
+                  handleClose();
+                }}
+              >
                 <FilterListOff sx={iconSx} />
                 {t('styleRules.deleteFilter')}
               </MenuItem>
             )}
             {!rule.filter && (
-              <MenuItem onClick={() => onAddFilter()}>
+              <MenuItem
+                onClick={() => {
+                  onAddFilter();
+                  handleClose();
+                }}
+              >
                 <FilterList sx={iconSx} />
                 {t('styleRules.addFilter')}
               </MenuItem>

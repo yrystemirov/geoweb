@@ -118,7 +118,7 @@ export namespace StyleRule {
 export type StyleFilterDto = {
   column: StyleFilterColumnDto;
   operator: OperatorType;
-  value: string;
+  value: string | boolean | number;
 };
 
 export enum OperatorType {

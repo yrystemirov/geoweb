@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/common/header';
 import Footer from './components/common/footer';
@@ -21,6 +21,13 @@ import { NotificationsProvider } from '@toolpad/core/useNotifications';
 import { ThemeProvider } from '@mui/material';
 import theme from './config/theme';
 import { dashboardUrl } from './components/Dashboard/routes';
+import { LocalizationProvider, LocalizationProviderProps } from '@mui/x-date-pickers';
+import ruLocale from 'dayjs/locale/ru';
+import kkLocale from 'dayjs/locale/kk';
+import enLocale from 'dayjs/locale/en-gb';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useTranslation } from 'react-i18next';
+import { Dayjs } from 'dayjs';
 
 const queryClient = new QueryClient();
 
@@ -95,12 +102,34 @@ const App: React.FC = () => {
 };
 
 export default function AppWrapper() {
+  const {
+    i18n: { language },
+  } = useTranslation();
+
+  const calendarLocale = useMemo(() => {
+    switch (language) {
+      case 'ru':
+        return ruLocale;
+      case 'kk':
+        return kkLocale;
+      case 'en':
+        return enLocale;
+      default:
+        return kkLocale;
+    }
+  }, [language]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
-        <LoadingProvider>
-          <App />
-        </LoadingProvider>
+        <LocalizationProvider
+          dateAdapter={AdapterDayjs}
+          adapterLocale={calendarLocale as LocalizationProviderProps<Dayjs, unknown>['adapterLocale']}
+        >
+          <LoadingProvider>
+            <App />
+          </LoadingProvider>
+        </LocalizationProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

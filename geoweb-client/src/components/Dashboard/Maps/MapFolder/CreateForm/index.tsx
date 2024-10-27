@@ -57,7 +57,7 @@ export const MapFolderCreateForm: FC<Props> = ({ goBackPath, parentId, onCancel,
     descriptionRu: string(),
     descriptionEn: string(),
     isPublic: boolean(),
-    rank: number().typeError(t('mustBeNumber')).required(t('requiredField')) as NumberSchema,
+    rank: number().typeError(t('typeNumber')).required(t('requiredField')) as NumberSchema,
   });
 
   const methods = useForm<CreateFolderRequest>({

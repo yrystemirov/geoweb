@@ -54,7 +54,8 @@ const resources = {
       requiredField: 'Міндетті толтыру керек',
       minValue: 'Мәнінің минималды мәні: {{value}}',
       invalidEmail: 'Email дұрыс емес',
-      mustBeNumber: 'Санды енгізу керек',
+      typeNumber: 'Санды енгізіңіз',
+      typeInteger: 'Бүтін санды енгізіңіз',
       errorOccurred: 'Қате пайда болды',
       backToList: 'Тізімге қайту',
       measurement: {
@@ -168,6 +169,7 @@ const resources = {
         filterName: 'Сүзгілеу үшін қабат атрибуты',
         operator: 'Салыстыру операторы',
         value: 'Мән',
+        dateValue: 'Күн мәні',
         pointShapes: {
           circle: 'Дөңгелек',
           square: 'Шаршы',
@@ -183,6 +185,7 @@ const resources = {
       },
       yes: 'Ия',
       no: 'Жоқ',
+      isNotSelected: 'Таңдалмаған',
       success: 'Сәтті',
       // error messages from backend
       'entry.by_code.already_exists': 'Осы кодпен жазба бар',
@@ -240,7 +243,8 @@ const resources = {
       requiredField: 'Поле обязательно для заполнения',
       minValue: 'Минимальное значение: {{value}}',
       invalidEmail: 'Некорректный email',
-      mustBeNumber: 'Должно быть числом',
+      typeNumber: 'Введите число',
+      typeInteger: 'Введите целое число',
       errorOccurred: 'Произошла ошибка',
       backToList: 'Назад к списку',
       measurement: {
@@ -351,6 +355,7 @@ const resources = {
         filterName: 'Атрибут слоя для фильтрации',
         operator: 'Оператор сравнения',
         value: 'Значение',
+        dateValue: 'Значение даты',
         pointShapes: {
           circle: 'Круг',
           square: 'Квадрат',
@@ -366,6 +371,7 @@ const resources = {
       },
       yes: 'Да',
       no: 'Нет',
+      isNotSelected: 'Не выбрано',
       success: 'Успешно',
       'entry.by_code.already_exists': 'Запись с таким кодом уже существует',
       'dictionary.by_code.already_exists': 'Справочник с таким кодом уже существует',

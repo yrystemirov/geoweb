@@ -34,14 +34,15 @@ export const RulesTable: FC<Props> = ({ rules = [], onAdd, onEdit, onDelete, onC
       headerName: t('styleRules.filter'),
       width: 150,
       flex: 1,
-      valueFormatter: (value: StyleFilterDto) =>
-        value
+      valueFormatter: (filter: StyleFilterDto) =>
+        // TODO: move logic to separate component
+        filter
           ? [
-              `[${value.column[nameProp]}]`,
-              value.operator,
-              `"${value.value}"`,
-              value.column.attrtype === AttrType.DICTIONARY ? `(${t('attrs.dictionaryCode')})` : '',
-            ].join(' ') // TODO: move logic to separate component
+              `[${filter.column[nameProp]}]`,
+              filter.operator,
+              `"${filter.value}"`,
+              filter.column.attrtype === AttrType.DICTIONARY && filter.value ? `(${t('attrs.dictionaryCode')})` : '',
+            ].join(' ')
           : '',
     },
     {
@@ -98,7 +99,7 @@ export const RulesTable: FC<Props> = ({ rules = [], onAdd, onEdit, onDelete, onC
         disableColumnMenu
         disableRowSelectionOnClick
         rowSelection={false}
-        getRowId={uuidv4}
+        getRowId={(row) => row.id || uuidv4()}
         getRowClassName={(params) => (params.row.isDeleted ? 'deleted-row' : '')}
       />
       <FilterDialog

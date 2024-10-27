@@ -11,6 +11,8 @@ import { object, string } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { AttrType } from '../../../../../../api/types/mapFolders';
 import { dictionariesAPI } from '../../../../../../api/dictioanries';
+import { ValueField } from './ValueField';
+import dayjs from 'dayjs';
 
 type Props = {
   open?: boolean;
@@ -19,10 +21,8 @@ type Props = {
   rule?: StyleRule.Dto;
 };
 
-type StyleFilterForm = {
+export type StyleFilterForm = Omit<StyleFilterDto, 'column'> & {
   column: StyleFilterDto['column']['attrname'];
-  operator: OperatorType;
-  value?: string;
 };
 
 const INITIAL_VALUES: StyleFilterForm = {
@@ -33,7 +33,6 @@ const INITIAL_VALUES: StyleFilterForm = {
 
 export const FilterDialog: FC<Props> = ({ open, onClose, onSubmit, rule }) => {
   const nameProp = useTranslatedProp('name');
-  const entryNameProp = useTranslatedProp('', true);
 
   const { t } = useTranslation();
   const { layerId } = useParams();
@@ -58,10 +57,16 @@ export const FilterDialog: FC<Props> = ({ open, onClose, onSubmit, rule }) => {
   const schema = object<StyleFilterForm>().shape({
     column: string().required(t('requiredField')),
     operator: string<OperatorType>().required(t('requiredField')),
-    value: string(),
+    value: string()
+      // if attrType is BIGINT then value should be integer
+      .test('isInt', t('typeInteger'), (value, context) => {
+        const attrType = attrs.find((attr) => attr.attrname === context.parent.column)?.attrType;
+        return attrType === AttrType.BIGINT ? Number.isInteger(+value!) : true;
+      }),
   });
 
   const methods = useForm<StyleFilterForm>({
+    // @ts-ignore
     resolver: yupResolver(schema),
     defaultValues,
   });
@@ -84,9 +89,22 @@ export const FilterDialog: FC<Props> = ({ open, onClose, onSubmit, rule }) => {
     enabled: selectedAttr?.attrType === AttrType.DICTIONARY,
   });
 
+  const correctValueByType = (value: any, type?: AttrType) => {
+    switch (type) {
+      case AttrType.TIMESTAMP:
+        // converting date to java timestamp format
+        return value ? dayjs(value).format('YYYY-MM-DDTHH:mm:ss') : value;
+      case AttrType.BOOLEAN:
+        return value === 'true' ? true : value === 'false' ? false : '';
+      default:
+        return value;
+    }
+  };
+
   const onSubmitHandler = handleSubmit((data) => {
     onSubmit({
       ...data,
+      value: correctValueByType(data.value, selectedAttr?.attrType),
       column: {
         nameKk: selectedAttr?.nameKk,
         nameRu: selectedAttr?.nameRu,
@@ -155,38 +173,7 @@ export const FilterDialog: FC<Props> = ({ open, onClose, onSubmit, rule }) => {
                 </MenuItem>
               ))}
             </TextField>
-            {selectedAttr?.attrType === AttrType.DICTIONARY ? (
-              // TODO: move logic to separate component with processing all types of attributes
-              <TextField
-                {...register('value')}
-                label={t('styleRules.value')}
-                fullWidth
-                margin="dense"
-                variant="outlined"
-                error={!!errors.value}
-                helperText={errors.value?.message}
-                select
-                value={formValues.value}
-                disabled={isEntriesLoading}
-              >
-                {entries?.map((entry) => (
-                  <MenuItem key={entry.id} value={entry.code}>
-                    {entry[entryNameProp]}
-                  </MenuItem>
-                ))}
-                {entries?.length === 0 && <MenuItem disabled>{t('noData')}</MenuItem>}
-              </TextField>
-            ) : (
-              <TextField
-                {...register('value')}
-                label={t('styleRules.value')}
-                fullWidth
-                margin="dense"
-                variant="outlined"
-                error={!!errors.value}
-                helperText={errors.value?.message}
-              />
-            )}
+            <ValueField selectedAttr={selectedAttr} methods={methods} />
           </Box>
         </DialogContent>
         <DialogActions>

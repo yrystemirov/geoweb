@@ -59,7 +59,7 @@ export const MapFolderEditForm: FC<Props> = ({ goBackPath, id: idProp, onSuccess
     descriptionRu: yup.string(),
     descriptionEn: yup.string(),
     isPublic: yup.boolean(),
-    rank: yup.number().typeError(t('mustBeNumber')).required(t('requiredField')) as yup.NumberSchema,
+    rank: yup.number().typeError(t('typeNumber')).required(t('requiredField')) as yup.NumberSchema,
   });
 
   const methods = useForm<EditFolderRequest>({
