@@ -1,9 +1,9 @@
 package kz.geoweb.api.service.impl;
 
-import kz.geoweb.api.config.properties.MinioProperties;
 import kz.geoweb.api.dto.*;
 import kz.geoweb.api.entity.FeatureFile;
 import kz.geoweb.api.entity.FeatureUpdateHistory;
+import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.enums.Action;
 import kz.geoweb.api.enums.AttrType;
 import kz.geoweb.api.exception.CustomException;
@@ -11,6 +11,7 @@ import kz.geoweb.api.exception.ForbiddenException;
 import kz.geoweb.api.mapper.FeatureFileMapper;
 import kz.geoweb.api.repository.FeatureFileRepository;
 import kz.geoweb.api.repository.FeatureUpdateHistoryRepository;
+import kz.geoweb.api.repository.LayerRepository;
 import kz.geoweb.api.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,7 @@ public class FeatureServiceImpl implements FeatureService {
     private final GeoserverService geoserverService;
     private final MinioService minioService;
     private final JdbcService jdbcService;
+    private final LayerRepository layerRepository;
 
     private Map<String, Object> getFeatureByGid(String layername, Integer gid) {
         String tableName = LAYERS_SCHEMA + "." + layername;
@@ -406,8 +408,9 @@ public class FeatureServiceImpl implements FeatureService {
     }
 
     public ExtentDto getLayerExtent(UUID layerId) {
-        LayerDto layerDto = layerService.getLayer(layerId);
-        String wkt = jdbcService.getTableExtent(layerDto.getLayername());
+        Layer layer = layerRepository.findById(layerId)
+                .orElseThrow(() -> new CustomException("layer.by_id.not_found", layerId.toString()));
+        String wkt = jdbcService.getTableExtent(layer.getLayername());
         return new ExtentDto(wkt);
     }
 }
