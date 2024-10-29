@@ -93,6 +93,7 @@ export const AttributeTabsPanel = (props: any) => {
           width: '100%',
           background: '#ffffff',
           zIndex: 1000000000,
+          overflow:'scroll'
         }}
         className="gis__attr-table"
       >

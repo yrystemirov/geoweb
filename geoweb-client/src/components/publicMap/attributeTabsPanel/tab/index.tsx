@@ -153,7 +153,6 @@ export const AttributeTableTab = (props: any) => {
       criteriaParam: [],
     };
     setAttrList([]);
-    debugger;
     mapOpenAPI
       .getOpenApiLayerFeatures(layer.layername, page, rowsPerPage)
       .then((response) => {
