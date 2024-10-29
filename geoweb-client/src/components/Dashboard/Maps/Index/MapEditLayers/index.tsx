@@ -189,9 +189,9 @@ export const MapFolderEditLayers: FC = () => {
             check: null,
             halfCheck: null,
             uncheck: null,
-            leaf: <Image className="rct-icon rct-icon-leaf" />,
-            parentOpen: <FolderOpen />,
-            parentClose: <Folder />,
+            leaf: <Image sx={{ fontSize: 20 }} />,
+            parentOpen: <FolderOpen sx={{ fontSize: 20 }} />,
+            parentClose: <Folder sx={{ fontSize: 20 }} />,
           }}
         />
 

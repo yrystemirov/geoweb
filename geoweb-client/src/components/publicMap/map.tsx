@@ -12,7 +12,6 @@ import TileLayer from 'ol/layer/Tile';
 import { BaseLayersTool } from './tools/baseLayers';
 import proj4 from 'proj4';
 import { toStringHDMS } from 'ol/coordinate';
-import { LeftPanel } from './leftPanel';
 import { mapOpenAPI } from '../../api/openApi';
 import LayerGroup from 'ol/layer/Group';
 import { IdentifyPanel } from './identifyPanel';

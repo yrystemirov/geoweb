@@ -8,19 +8,19 @@ import { usePublicMapStore } from '../../../../hooks/usePublicMapStore';
 type Props = {
   layer: LayerDto;
   onFilter?: () => void;
-  onShowLegend?: () => void;
-  onZoomToLayer?: () => void;
+  onLegendClick?: () => void;
+  isLegendVisible?: boolean;
 };
 
 // функции:
 // - открытие атрибутивной таблицы ✅
 // - управление прозрачностью слоя ✅
 // - фильтрация слоя (диалоговое окно)
-// - отображение легенды
+// - отображение легенды ✅
 // - приближение к слою
-export const LayerActionsMenu: FC<Props> = ({ layer, onFilter, onShowLegend, onZoomToLayer }) => {
+export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, onFilter, onLegendClick }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { userLayers, attributeTables, setAttributeTables, setCurrentAttributeTable } = usePublicMapStore();
+  const { map, userLayers, attributeTables, setAttributeTables, setCurrentAttributeTable } = usePublicMapStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [opacity, setOpacity] = useState<number>(1);
   const [isOpacityOpen, setIsOpacityOpen] = useState(false);
@@ -51,8 +51,14 @@ export const LayerActionsMenu: FC<Props> = ({ layer, onFilter, onShowLegend, onZ
     setIsOpacityOpen(true);
   };
 
+  const handleZoomToLayer = () => {
+    // TODO: zoom to layer
+    handleClose();
+  };
+
   const isSimpleLayer = layer.layerType === LayerType.SIMPLE;
   const isVisible = userLayers.some((l) => l.getProperties().systemLayerProps.id === layer.id && l.getVisible());
+  const isAttrTableOpen = attributeTables.some((at) => at.id == layer.id);
 
   useEffect(() => {
     userLayers.forEach((l) => {
@@ -66,9 +72,27 @@ export const LayerActionsMenu: FC<Props> = ({ layer, onFilter, onShowLegend, onZ
   return (
     <Box>
       <IconButton onClick={handleClick}>
-        <MoreVert />
+        <MoreVert sx={{ fontSize: 20 }} />
       </IconButton>
       <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleClose} closeAfterTransition sx={{ zIndex: 5001 }}>
+        {onLegendClick && (
+          <MenuItem hidden={isOpacityOpen} onClick={onLegendClick}>
+            {t(`layerPanel.${isLegendVisible ? 'hideLegend' : 'showLegend'}`)}
+          </MenuItem>
+        )}
+        <MenuItem hidden={isOpacityOpen} onClick={handleZoomToLayer}>
+          {t('layerPanel.zoomToLayer')}
+        </MenuItem>
+        {isSimpleLayer && onFilter && (
+          <MenuItem hidden={isOpacityOpen} onClick={() => onFilter()}>
+            {t('layerPanel.filter')}
+          </MenuItem>
+        )}
+        {isSimpleLayer && (
+          <MenuItem hidden={isOpacityOpen} onClick={hadleAttrTable} disabled={isAttrTableOpen}>
+            {t('layerPanel.openAttrTable')} {isAttrTableOpen && t('layerPanel.attrTableIsOpen')}
+          </MenuItem>
+        )}
         <MenuItem sx={{ minWidth: 200 }} hidden={!isOpacityOpen}>
           <Slider
             min={0}
@@ -83,31 +107,6 @@ export const LayerActionsMenu: FC<Props> = ({ layer, onFilter, onShowLegend, onZ
         <MenuItem hidden={isOpacityOpen || !isVisible} onClick={handleOpacity}>
           {t('layerPanel.setOpacity')}
         </MenuItem>
-
-        {onShowLegend && (
-          <MenuItem hidden={isOpacityOpen} onClick={() => onShowLegend()}>
-            {t('layerPanel.showLegend')}
-          </MenuItem>
-        )}
-        {onZoomToLayer && (
-          <MenuItem hidden={isOpacityOpen} onClick={() => onZoomToLayer()}>
-            {t('layerPanel.zoomToLayer')}
-          </MenuItem>
-        )}
-        {isSimpleLayer && onFilter && (
-          <MenuItem hidden={isOpacityOpen} onClick={() => onFilter()}>
-            {t('layerPanel.filter')}
-          </MenuItem>
-        )}
-        {isSimpleLayer && (
-          <MenuItem
-            hidden={isOpacityOpen}
-            onClick={hadleAttrTable}
-            disabled={attributeTables.some((at) => at.id == layer.id)}
-          >
-            {t('layerPanel.openAttributeTable')}
-          </MenuItem>
-        )}
       </Menu>
     </Box>
   );
