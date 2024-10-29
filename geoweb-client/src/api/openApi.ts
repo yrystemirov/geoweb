@@ -9,7 +9,7 @@ const getOpenApiRootFolders = () => {
 };
 
 const getOpenApiRootFoldertreeById = (id: string) => {
-  return instance.get<FolderTreeDto[]>(`${OPEN_API_URL}/folders/${id}/tree`);
+  return instance.get<FolderTreeDto>(`${OPEN_API_URL}/folders/${id}/tree`);
 };
 
 const getOpenApiIdentify = (params: IdentifyParams) => {

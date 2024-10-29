@@ -178,14 +178,14 @@ export const MapFolderEditLayers: FC = () => {
         <GoBackButton text={t('backToList')} onClick={() => navigate(`${dashboardUrl}/maps`)} />
         <CardHeader title={t('maps.editStructure')} sx={{ textAlign: 'center', flex: 1 }} />
       </Box>
-      <Box className="edit-layers-tree">
+      <Box className="layers-tree">
         <CheckboxTree
           nodes={treeNodes}
           expanded={expanded}
           onExpand={(v) => setExpanded(v)}
           icons={{
-            expandClose: <KeyboardArrowRight className="rct-icon rct-icon-expand-close" />,
-            expandOpen: <KeyboardArrowDown />,
+            expandClose: <KeyboardArrowRight sx={{ fontSize: 20 }} />,
+            expandOpen: <KeyboardArrowDown sx={{ fontSize: 20 }} />,
             check: null,
             halfCheck: null,
             uncheck: null,

@@ -70,10 +70,24 @@
   right: .5em;
 }
 
-.edit-layers-tree {
-  .react-checkbox-tree label, .rct-node-icon {
+.layers-tree {
+  .react-checkbox-tree label, .rct-node-icon, .rct-checkbox, .rct-collapse {
     display: flex;
     align-items: center;
+  }
+
+  .rct-collapse {
+    padding: 0;
+    width: 20px;
+  }
+
+  .rct-checkbox {
+    padding-left: 0;
+  }
+  
+  .rct-node-icon {
+    color: inherit;
+    padding: 0;
   }
 
   .rct-checkbox:empty {
@@ -93,4 +107,8 @@
 
 .MuiDataGrid-cell:focus, .MuiDataGrid-cell:focus-within {
   outline: none;
+}
+
+[hidden] {
+  display: none!important;
 }
