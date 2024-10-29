@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { LayerDto } from '../../../../api/types/mapFolders';
 import { useTranslatedProp } from '../../../../hooks/useTranslatedProp';
 import { useTranslation } from 'react-i18next';
@@ -9,8 +9,21 @@ const legendUrlPrefix =
 
 export const LegendImage: FC<{ layer: LayerDto }> = ({ layer }) => {
   const nameProp = useTranslatedProp('name');
-  const { t } = useTranslation();
+  const {
+    t,
+    i18n: { language },
+  } = useTranslation();
   const [isError, setIsError] = useState(false);
+  const languageParam = useMemo(() => {
+    switch (language) {
+      case 'kk':
+        return 'ita';
+      case 'ru':
+        return 'eng';
+      default:
+        return '';
+    }
+  }, [language]);
 
   if (isError) {
     return (
@@ -20,5 +33,12 @@ export const LegendImage: FC<{ layer: LayerDto }> = ({ layer }) => {
     );
   }
 
-  return <img src={`${legendUrlPrefix}${layer.layername}`} alt={layer[nameProp]} onError={() => setIsError(true)} />;
+  return (
+    <img
+      src={`${legendUrlPrefix}${layer.layername}&LANGUAGE=${languageParam}`}
+      alt={layer[nameProp]}
+      onError={() => setIsError(true)}
+      style={{ maxWidth: '45vw', maxHeight: '45vh' }}
+    />
+  );
 };

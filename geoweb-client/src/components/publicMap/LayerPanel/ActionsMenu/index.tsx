@@ -4,6 +4,10 @@ import { MoreVert } from '@mui/icons-material';
 import { t } from 'i18next';
 import { LayerDto, LayerType } from '../../../../api/types/mapFolders';
 import { usePublicMapStore } from '../../../../hooks/usePublicMapStore';
+import { useMutation } from '@tanstack/react-query';
+import { mapOpenAPI } from '../../../../api/openApi';
+import { convertWktToGeometry, fitExtentToGeometryWithAnimation} from '../../../../utils/openlayers/utils';
+import { useNotify } from '../../../../hooks/useNotify';
 
 type Props = {
   layer: LayerDto;
@@ -15,15 +19,31 @@ type Props = {
 // функции:
 // - открытие атрибутивной таблицы ✅
 // - управление прозрачностью слоя ✅
-// - фильтрация слоя (диалоговое окно)
+// - фильтрация слоя (диалоговое окно) ⏳
 // - отображение легенды ✅
-// - приближение к слою
+// - приближение к слою ✅
 export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, onFilter, onLegendClick }) => {
+  const { showError } = useNotify();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { map, userLayers, attributeTables, setAttributeTables, setCurrentAttributeTable } = usePublicMapStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [opacity, setOpacity] = useState<number>(1);
   const [isOpacityOpen, setIsOpacityOpen] = useState(false);
+
+  const getExtentMutation = useMutation({
+    mutationFn: () => mapOpenAPI.getExtentByLayerId(layer.id).then((res) => res.data.extent),
+    onSuccess: (data) => {
+      try {
+        const geometry = convertWktToGeometry(data);
+        fitExtentToGeometryWithAnimation({ map: map!, geometry, padding: 10 });
+      } catch (error) {
+        showError({ error });
+      }
+    },
+    onError: (error) => {
+      showError({ error });
+    },
+  });
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -52,7 +72,7 @@ export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, on
   };
 
   const handleZoomToLayer = () => {
-    // TODO: zoom to layer
+    getExtentMutation.mutate();
     handleClose();
   };
 
