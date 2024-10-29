@@ -8,4 +8,5 @@ public interface JdbcService {
     void deleteTable(String layername);
     void createAttribute(String layername, String attrname, AttrType type);
     void deleteAttribute(String layername, String attrname);
+    Boolean tableExists(String tableName);
 }

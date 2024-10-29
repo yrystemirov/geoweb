@@ -2,6 +2,8 @@ package kz.geoweb.api.controller;
 
 import kz.geoweb.api.dto.*;
 import kz.geoweb.api.service.FeatureService;
+import kz.geoweb.api.service.JdbcService;
+import kz.geoweb.api.service.OgrService;
 import kz.geoweb.api.utils.HttpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FeatureController {
     private final FeatureService featureService;
+    private final JdbcService jdbcService;
+    private final OgrService ogrService;
 
     @PostMapping
     public void save(@RequestParam String layername,
@@ -59,5 +63,15 @@ public class FeatureController {
         HttpHeaders headers = HttpUtils.getDownloadHeaders(featureFileResponseDto.getFilename(),
                 featureFileResponseDto.getContentType(), featureFileResponseDto.getSize());
         return new ResponseEntity<>(featureFileResponseDto.getFile(), headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/test")
+    public Boolean test(@RequestParam String tableName) {
+        return jdbcService.tableExists(tableName);
+    }
+
+    @GetMapping("/testogr")
+    public void testOgr() {
+        ogrService.importFile("C:\\Users\\yerhat\\Downloads\\Telegram Desktop\\Esilski_vodohoziaistvenn.gdb.zip", "rivers", "POINT");
     }
 }

@@ -40,4 +40,16 @@ public class JdbcServiceImpl implements JdbcService {
         jdbcClient.sql("ALTER TABLE " + LAYERS_SCHEMA + "." + layername + " DROP COLUMN "
                 + attrname).update();
     }
+
+    @Override
+    public Boolean tableExists(String tableName) {
+        tableName = tableName.toLowerCase();
+        String sql = "SELECT count(*) FROM information_schema.tables " +
+                "WHERE table_schema='" + LAYERS_SCHEMA + "' AND lower(table_name) = ?";
+        Integer count = jdbcClient.sql(sql)
+                .param(tableName)
+                .query(Integer.class)
+                .single();
+        return count > 0;
+    }
 }
