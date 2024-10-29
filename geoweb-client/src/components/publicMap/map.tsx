@@ -1,8 +1,6 @@
 import 'ol/ol.css';
 import { useEffect, useRef, useState } from 'react';
 import { Map, View } from 'ol';
-import { Tile } from 'ol/layer';
-import { OSM } from 'ol/source';
 import './map.css';
 import { Box } from '@mui/material';
 import { HomeExtentButton } from '../common/mapTools/HomeExtentButton';
@@ -19,6 +17,8 @@ import { mapOpenAPI } from '../../api/openApi';
 import LayerGroup from 'ol/layer/Group';
 import { IdentifyPanel } from './identifyPanel';
 import { AttributeTabsPanel } from './attributeTabsPanel';
+import { FolderTreeDto } from '../../api/types/mapFolders';
+import { LayerPanel } from './LayerPanel';
 
 const MapComponent = () => {
   const mapDivRef = useRef<HTMLDivElement | null>(null);
@@ -37,20 +37,19 @@ const MapComponent = () => {
   const [mapMouseOverCoord, setMapMouseOverCoord] = useState<string>('');
   const [mounted, setMounted] = useState<boolean>(false);
   const [mapDataLoaded, setMapDataLoaded] = useState<boolean>(false);
-  const [publicMaps, setPublicMaps] = useState<any>([]);
+  const [publicMaps, setPublicMaps] = useState<FolderTreeDto[]>([]);
 
   const [lyrTreeInited, setLyrTreeinIted] = useState<boolean>(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
   useEffect(() => {
     if (!mounted) return;
 
-    mapOpenAPI.getOpenApiRootFolders().then((res: any) => {
+    mapOpenAPI.getOpenApiRootFolders().then((res) => {
       for (const lyrGroup of res.data) {
-        mapOpenAPI.getOpenApiRootFoldertreeById(lyrGroup.id).then((response: any) => {
+        mapOpenAPI.getOpenApiRootFoldertreeById(lyrGroup.id).then((response) => {
           publicMaps.push(response.data);
           setPublicMaps(publicMaps);
           if (publicMaps.length === res.data.length) {
@@ -273,7 +272,7 @@ const MapComponent = () => {
           zIndex: 5000,
         }}
       >
-        {map && <LeftPanel color={systemThemeColor} publicMaps={publicMaps} />}
+        {map && <LayerPanel color={systemThemeColor} publicMaps={publicMaps} />}
       </Box>
       <Box
         display={'flex'}
