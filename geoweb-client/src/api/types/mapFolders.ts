@@ -23,7 +23,7 @@ export type LayerDto = {
   layername: string;
   geometryType: GeometryType;
   layerType: LayerType;
-  styleId?: string; // пока не используется
+  styleId?: string;
   url: string;
   isPublic: boolean;
   folders: FolderDto[];

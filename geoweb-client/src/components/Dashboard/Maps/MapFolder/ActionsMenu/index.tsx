@@ -40,7 +40,7 @@ export const MapFolderActionsMenu: FC<Props> = ({
   return (
     <div>
       <IconButton onClick={(e) => handleClick(e)}>
-        <MoreVert />
+        <MoreVert sx={{ fontSize: 20 }} />
       </IconButton>
       <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleClose} closeAfterTransition>
         {onEdit && <MenuItem onClick={() => onEdit()}>{t('edit')}</MenuItem>}
