@@ -405,8 +405,9 @@ public class FeatureServiceImpl implements FeatureService {
         return downloadFeatureFile(id);
     }
 
-    public ExtentDto getLayerExtent(String layerName) {
-        String wkt = jdbcService.getTableExtent(layerName);
+    public ExtentDto getLayerExtent(UUID layerId) {
+        LayerDto layerDto = layerService.getLayer(layerId);
+        String wkt = jdbcService.getTableExtent(layerDto.getLayername());
         return new ExtentDto(wkt);
     }
 }

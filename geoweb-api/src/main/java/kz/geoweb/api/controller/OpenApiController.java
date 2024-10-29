@@ -75,8 +75,8 @@ public class OpenApiController {
         return entryService.getEntriesByDictionaryCode(dictionaryCode, search);
     }
 
-    @GetMapping("/layers/extent")
-    public ExtentDto getLayerExtent(@RequestParam String layername) {
-        return featureService.getLayerExtent(layername);
+    @GetMapping("/layers/{id}/extent")
+    public ExtentDto getLayerExtent(@PathVariable UUID id) {
+        return featureService.getLayerExtent(id);
     }
 }

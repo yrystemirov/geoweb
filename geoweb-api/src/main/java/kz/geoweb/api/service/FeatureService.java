@@ -29,5 +29,5 @@ public interface FeatureService {
 
     FeatureFileResponseDto downloadFeatureFilePublic(UUID id);
 
-    ExtentDto getLayerExtent(String layername);
+    ExtentDto getLayerExtent(UUID layerId);
 }
