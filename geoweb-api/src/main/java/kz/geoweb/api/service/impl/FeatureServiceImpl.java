@@ -49,7 +49,7 @@ public class FeatureServiceImpl implements FeatureService {
     private final EntryService entryService;
     private final GeoserverService geoserverService;
     private final MinioService minioService;
-    private final MinioProperties minioProperties;
+    private final JdbcService jdbcService;
 
     private Map<String, Object> getFeatureByGid(String layername, Integer gid) {
         String tableName = LAYERS_SCHEMA + "." + layername;
@@ -403,5 +403,10 @@ public class FeatureServiceImpl implements FeatureService {
             throw new ForbiddenException("layer.is_not_public", layerInfoDto.getLayername());
         }
         return downloadFeatureFile(id);
+    }
+
+    public ExtentDto getLayerExtent(String layerName) {
+        String wkt = jdbcService.getTableExtent(layerName);
+        return new ExtentDto(wkt);
     }
 }
