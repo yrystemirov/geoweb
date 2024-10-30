@@ -10,7 +10,7 @@ import {
 } from '@mui/icons-material';
 import { common } from '@mui/material/colors';
 
-const iconSx = { fontSize: 20 };
+const iconSx = { fontSize: 20, opacity: 0.8 };
 export const icons = {
   expandClose: <KeyboardArrowRight sx={iconSx} />,
   expandOpen: <KeyboardArrowDown sx={iconSx} />,

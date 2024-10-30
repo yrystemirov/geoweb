@@ -6,7 +6,7 @@ import { LayerDto, LayerType } from '../../../../api/types/mapFolders';
 import { usePublicMapStore } from '../../../../hooks/usePublicMapStore';
 import { useMutation } from '@tanstack/react-query';
 import { mapOpenAPI } from '../../../../api/openApi';
-import { convertWktToGeometry, fitExtentToGeometryWithAnimation} from '../../../../utils/openlayers/utils';
+import { convertWktToGeometry, fitExtentToGeometryWithAnimation } from '../../../../utils/openlayers/utils';
 import { useNotify } from '../../../../hooks/useNotify';
 
 type Props = {
@@ -58,8 +58,8 @@ export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, on
     }, 300); // чтобы не мигало
   };
 
-  const hadleAttrTable = () => {
-    if (attributeTables.length == 0 || attributeTables.filter((at) => at.id == layer.id).length == 0) {
+  const handleAttrTable = () => {
+    if (attributeTables.length === 0 || !attributeTables.some((at) => at.id === layer.id)) {
       attributeTables.push(layer);
       setAttributeTables(attributeTables);
     }
@@ -78,7 +78,7 @@ export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, on
 
   const isSimpleLayer = layer.layerType === LayerType.SIMPLE;
   const isVisible = userLayers.some((l) => l.getProperties().systemLayerProps.id === layer.id && l.getVisible());
-  const isAttrTableOpen = attributeTables.some((at) => at.id == layer.id);
+  const isAttrTableOpen = attributeTables.some((at) => at.id === layer.id);
 
   useEffect(() => {
     userLayers.forEach((l) => {
@@ -109,7 +109,7 @@ export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, on
           </MenuItem>
         )}
         {isSimpleLayer && (
-          <MenuItem hidden={isOpacityOpen} onClick={hadleAttrTable} disabled={isAttrTableOpen}>
+          <MenuItem hidden={isOpacityOpen} onClick={handleAttrTable}>
             {t('layerPanel.openAttrTable')} {isAttrTableOpen && t('layerPanel.attrTableIsOpen')}
           </MenuItem>
         )}

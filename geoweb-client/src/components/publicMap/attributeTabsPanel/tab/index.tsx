@@ -1,212 +1,75 @@
-import { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
-
-import { debounceTime, Subject } from 'rxjs';
-
-import {
-  Paper,
-  TablePagination,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Box,
-  CircularProgress,
-} from '@mui/material';
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-
-//import { drawLayerObjOnMap } from '../../../mapTools/LayerFN';
-import VectorLayer from 'ol/layer/Vector';
-import { toast } from 'react-toastify';
-import VectorSource from 'ol/source/Vector';
+import { useState, useMemo, useEffect } from 'react';
+import { Paper } from '@mui/material';
+import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { usePublicMapStore } from '../../../../hooks/usePublicMapStore';
 import { mapOpenAPI } from '../../../../api/openApi';
+import { useQuery } from '@tanstack/react-query';
+import { convertWktToGeometry, fitExtentToGeometryWithAnimation } from '../../../../utils/openlayers/utils';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import { Feature } from 'ol';
 import OpenlayersBaseLayersUtils from '../../../../utils/openlayers/OpenlayersBaseLayersUtils';
-//import ExportFileDialog from '../../leftPanel/layersTab/workingLayers/exportFileDialog';
+import CustomNoRowsOverlay from '../../../common/NoRows/DataGrid';
+import { useMuiLocalization } from '../../../../hooks/useMuiLocalization';
+import { useTranslatedProp } from '../../../../hooks/useTranslatedProp';
 
 export const AttributeTableTab = (props: any) => {
+  const nameProp = useTranslatedProp('name');
   const { map } = usePublicMapStore();
+  const { dataGridLocale } = useMuiLocalization();
   const { layer } = props;
 
-  const [attrList, setAttrList] = useState<any[]>([]);
-  const [attrFilterList, setAttrFilterList] = useState<any[]>([]);
-  const [attrs, setAttrs] = useState<any[]>([]);
-  const [displayedColumns, setDisplayedColumns] = useState<any[]>([]);
+  const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
+  const [search, setSearch] = useState('');
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [total, setTotal] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const hiddenFileInput = useRef(null);
-  const [currentUploadLayerGid, setCurrentUploadLayerGid] = useState<any | null>(null);
-  const [uploadDialog, setUploadDialog] = useState(false);
+  const { data: attrs, isLoading: isAttrsLoading } = useQuery({
+    queryKey: ['layerAttributes', layer.id],
+    queryFn: () => mapOpenAPI.getOpenApiLayerAttribtes(layer.id).then((res) => res.data),
+    enabled: !!layer.id,
+    staleTime: 1000 * 60 * 60,
+  });
 
-  /*
-  const handleInputFileChange = async (event: any) => {
-    const fileUploaded = event.target.files[0];
-    let formData = new FormData();
-    formData.append('files', fileUploaded, fileUploaded.name || '');
-    try {
-      const uploadedFiles = await api.post('uploads/main/files/upload', formData);
-      if (uploadedFiles && uploadedFiles.data && uploadedFiles.data.length > 0) {
-        let uploadedFileData = uploadedFiles.data[0];
-        api
-          .post(`${gisApi}/feature-files/add`, {
-            layerGid: currentUploadLayerGid,
-            fileName: uploadedFileData.originalname,
-            minioBucket: uploadedFileData.bucket,
-            minioObject: uploadedFileData.filename,
-          })
-          .then((response) => {
-            toast.success(t('common:common.file_uploaded_successfully'));
-            setCurrentUploadLayerGid(null);
-            //@ts-ignore
-            hiddenFileInput.current.value = '';
-          })
-          .catch((error) => {
-            //@ts-ignore
-            hiddenFileInput.current.value = '';
-            toast.error(t('gis:gis.error_loading'));
-          });
-      } else {
-        //@ts-ignore
-        hiddenFileInput.current.value = '';
-        toast.error(t('gis:gis.error_loading'));
-      }
-    } catch (e: any) {
-      //@ts-ignore
-      hiddenFileInput.current.value = '';
-      toast.error(e.message);
-    }
-  };
-
-  const tryToOpenFile = (layerGid: any) => {
-    api
-      .get(`${gisApi}/feature-files/layerGid/${layerGid}`)
-      .then((response) => {
-        if (response.data.length > 0) {
-          let lastFile = response.data[response.data.length - 1];
-          api
-            .get(`uploads/main/files/download?bucket=${lastFile.minioBucket}&filename=${lastFile.minioObject}`, {
-              responseType: 'blob',
-            })
-            .then((res) => {
-              const file = new Blob([res.data], { type: 'application/pdf' });
-              //Build a URL from the file
-              const fileURL = URL.createObjectURL(file);
-              //Open the URL on new Window
-              const pdfWindow = window.open();
-              //@ts-ignore
-              pdfWindow.location.href = fileURL;
-            })
-            .catch((error) => {
-              console.log('gis api error', error);
-              setIsLoading(false);
-            });
-        } else {
-          toast.error(t('gis:gis.no_files_found_specified_object'));
-        }
-      })
-      .catch((error) => {
-        toast.error(t('gis:gis.error_loading'));
-      });
-  };
-*/
-  useEffect(() => {
-    setPage(0);
-    setAttrs([]);
-    setDisplayedColumns([]);
-    if (layer) {
-      mapOpenAPI
-        .getOpenApiLayerAttribtes(layer.id)
-        .then((response) => {
-          const _attrs: any[] = response.data.filter((x: any) => x.attrname !== 'gid');
-          setAttrs(_attrs);
-          const _displayedColumns = _attrs.map((x) => x.attrname);
-          setDisplayedColumns(_displayedColumns);
-        })
-        .catch((error) => {
-          console.log('error layers attrs', error);
-          setPage(0);
-          setAttrs([]);
-          setDisplayedColumns([]);
-        });
-    }
-  }, [layer]);
+  const {
+    data: features,
+    isFetching: isFeaturesFetching,
+    isLoading: isFeaturesLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['layerFeatures', layer.layername],
+    queryFn: () =>
+      mapOpenAPI.getOpenApiLayerFeatures(layer.layername, pagination.page, pagination.pageSize).then((res) => res.data),
+    enabled: !!layer.layername,
+  });
 
   useEffect(() => {
-    if (displayedColumns && displayedColumns.length > 0) getAttributes();
-  }, [displayedColumns, page]);
+    if (pagination.page === 0 && isFeaturesLoading) {
+      // skip first fetch
+      return;
+    }
+    refetch();
+  }, [pagination, refetch]);
 
-  const getAttributes = () => {
-    const filter = {
-      layerId: layer.id,
-      criteria: '',
-      layerName: layer.layername,
-      limit: rowsPerPage,
-      offset: page * rowsPerPage,
-      gid: 0,
-      attributes: [],
-      orderByColumn: 'gid',
-      criteriaParam: [],
-    };
-    setAttrList([]);
-    mapOpenAPI
-      .getOpenApiLayerFeatures(layer.layername, page, rowsPerPage)
-      .then((response) => {
-        if (response.status === 200 || response.status === 201) {
-          if (response.data && response.data.content) {
-            setTotal(response.data.totalElements);
-            setAttrList(response.data.content);
-            setAttrFilterList(response.data.content);
-          }
-        }
-      })
-      .catch((error) => {
-        console.log('gis api error', error);
-      });
-  };
+  const columns = useMemo(
+    () =>
+      attrs?.map(
+        (attr) =>
+          ({
+            field: attr.attrname,
+            headerName: attr[nameProp],
+            width: 150,
+          }) as GridColDef,
+      ) || [],
+    [attrs, nameProp],
+  );
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
+  // const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+  //   setSearch(event.target.value);
+  //   setPagination({ ...pagination, page: 0 });
+  //   refetch();
+  // };
 
-  const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-
-  const handleExportExcel = () => {};
-
-  // search
-  const searchSubject = new Subject();
-  searchSubject
-    .asObservable()
-    .pipe(debounceTime(1000))
-    .subscribe((data: any) => {
-      let _search = data.trim(); // Remove whitespace
-      _search = _search.toLowerCase();
-      if (_search.length > 1) {
-        const filterData: any[] = [];
-        attrList.forEach((item) => {
-          const dlist = _search.split(' ').every((word: any) => {
-            return displayedColumns.some((property) => `${item[property]}`.toLowerCase().includes(word));
-          });
-          if (dlist) {
-            filterData.push(item);
-          }
-        });
-
-        setAttrList(filterData);
-      } else {
-        setAttrList(attrFilterList);
-      }
-    });
-
-  const handleSearch = (event: any) => {
-    searchSubject.next(event.target.value);
+  const handlePaginationChange = (model: GridPaginationModel) => {
+    setPagination(model);
   };
 
   const zoomToObject = (item: any) => {
@@ -231,106 +94,57 @@ export const AttributeTableTab = (props: any) => {
       map?.addLayer(vector);
       map?.updateSize();
     }
-    vector.getSource()?.clear();
-
-    //drawLayerObjOnMap(map!, item.gid, layer.layername, vector, t);
-  };
-  const handleRowDoubleClick = (item: any) => {
-    zoomToObject(item);
-  };
-
-  const loading = () => {
-    return (
-      <Box sx={{ display: 'flex' }}>
-        <CircularProgress />
-      </Box>
-    );
+    const geom = convertWktToGeometry(item.geom);
+    fitExtentToGeometryWithAnimation({ map: map!, geometry: geom, maxZoom: map?.getView().getZoom() });
+    const feature = new Feature({
+      geometry: geom,
+    });
+    vector.setVisible(true);
+    vector.getSource()?.addFeature(feature);
+    setTimeout(() => {
+      vector.getSource()?.removeFeature(feature);
+    }, 2000);
   };
 
-  const clickExportExcel = () => {
-    setUploadDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setUploadDialog(false);
+  const handleRowDoubleClick = (params: any) => {
+    zoomToObject(params.row);
   };
 
   return (
-    <>
-      <Paper sx={{ width: '100%', overflow: 'hidden', zIndex: 500000 }}>
-        {/* <input
-          type="file"
-          onChange={handleInputFileChange}
-          ref={hiddenFileInput}
-          style={{ display: 'none' }}
-          accept="application/pdf"
-        /> */}
-        <div className="attr-table-filter">
-          <div className="attr-table-pagination">
-            {/* <TablePagination
-              align="left"
-              rowsPerPageOptions={[10, 25, 100]}
-              component="div"
-              count={total}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              sx={{ display: 'flex' }}
-              //labelRowsPerPage={t('gis:gis.numberLinesPerPage')}
-              labelDisplayedRows={({ from, to, count }) => `${from}-${to} из ${count}`}
-            /> */}
-          </div>
-          {/* <div style={{ display: 'flex' }}>
-            <div style={{ color: 'darkslateblue', marginRight: '18px', cursor: 'pointer' }} title="экспорт файла">
-              <CloudDownloadIcon onClick={clickExportExcel}></CloudDownloadIcon>
-            </div>
-            <input placeholder="Поиск" className="inp-search" onKeyUp={handleSearch} />
-          </div> */}
-        </div>
-        <TableContainer sx={{ minHeight: '182px', height: 'calc(100% - 50px)' }}>
-          <Table stickyHeader size="small" aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                {attrs.map((column) => (
-                  <TableCell
-                    key={column.id}
-                    // align={column.align}
-                    // style={{minWidth: column.minWidth}}
-                  >
-                    {column.nameRu}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody className="skjdfhkjshfhsdkjf">
-              {attrList.map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.gid}>
-                    {displayedColumns.map((column) => {
-                      const value = row[column];
-                      return (
-                        <TableCell key={column} align="left" onDoubleClick={() => handleRowDoubleClick(row)}>
-                          {column.format && typeof value === 'number' ? column.format(value) : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-      {/* {uploadDialog && (
-                <ExportFileDialog
-                    show={uploadDialog}
-                    layer={layer}
-                    page={page}
-                    rowsPerPage={rowsPerPage}
-                    onClose={handleCloseDialog}
-                />
-            )} */}
-    </>
+    <Paper sx={{ width: '100%', height: '200px', overflow: 'auto', zIndex: 500000 }}>
+      {/* TODO: use search */}
+      {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}> <TextField label="Поиск" variant="outlined" size="small" value={search} onChange={handleSearchChange} /> </Box> */}
+      <DataGrid
+        rows={features?.content || []}
+        columns={columns}
+        localeText={dataGridLocale}
+        pageSizeOptions={[25, 50, 100]}
+        pagination
+        paginationMode="server"
+        rowCount={features?.totalElements || 0}
+        onPaginationModelChange={handlePaginationChange}
+        paginationModel={pagination}
+        loading={isAttrsLoading || isFeaturesFetching}
+        onRowDoubleClick={handleRowDoubleClick}
+        autoHeight
+        getRowId={(row) => row.gid}
+        rowSelection={false}
+        disableColumnMenu
+        disableColumnSorting
+        columnVisibilityModel={{
+          gid: false,
+        }}
+        slots={{
+          noRowsOverlay: CustomNoRowsOverlay,
+        }}
+        slotProps={{
+          loadingOverlay: {
+            variant: 'skeleton',
+            noRowsVariant: 'linear-progress',
+          },
+        }}
+        sx={{ minHeight: 200 }}
+      />
+    </Paper>
   );
 };
