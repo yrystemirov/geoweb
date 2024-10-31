@@ -1,15 +1,12 @@
 package kz.geoweb.api.controller;
 
-import kz.geoweb.api.config.properties.GeoserverProperties;
 import kz.geoweb.api.dto.StyleIconResponseDto;
 import kz.geoweb.api.dto.StyleRequestDto;
 import kz.geoweb.api.dto.StyleResponseDto;
 import kz.geoweb.api.dto.StyleResponseFullDto;
-import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.service.StyleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,9 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -28,10 +22,6 @@ import java.util.UUID;
 @Slf4j
 public class StyleController {
     private final StyleService styleService;
-    private final GeoserverProperties geoserverProperties;
-
-    @Value("${app.geoserver.icons.path}")
-    private String geoserverIconsPath;
 
     @GetMapping
     public ResponseEntity<Page<StyleResponseDto>> getStyles(Pageable pageable) {
@@ -66,21 +56,8 @@ public class StyleController {
     }
 
     @PostMapping("/icons/upload")
-    public ResponseEntity<StyleIconResponseDto> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            String filename = file.getOriginalFilename();
-            boolean exists = new File(geoserverIconsPath, Objects.requireNonNull(filename)).exists();
-            if (exists) {
-                throw new CustomException("file.with_name.already_exists", filename);
-            }
-            File destinationFile = new File(geoserverIconsPath + "/" + filename);
-            file.transferTo(destinationFile);
-            String iconPath = geoserverProperties.getIconsPath() + "/" + filename;
-            StyleIconResponseDto styleIconResponseDto = new StyleIconResponseDto(iconPath);
-            return ResponseEntity.ok(styleIconResponseDto);
-        } catch (IOException e) {
-            log.error("Error while uploading file", e);
-            throw new CustomException("file.upload.error");
-        }
+    public ResponseEntity<StyleIconResponseDto> uploadIcon(@RequestParam("file") MultipartFile file) {
+        StyleIconResponseDto styleIconResponseDto = styleService.uploadIcon(file);
+        return ResponseEntity.ok(styleIconResponseDto);
     }
 }

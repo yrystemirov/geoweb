@@ -1,5 +1,6 @@
 package kz.geoweb.api.service.impl;
 
+import kz.geoweb.api.config.properties.GeoserverProperties;
 import kz.geoweb.api.dto.*;
 import kz.geoweb.api.entity.Layer;
 import kz.geoweb.api.entity.Style;
@@ -11,19 +12,30 @@ import kz.geoweb.api.repository.StyleRepository;
 import kz.geoweb.api.service.GeoserverService;
 import kz.geoweb.api.service.StyleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StyleServiceImpl implements StyleService {
     private final GeoserverService geoserverService;
     private final StyleRepository styleRepository;
     private final LayerRepository layerRepository;
     private final StyleMapper styleMapper;
+    private final GeoserverProperties geoserverProperties;
+
+    @Value("${app.geoserver.icons.path}")
+    private String geoserverIconsPath;
 
 
     private Style getEntityById(UUID id) {
@@ -430,6 +442,24 @@ public class StyleServiceImpl implements StyleService {
         } else {
             if (rule.getStrokeColor() == null) throw new CustomException("style.rule.stroke_color.is_null.error");
             if (rule.getStrokeWidth() == null) throw new CustomException("style.rule.stroke_width.is_null.error");
+        }
+    }
+
+    @Override
+    public StyleIconResponseDto uploadIcon(MultipartFile file) {
+        try {
+            String filename = file.getOriginalFilename();
+            boolean exists = new File(geoserverIconsPath, Objects.requireNonNull(filename)).exists();
+            if (exists) {
+                throw new CustomException("file.with_name.already_exists", filename);
+            }
+            File destinationFile = new File(geoserverIconsPath + "/" + filename);
+            file.transferTo(destinationFile);
+            String iconPath = geoserverProperties.getIconsPath() + "/" + filename;
+            return new StyleIconResponseDto(iconPath);
+        } catch (IOException e) {
+            log.error("Error while uploading file", e);
+            throw new CustomException("file.upload.error");
         }
     }
 }
