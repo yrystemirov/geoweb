@@ -30,7 +30,7 @@ export const LayerPanel: React.FC<Props> = ({ color = 'rgb(64 152 68 / 70%)', pu
     return {
       value: folder.id,
       label: (
-        <Typography display={'flex'} alignItems={'center'} minHeight={36} color={common.black}>
+        <Typography display={'flex'} alignItems={'center'} minHeight={36} color={common.black} noWrap>
           {folder[nameProp]}
         </Typography>
       ),
@@ -42,7 +42,7 @@ export const LayerPanel: React.FC<Props> = ({ color = 'rgb(64 152 68 / 70%)', pu
             label: (
               <Box display={'flex'} flexDirection={'column'} alignItems={'flex-start'}>
                 <Box display={'flex'} alignItems={'center'}>
-                  <Typography color={common.black}>{layer[nameProp]}</Typography>
+                  <Typography color={common.black} noWrap>{layer[nameProp]}</Typography>
                   <LayerActionsMenu
                     layer={layer}
                     isLegendVisible={activeLegendLayers.includes(layer.layername)}
@@ -67,7 +67,7 @@ export const LayerPanel: React.FC<Props> = ({ color = 'rgb(64 152 68 / 70%)', pu
 
   const mapNodes = useMemo(
     () => publicMaps?.map((folder) => recursiveConvertToTreeNode(folder)),
-    [publicMaps, activeLegendLayers],
+    [publicMaps, activeLegendLayers, nameProp],
   );
 
   const switchLayerVisibility = (checked: { [key: string]: string[] }) => {

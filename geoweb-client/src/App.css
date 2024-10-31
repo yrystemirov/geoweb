@@ -71,6 +71,10 @@
 }
 
 .layers-tree {
+  .react-checkbox-tree {
+    overflow: auto;
+  }
+  
   .react-checkbox-tree label, .rct-node-icon, .rct-checkbox, .rct-collapse {
     display: flex;
   }

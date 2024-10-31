@@ -1,14 +1,9 @@
 import { Box, Tab, Tabs, Tooltip } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-
 import { AttributeTableTab } from './tab';
 import VectorLayer from 'ol/layer/Vector';
-
 // import { translateField } from 'utils/data.utils';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-
 import VectorSource from 'ol/source/Vector';
 import { usePublicMapStore } from '../../../hooks/usePublicMapStore';
 
@@ -92,7 +87,7 @@ export const AttributeTabsPanel = (props: any) => {
           height: '270px',
           width: '100%',
           background: '#ffffff',
-          zIndex: 1000000000,
+          zIndex: 1020,
           overflow:'scroll'
         }}
         className="gis__attr-table"

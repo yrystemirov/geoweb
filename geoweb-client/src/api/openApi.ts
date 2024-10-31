@@ -24,10 +24,15 @@ const getOpenApiLayerFeatures = (layerName: string, page: number, size: number) 
   return instance.get<any>(`${OPEN_API_URL}/features?layername=${layerName}&page=${page}&size=${size}`);
 };
 
+const getExtentByLayerId = (id: string) => {
+  return instance.get<{ extent: string }>(`${OPEN_API_URL}/layers/${id}/extent`);
+};
+
 export const mapOpenAPI = {
-  getOpenApiRootFolders,
-  getOpenApiRootFoldertreeById,
+  getExtentByLayerId,
   getOpenApiIdentify,
   getOpenApiLayerAttribtes,
   getOpenApiLayerFeatures,
+  getOpenApiRootFolders,
+  getOpenApiRootFoldertreeById,
 };

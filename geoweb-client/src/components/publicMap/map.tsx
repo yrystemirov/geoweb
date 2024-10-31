@@ -268,7 +268,7 @@ const MapComponent = () => {
           transform: 'translateY(-50%)',
           borderRadius: '10px',
           alignItems: 'flex-end',
-          zIndex: 5000,
+          zIndex: 1010,
         }}
       >
         {map && <LayerPanel color={systemThemeColor} publicMaps={publicMaps} />}
@@ -284,7 +284,7 @@ const MapComponent = () => {
           transform: 'translateY(-50%)',
           borderRadius: '10px',
           alignItems: 'flex-end',
-          zIndex: 5000,
+          zIndex: 1010,
         }}
       >
         {map && (
