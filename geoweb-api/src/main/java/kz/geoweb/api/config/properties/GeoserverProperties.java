@@ -13,4 +13,6 @@ public class GeoserverProperties {
     private String password;
     private String workspace;
     private String datastore;
+    private String dataDir;
+    private String iconsPath;
 }
