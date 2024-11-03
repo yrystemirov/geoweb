@@ -8,6 +8,7 @@ import kz.geoweb.api.dto.WmsResponseDto;
 import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.service.GeoserverService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static kz.geoweb.api.utils.GisConstants.GEOSERVER_SLD_CONTENT_TYPE;
+import static kz.geoweb.api.utils.GisConstants.LAYERS_SCHEMA;
 
 @Service
 @Slf4j
@@ -30,6 +32,13 @@ public class GeoserverServiceImpl implements GeoserverService {
     private final String geoserverRestUrl;
     private final String workspace;
     private final String datastore;
+
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
+    @Value("${spring.datasource.username}")
+    private String dbUsername;
+    @Value("${spring.datasource.password}")
+    private String dbPassword;
 
     public GeoserverServiceImpl(GeoserverProperties geoserverProperties, RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.geoserverProperties = geoserverProperties;
@@ -50,6 +59,80 @@ public class GeoserverServiceImpl implements GeoserverService {
         requestHeaders.setBasicAuth(encodedCredentials);
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         return requestHeaders;
+    }
+
+    @Override
+    public void createWorkspaceIfNotExists() {
+        String url = geoserverRestUrl + "workspaces/" + workspace;
+        HttpHeaders headers = getHeaders();
+        headers.setContentType(MediaType.APPLICATION_XML);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            if (response.getStatusCode().equals(HttpStatus.OK)) {
+                log.info("Workspace '{}' already exists.", workspace);
+                return;
+            }
+        } catch (Exception e) {
+            log.info("Workspace '{}' does not exist. Attempting to create it.", workspace);
+        }
+
+        String workspaceCreationUrl = geoserverRestUrl + "workspaces";
+        String workspaceConfig = "<workspace><name>" + workspace + "</name></workspace>";
+        HttpEntity<String> workspaceEntity = new HttpEntity<>(workspaceConfig, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(workspaceCreationUrl, HttpMethod.POST, workspaceEntity, String.class);
+        if (!response.getStatusCode().equals(HttpStatus.CREATED)) {
+            throw new CustomException("Failed to create workspace: " + workspace);
+        }
+        log.info("Workspace '{}' created successfully!", workspace);
+    }
+
+    @Override
+    public void createDatastoreIfNotExists() {
+        String url = geoserverRestUrl + "workspaces/" + workspace + "/datastores/" + datastore;
+        HttpHeaders headers = getHeaders();
+        headers.setContentType(MediaType.APPLICATION_XML);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            if (response.getStatusCode().equals(HttpStatus.OK)) {
+                log.info("Datastore '{}' already exists.", datastore);
+                return;
+            }
+        } catch (Exception e) {
+            log.info("Datastore '{}' does not exist. Attempting to create it.", datastore);
+        }
+
+        String[] dbUrlParts = dbUrl.split("://")[1].split("/");
+        String hostPortPart = dbUrlParts[0];
+        String[] hostPortPartArray = hostPortPart.split(":");
+        String dbHost = hostPortPartArray[0];
+        String dbPort = hostPortPartArray[1];
+        String dbName = dbUrlParts[1];
+
+        String datastoreCreationUrl = geoserverRestUrl + "workspaces/" + workspace + "/datastores";
+        String datastoreConfig = "<dataStore>" +
+                "  <name>" + datastore + "</name>" +
+                "  <connectionParameters>" +
+                "    <entry key=\"host\">" + dbHost + "</entry>" +
+                "    <entry key=\"port\">" + dbPort + "</entry>" +
+                "    <entry key=\"database\">" + dbName + "</entry>" +
+                "    <entry key=\"schema\">" + LAYERS_SCHEMA + "</entry>" +
+                "    <entry key=\"user\">" + dbUsername + "</entry>" +
+                "    <entry key=\"passwd\">" + dbPassword + "</entry>" +
+                "    <entry key=\"dbtype\">postgis</entry>" +
+                "  </connectionParameters>" +
+                "</dataStore>";
+
+        HttpEntity<String> datastoreEntity = new HttpEntity<>(datastoreConfig, headers);
+        ResponseEntity<String> response = restTemplate.exchange(datastoreCreationUrl, HttpMethod.POST, datastoreEntity, String.class);
+        if (!response.getStatusCode().equals(HttpStatus.CREATED)) {
+            throw new CustomException("Failed to create datastore: " + datastore);
+        }
+        log.info("Datastore '{}' created successfully!", datastore);
     }
 
     @Override
