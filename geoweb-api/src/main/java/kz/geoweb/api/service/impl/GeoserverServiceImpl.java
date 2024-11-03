@@ -127,6 +127,9 @@ public class GeoserverServiceImpl implements GeoserverService {
                 "  </connectionParameters>" +
                 "</dataStore>";
 
+        log.info("datastoreCreateUrl: {}", datastoreCreationUrl);
+        log.info("datastoreConfig: {}", datastoreConfig);
+
         HttpEntity<String> datastoreEntity = new HttpEntity<>(datastoreConfig, headers);
         ResponseEntity<String> response = restTemplate.exchange(datastoreCreationUrl, HttpMethod.POST, datastoreEntity, String.class);
         if (!response.getStatusCode().equals(HttpStatus.CREATED)) {
