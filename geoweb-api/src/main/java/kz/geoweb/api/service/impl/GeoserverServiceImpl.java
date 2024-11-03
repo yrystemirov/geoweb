@@ -82,6 +82,9 @@ public class GeoserverServiceImpl implements GeoserverService {
         String workspaceConfig = "<workspace><name>" + workspace + "</name></workspace>";
         HttpEntity<String> workspaceEntity = new HttpEntity<>(workspaceConfig, headers);
 
+        log.info("workspaceCreateUrl: {}", workspaceCreationUrl);
+        log.info("workspaceConfig: {}", workspaceConfig);
+
         ResponseEntity<String> response = restTemplate.exchange(workspaceCreationUrl, HttpMethod.POST, workspaceEntity, String.class);
         if (!response.getStatusCode().equals(HttpStatus.CREATED)) {
             throw new CustomException("Failed to create workspace: " + workspace);
