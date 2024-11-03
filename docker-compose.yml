@@ -23,8 +23,12 @@ services:
       dockerfile: ./docker/backend/Dockerfile
     ports:
       - "${API_EXTERNAL_PORT}:${API_INTERNAL_PORT}"
+    volumes:
+      - geoserver_icons:${APP_GEOSERVER_ICONS_PATH}
     depends_on:
       - db
+      - minio
+      - geoserver
     environment:
       SERVER_PORT: ${API_INTERNAL_PORT}
       SPRING_DATASOURCE_URL: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_INTERNAL_PORT}/${POSTGRES_DB}
@@ -37,13 +41,16 @@ services:
       JWT_ACCESS_EXPIRY_MINUTES: ${JWT_ACCESS_EXPIRY_MINUTES}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_REFRESH_EXPIRY_DAYS: ${JWT_REFRESH_EXPIRY_DAYS}
-      GEOSERVER_URL: http://geoweb_geoserver:8080/geoserver/
+      GEOSERVER_URL: http://${GEOSERVER_HOST}:8080/geoserver/
       GEOSERVER_WORKSPACE: ${GEOSERVER_WORKSPACE}
       GEOSERVER_DATASTORE: ${GEOSERVER_DATASTORE}
-      APP_MINIO_HOST: ${MINIO_HOST}
+      APP_MINIO_HOST: http://${MINIO_HOST}
       APP_MINIO_PORT: ${MINIO_PORT}
       APP_MINIO_USER: ${MINIO_ROOT_USER}
       APP_MINIO_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      APP_GEOSERVER_ICONS_PATH: ${APP_GEOSERVER_ICONS_PATH}
+      GEOSERVER_DATA_DIR: ${GEOSERVER_DATA_DIR}
+      GEOSERVER_ICONS_PATH: ${GEOSERVER_ICONS_PATH}
   db:
     container_name: ${POSTGRES_HOST}
     image: 'postgis/postgis:latest'
@@ -86,6 +93,7 @@ services:
       container_name: geoweb_geoserver
       volumes:
         - ./docker-data/geoserver-data:/opt/geoserver/data_dir
+        - geoserver_icons:${GEOSERVER_DATA_DIR}${GEOSERVER_ICONS_PATH}
       ports:
         - ${GEOSERVER_PORT}:8080
       restart: on-failure
@@ -104,4 +112,6 @@ services:
 networks:
   default:
     name: ${DOCKER_NETWORK_NAME}
-    #external: true  
+    #external: true
+volumes:
+  geoserver_icons:
