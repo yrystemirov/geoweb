@@ -1,20 +1,20 @@
 version: '3.8'
 services:
-  client-frontend:
-   image: geoweb-frontend:0.0.1
-   container_name: geoweb_client
-   build:
-    context: .
-    dockerfile: ./docker/frontend/Dockerfile
-   restart: always
-   ports:
-     - '3000:3000'
-  nginx: 
-    build:
-      context: .
-      dockerfile: ./docker/nginx/Dockerfile
-    ports:
-      - 80:80
+  # client-frontend:
+  #  image: geoweb-frontend:0.0.1
+  #  container_name: geoweb_client
+  #  build:
+  #   context: .
+  #   dockerfile: ./docker/frontend/Dockerfile
+  #  restart: always
+  #  ports:
+  #    - '3000:3000'
+  # nginx: 
+  #   build:
+  #     context: .
+  #     dockerfile: ./docker/nginx/Dockerfile
+  #   ports:
+  #     - 80:80
   client-backend:
     container_name: geoweb_api
     image: geoweb-backend:0.0.1
@@ -41,7 +41,7 @@ services:
       JWT_ACCESS_EXPIRY_MINUTES: ${JWT_ACCESS_EXPIRY_MINUTES}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_REFRESH_EXPIRY_DAYS: ${JWT_REFRESH_EXPIRY_DAYS}
-      GEOSERVER_URL: http://${GEOSERVER_HOST}:${GEOSERVER_PORT}/geoserver/
+      GEOSERVER_URL: http://${GEOSERVER_HOST}:8080/geoserver/
       GEOSERVER_WORKSPACE: ${GEOSERVER_WORKSPACE}
       GEOSERVER_DATASTORE: ${GEOSERVER_DATASTORE}
       APP_MINIO_HOST: http://${MINIO_HOST}
@@ -65,17 +65,17 @@ services:
       - ./infrastructure/db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
       - ./docker-data/postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
-  pgadmin:
-    container_name: geoweb_pgadmin4
-    image: dpage/pgadmin4:7
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - "5151:80"
-    volumes:
-      - ./docker-data/pgadmin-data:/var/lib/pgadmin
+  # pgadmin:
+  #   container_name: geoweb_pgadmin4
+  #   image: dpage/pgadmin4:7
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #   ports:
+  #     - "5151:80"
+  #   volumes:
+  #     - ./docker-data/pgadmin-data:/var/lib/pgadmin
   minio:
     container_name: ${MINIO_HOST}
     image: minio/minio
