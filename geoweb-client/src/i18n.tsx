@@ -200,6 +200,11 @@ const resources = {
       // error messages from backend
       'entry.by_code.already_exists': 'Осы кодпен жазба бар',
       'dictionary.by_code.already_exists': 'Осы кодпен сөздік бар',
+      'password.invalid': 'Құпия сөз дұрыс емес',
+      'user.not_found': 'Пайдаланушы табылмады',
+      'user.username.exists': 'Осы логинмен пайдаланушы бар',
+      'user.phone_number.exists': 'Осы телефон нөмірімен пайдаланушы бар',
+      forbidden: 'Құқықсыз',
     },
   },
   ru: {
@@ -395,6 +400,11 @@ const resources = {
       success: 'Успешно',
       'entry.by_code.already_exists': 'Запись с таким кодом уже существует',
       'dictionary.by_code.already_exists': 'Справочник с таким кодом уже существует',
+      'password.invalid': 'Неверный пароль',
+      'user.not_found': 'Пользователь не найден',
+      'user.username.exists': 'Пользователь с таким логином уже существует',
+      'user.phone_number.exists': 'Пользователь с таким номером телефона уже существует',
+      forbidden: 'Запрещено',
     },
   },
 };
