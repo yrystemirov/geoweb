@@ -11,6 +11,7 @@ import kz.geoweb.api.repository.LayerRepository;
 import kz.geoweb.api.repository.StyleRepository;
 import kz.geoweb.api.service.GeoserverService;
 import kz.geoweb.api.service.StyleService;
+import kz.geoweb.api.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -456,7 +457,8 @@ public class StyleServiceImpl implements StyleService {
             File destinationFile = new File(geoserverIconsPath + "/" + filename);
             file.transferTo(destinationFile);
             String iconPath = geoserverProperties.getIconsPath() + "/" + filename;
-            return new StyleIconResponseDto(iconPath);
+            String format = "image/" + FileUtils.getExtension(filename);
+            return new StyleIconResponseDto(iconPath, format);
         } catch (IOException e) {
             log.error("Error while uploading file", e);
             throw new CustomException("file.upload.error");
