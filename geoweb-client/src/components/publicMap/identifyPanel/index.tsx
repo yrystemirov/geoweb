@@ -3,6 +3,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
   IconButton,
   Pagination,
   Paper,
@@ -10,7 +11,7 @@ import {
   TableBody,
   TableCell,
   TableRow,
-  Typography
+  Typography,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -20,6 +21,7 @@ import { usePublicMapStore } from '../../../hooks/usePublicMapStore';
 import { mapOpenAPI } from '../../../api/openApi';
 import { translateField } from '../../../utils/localization';
 import { useTranslation } from 'react-i18next';
+import { Loader } from '../../common/Loader';
 
 class GeoserverIdnetifyParams {
   constructor(
@@ -75,7 +77,6 @@ export const IdentifyPanel = () => {
             }
             identData_.push(item_);
         })*/
-    setIsLoading(true);
     let _layerNames: any[] = [];
     let layerGroups: any = map?.getLayers().getArray();
     let vectorSourceForGeoserverUrl = null;
@@ -146,6 +147,7 @@ export const IdentifyPanel = () => {
   };*/
 
   function getIdent(url: any, identData_: any[]) {
+    setIsLoading(true);
     const newData: any[] = identData_ ? identData_ : [];
     const urlParams = new URLSearchParams(url);
 
@@ -175,6 +177,12 @@ export const IdentifyPanel = () => {
           });
         }
         setIdentData(identDataByLayers);
+      })
+      .catch((error: any) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }
 
@@ -297,6 +305,13 @@ export const IdentifyPanel = () => {
   const renderList = () => {
     let result = [];
     let index = 0;
+    if (!identData || Object.keys(identData).length === 0) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          {!isLoading && t('noData')}
+        </Box>
+      );
+    }
     for (var key in identData) {
       result.push(
         <Accordion
@@ -427,13 +442,14 @@ export const IdentifyPanel = () => {
           overflowY: 'auto',
           overflowX: 'hidden !important',
           background: '#ffffff',
+          display: 'flex',
+          flexDirection: 'column',
           // boxShadow: '0px 32px 32px -8px rgba(18, 18, 18, 0.08), 0px 0px 32px -8px rgba(18, 18, 18, 0.12), 0px 0px 1px rgba(18, 18, 18, 0.2)',
         }}
       >
         <div
           className="menu"
           style={{
-            height: '43px',
             background: systemThemeColor,
           }}
         >
@@ -450,7 +466,10 @@ export const IdentifyPanel = () => {
             <CloseIcon fontSize={'small'} />
           </IconButton>
         </div>
-        <div className="details">{renderList()}</div>
+        <Box className="details" flex={1} position={'relative'}>
+          {isLoading && <Loader />}
+          {renderList()}
+        </Box>
       </Paper>
     </>
   );
