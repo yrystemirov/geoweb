@@ -1,8 +1,8 @@
 version: '3.8'
 services:
-  client-frontend:
+  frontend:
    image: geoweb-frontend:0.0.1
-   container_name: geoweb_client
+   container_name: ${FRONTEND_CONTAINER}
    build:
     context: .
     dockerfile: ./docker/frontend/Dockerfile
@@ -15,12 +15,12 @@ services:
       dockerfile: ./docker/nginx/Dockerfile
     ports:
       - 81:80
-  client-backend:
-    container_name: geoweb_api
-    image: geoweb-backend:0.0.1
+  api:
+    container_name: ${API_CONTAINER}
+    image: geoweb-api:0.0.1
     build:
       context: .
-      dockerfile: ./docker/backend/Dockerfile
+      dockerfile: ./docker/api/Dockerfile
     ports:
       - "${API_EXTERNAL_PORT}:${API_INTERNAL_PORT}"
     volumes:
@@ -31,8 +31,7 @@ services:
       - geoserver
     environment:
       SERVER_PORT: ${API_INTERNAL_PORT}
-      SPRING_DATASOURCE_URL: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_INTERNAL_PORT}/${POSTGRES_DB}
-      POSTGRES_HOST: ${POSTGRES_HOST}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${POSTGRES_CONTAINER}:${POSTGRES_INTERNAL_PORT}/${POSTGRES_DB}
       POSTGRES_PORT: ${POSTGRES_INTERNAL_PORT}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -41,10 +40,12 @@ services:
       JWT_ACCESS_EXPIRY_MINUTES: ${JWT_ACCESS_EXPIRY_MINUTES}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_REFRESH_EXPIRY_DAYS: ${JWT_REFRESH_EXPIRY_DAYS}
-      GEOSERVER_URL: http://${GEOSERVER_HOST}:8080/geoserver/
+      GEOSERVER_URL: http://${GEOSERVER_CONTAINER}:8080/geoserver/
       GEOSERVER_WORKSPACE: ${GEOSERVER_WORKSPACE}
       GEOSERVER_DATASTORE: ${GEOSERVER_DATASTORE}
-      APP_MINIO_HOST: http://${MINIO_HOST}
+      GEOSERVER_ADMIN_USER: ${GEOSERVER_ADMIN_USER}
+      GEOSERVER_ADMIN_PASSWORD: ${GEOSERVER_ADMIN_PASSWORD}
+      APP_MINIO_HOST: http://${MINIO_CONTAINER}
       APP_MINIO_PORT: ${MINIO_PORT}
       APP_MINIO_USER: ${MINIO_ROOT_USER}
       APP_MINIO_PASSWORD: ${MINIO_ROOT_PASSWORD}
@@ -52,7 +53,7 @@ services:
       GEOSERVER_DATA_DIR: ${GEOSERVER_DATA_DIR}
       GEOSERVER_ICONS_PATH: ${GEOSERVER_ICONS_PATH}
   db:
-    container_name: ${POSTGRES_HOST}
+    container_name: ${POSTGRES_CONTAINER}
     image: 'postgis/postgis:latest'
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -65,7 +66,7 @@ services:
       - ./docker-data/postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
   pgadmin:
-    container_name: geoweb_pgadmin4
+    container_name: ${PGADMIN_CONTAINER}
     image: dpage/pgadmin4:7
     restart: always
     environment:
@@ -76,7 +77,7 @@ services:
     volumes:
       - ./docker-data/pgadmin-data:/var/lib/pgadmin
   minio:
-    container_name: ${MINIO_HOST}
+    container_name: ${MINIO_CONTAINER}
     image: minio/minio
     ports:
       - "9000:9000"
@@ -88,8 +89,8 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server --console-address ":9001" /data
   geoserver:
-      image: kartoza/geoserver:${GS_VERSION}
-      container_name: geoweb_geoserver
+      image: kartoza/geoserver:${GEOSERVER_VERSION}
+      container_name: ${GEOSERVER_CONTAINER}
       volumes:
         - ./docker-data/geoserver-data:/opt/geoserver/data_dir
         - geoserver_icons:${GEOSERVER_DATA_DIR}${GEOSERVER_ICONS_PATH}
@@ -97,8 +98,8 @@ services:
         - ${GEOSERVER_PORT}:8080
       restart: on-failure
       environment:
-        - GEOSERVER_DATA_DIR=/opt/geoserver/data_dir
-        - GEOWEBCACHE_CACHE_DIR=/opt/geoserver/data_dir/gwc
+        - GEOSERVER_DATA_DIR=${GEOSERVER_DATA_DIR} #/opt/geoserver/data_dir
+        - GEOWEBCACHE_CACHE_DIR=${GEOWEBCACHE_CACHE_DIR} #/opt/geoserver/data_dir/gwc
         - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD}
         - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER}
         - INITIAL_MEMORY=${INITIAL_MEMORY}
