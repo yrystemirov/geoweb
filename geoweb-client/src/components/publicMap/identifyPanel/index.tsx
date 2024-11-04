@@ -1,30 +1,20 @@
-import { useContext, useEffect, useState } from 'react';
-
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import { useEffect, useState } from 'react';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Divider,
   IconButton,
   Pagination,
   Paper,
-  Tab,
   Table,
   TableBody,
   TableCell,
   TableRow,
-  Typography,
+  Typography
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VectorLayer from 'ol/layer/Vector';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
-import Box from '@mui/material/Box';
-import { TabContext } from '@mui/lab';
-import FileOpenIcon from '@mui/icons-material/FileOpen';
 import OpenlayersBaseLayersUtils from '../../../utils/openlayers/OpenlayersBaseLayersUtils';
 import { usePublicMapStore } from '../../../hooks/usePublicMapStore';
 import { mapOpenAPI } from '../../../api/openApi';
@@ -40,7 +30,7 @@ class GeoserverIdnetifyParams {
   ) {}
 }
 
-export const IdentifyPanel = (props: any) => {
+export const IdentifyPanel = () => {
   const { i18n, t } = useTranslation();
   const { map, userLayers, identifyEventData, setIdentifyEventData, systemThemeColor } = usePublicMapStore();
   const [identData, setIdentData] = useState<any>();
