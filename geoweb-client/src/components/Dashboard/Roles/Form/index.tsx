@@ -81,6 +81,7 @@ export const RoleForm: FC<Props> = ({ editData, onCancel, onSuccess }) => {
           error={!!errors.name}
           helperText={errors.name?.message}
           {...methods.register('name')}
+          required
         />
         <TextField
           label={t('roles.code')}
@@ -89,6 +90,7 @@ export const RoleForm: FC<Props> = ({ editData, onCancel, onSuccess }) => {
           error={!!errors.code}
           helperText={errors.code?.message}
           {...methods.register('code')}
+          required
         />
         <TextField
           label={t('roles.description')}
