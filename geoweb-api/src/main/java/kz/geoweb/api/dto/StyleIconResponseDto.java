@@ -4,11 +4,11 @@ import lombok.Data;
 
 @Data
 public class StyleIconResponseDto {
-    private String iconPath;
-    private String format;
+    private String imgSrc;
+    private String imgFormat;
 
-    public StyleIconResponseDto(String iconPath, String format) {
-        this.iconPath = iconPath;
-        this.format = format;
+    public StyleIconResponseDto(String imgSrc, String imgFormat) {
+        this.imgSrc = imgSrc;
+        this.imgFormat = imgFormat;
     }
 }

@@ -456,9 +456,9 @@ public class StyleServiceImpl implements StyleService {
             }
             File destinationFile = new File(geoserverIconsPath + "/" + filename);
             file.transferTo(destinationFile);
-            String iconPath = geoserverProperties.getIconsPath() + "/" + filename;
-            String format = "image/" + FileUtils.getExtension(filename);
-            return new StyleIconResponseDto(iconPath, format);
+            String imgSrc = geoserverProperties.getIconsPath() + "/" + filename;
+            String imgFormat = "image/" + FileUtils.getExtension(filename);
+            return new StyleIconResponseDto(imgSrc, imgFormat);
         } catch (IOException e) {
             log.error("Error while uploading file", e);
             throw new CustomException("file.upload.error");
