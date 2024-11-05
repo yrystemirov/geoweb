@@ -256,6 +256,12 @@ const MapComponent = () => {
     };
   }, [map, identifyHandler]);
 
+  useEffect(() => {
+    return () => {
+      setIdentifyEventData(null);
+    };
+  }, []);
+
   return (
     <div
       className="map gis"
