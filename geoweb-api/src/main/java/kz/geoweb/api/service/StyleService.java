@@ -1,10 +1,12 @@
 package kz.geoweb.api.service;
 
+import kz.geoweb.api.dto.StyleIconResponseDto;
 import kz.geoweb.api.dto.StyleRequestDto;
 import kz.geoweb.api.dto.StyleResponseDto;
 import kz.geoweb.api.dto.StyleResponseFullDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -15,4 +17,5 @@ public interface StyleService {
     StyleResponseDto updateStyle(UUID styleId, StyleRequestDto styleRequestDto);
     void deleteStyle(UUID id);
     String generateStyleXml(StyleRequestDto styleRequestDto);
+    StyleIconResponseDto uploadIcon(MultipartFile file);
 }

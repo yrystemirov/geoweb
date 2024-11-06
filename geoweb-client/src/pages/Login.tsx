@@ -8,6 +8,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useLoading } from '../components/common/loadingBar/loadingContext';
 import { useAuth } from '../hooks/useAuth';
 import { dashboardUrl } from '../components/Dashboard/routes';
+import { useNotify } from '../hooks/useNotify';
 
 interface FormValues {
   username: string;
@@ -15,6 +16,7 @@ interface FormValues {
 }
 
 const Login: React.FC = () => {
+  const { showError } = useNotify();
   const { setToken } = useAuth();
   const navigate = useNavigate();
   const { setLoading } = useLoading();
@@ -27,7 +29,7 @@ const Login: React.FC = () => {
       setToken(tokenData);
     },
     onError: (error) => {
-      console.log('error', error);
+      showError({ error });
     },
   });
 
@@ -56,17 +58,10 @@ const Login: React.FC = () => {
       component="form"
       onSubmit={handleSubmit((data) => getToken(data))}
     >
-      <Typography
-        variant="h6"
-        gutterBottom
-      >
+      <Typography variant="h6" gutterBottom>
         {t('signInTitle')}
       </Typography>
-      <Box
-        display={'flex'}
-        flexDirection={'column'}
-        gap={2}
-      >
+      <Box display={'flex'} flexDirection={'column'} gap={2}>
         <Controller
           name="username"
           control={control}
@@ -98,12 +93,7 @@ const Login: React.FC = () => {
             />
           )}
         />
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          disabled={isPending}
-        >
+        <Button type="submit" variant="contained" color="primary" disabled={isPending}>
           {t('signIn')}
         </Button>
       </Box>

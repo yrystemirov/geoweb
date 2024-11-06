@@ -6,7 +6,7 @@ import { LibraryAddCheck } from '@mui/icons-material';
 import CheckboxTree, { Node } from 'react-checkbox-tree';
 import { useTranslatedProp } from '../../../hooks/useTranslatedProp';
 import { icons } from './data';
-import { common } from '@mui/material/colors';
+import { common, grey } from '@mui/material/colors';
 import { usePublicMapStore } from '../../../hooks/usePublicMapStore';
 import { LayerActionsMenu } from './ActionsMenu';
 import { LegendImage } from './LegendImage';
@@ -116,7 +116,7 @@ export const LayerPanel: React.FC<Props> = ({ color = 'rgb(64 152 68 / 70%)', pu
           }}
         >
           {mapNodes?.map((mapNode) => (
-            <Box className="layers-tree" key={mapNode.value} sx={{ borderBottom: '1px solid #e0e0e0', p: 1, color }}>
+            <Box className="layers-tree" key={mapNode.value} sx={{ borderBottom: `1px solid ${grey[300]}`, p: 1, color }}>
               <CheckboxTree
                 nodes={[mapNode]}
                 checked={checked[mapNode.value] || []}

@@ -50,4 +50,9 @@ public class UserController {
         permissionService.hasAnyRole(RoleEnum.SUPERADMIN, RoleEnum.ADMIN);
         userService.deleteUser(id);
     }
+
+    @GetMapping("/current")
+    public UserDto getCurrentUser() {
+        return userService.getCurrentUser();
+    }
 }

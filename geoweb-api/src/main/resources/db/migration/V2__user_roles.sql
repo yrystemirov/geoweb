@@ -45,7 +45,7 @@ values ('f47c4b38-8b95-4637-9a73-9f3631ad0b28', 'admin',
         'Администратор', '2024-01-01');
 
 insert into role (id, code, name)
-values ('001eb4b9-b0f1-463c-8598-24f7a470b793', 'ADMIN', 'Администратор');
+values ('001eb4b9-b0f1-463c-8598-24f7a470b793', 'SUPERADMIN', 'Суперадминистратор');
 
 insert into user_role(user_id, role_id)
 values ('f47c4b38-8b95-4637-9a73-9f3631ad0b28', '001eb4b9-b0f1-463c-8598-24f7a470b793');

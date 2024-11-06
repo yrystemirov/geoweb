@@ -40,6 +40,12 @@ const MapComponent = () => {
 
   const [lyrTreeInited, setLyrTreeinIted] = useState<boolean>(false);
 
+  const identifyHandler = (event: any) => {
+    if (mapMode === MapMode.IDENTIFY) {
+      setIdentifyEventData(event);
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -114,18 +120,6 @@ const MapComponent = () => {
       let wgsCoords = proj4('EPSG:3857', 'EPSG:4326', evt.coordinate);
 
       setMapMouseOverCoord(toStringHDMS(wgsCoords, 0));
-    });
-
-    mapObj.on('singleclick', (event) => {
-      if (mapMode === MapMode.IDENTIFY) {
-        setIdentifyEventData(event);
-      }
-    });
-
-    mapObj.on('dblclick', (event) => {
-      if (mapMode === MapMode.IDENTIFY) {
-        setIdentifyEventData(event);
-      }
     });
 
     mapObj.setTarget(mapDivRef.current);
@@ -250,6 +244,23 @@ const MapComponent = () => {
 
     return res;
   };
+
+  useEffect(() => {
+    if (map) {
+      map.on('singleclick', identifyHandler);
+    }
+    return () => {
+      if (map) {
+        map.un('singleclick', identifyHandler);
+      }
+    };
+  }, [map, identifyHandler]);
+
+  useEffect(() => {
+    return () => {
+      setIdentifyEventData(null);
+    };
+  }, []);
 
   return (
     <div

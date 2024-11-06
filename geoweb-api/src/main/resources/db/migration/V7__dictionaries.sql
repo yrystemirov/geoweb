@@ -4,7 +4,8 @@ create table dictionary
     code    varchar(100) not null unique,
     name_kk varchar(500),
     name_ru varchar(500),
-    name_en varchar(500)
+    name_en varchar(500),
+    type    varchar(100) not null default 'TEXT'
 );
 
 create index idx__dictionary__code on dictionary (code);

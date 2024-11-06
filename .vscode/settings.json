@@ -9,5 +9,25 @@
   "prettier.printWidth": 150,
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#4ac155",
+    "activityBar.background": "#4ac155",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#6359c6",
+    "activityBarBadge.foreground": "#e7e7e7",
+    "commandCenter.border": "#e7e7e799",
+    "sash.hoverBorder": "#4ac155",
+    "statusBar.background": "#37a141",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#4ac155",
+    "statusBarItem.remoteBackground": "#37a141",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "titleBar.activeBackground": "#37a141",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#37a14199",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#37a141"
 }
