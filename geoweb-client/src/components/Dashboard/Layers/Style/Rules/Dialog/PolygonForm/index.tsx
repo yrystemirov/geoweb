@@ -13,6 +13,7 @@ import { DashedFields } from '../DashedFields';
 import { LineFormDataType } from '../LineForm';
 import { TextSymbolizerFields } from '../TextSymbolizerFields';
 import { PointFormDataType } from '../PointForm';
+import { grey } from '@mui/material/colors';
 
 export type PolygonFormDataType = StyleRule.Polygon &
   StyleRule.Common &
@@ -284,7 +285,7 @@ export const PolygonForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         sx={
           formValues.dashed
             ? {
-                border: '1px solid #e0e0e0',
+                border: `1px solid ${grey[300]}`,
                 p: 2,
                 borderRadius: 1,
                 mt: 2,
@@ -304,7 +305,7 @@ export const PolygonForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         sx={
           formValues.hasTextSymbolizer
             ? {
-                border: '1px solid #e0e0e0',
+                border: `1px solid ${grey[300]}`,
                 p: 2,
                 borderRadius: 1,
                 mt: 2,

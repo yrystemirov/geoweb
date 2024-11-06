@@ -12,6 +12,7 @@ import { useTranslatedProp } from '../../../../../../../hooks/useTranslatedProp'
 import { TextSymbolizerFields } from '../TextSymbolizerFields';
 import { PointFormDataType } from '../PointForm';
 import { DashedFields } from '../DashedFields';
+import { grey } from '@mui/material/colors';
 
 export type LineFormDataType = StyleRule.Line &
   StyleRule.Common &
@@ -242,7 +243,7 @@ export const LineForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         sx={
           formValues.dashed
             ? {
-                border: '1px solid #e0e0e0',
+                border: `1px solid ${grey[300]}`,
                 p: 2,
                 borderRadius: 1,
                 mt: 2,
@@ -260,7 +261,7 @@ export const LineForm: FC<Props> = ({ editData, onSubmit, onClose }) => {
         sx={
           formValues.hasTextSymbolizer
             ? {
-                border: '1px solid #e0e0e0',
+                border: `1px solid ${grey[300]}`,
                 p: 2,
                 borderRadius: 1,
                 mt: 2,
