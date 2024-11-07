@@ -1,1 +1,0 @@
-alter table dictionary add column type varchar(100) not null default 'TEXT';

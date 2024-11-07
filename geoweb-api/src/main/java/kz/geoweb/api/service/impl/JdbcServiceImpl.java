@@ -2,6 +2,7 @@ package kz.geoweb.api.service.impl;
 
 import kz.geoweb.api.enums.AttrType;
 import kz.geoweb.api.enums.GeometryType;
+import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.service.JdbcService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -51,5 +52,21 @@ public class JdbcServiceImpl implements JdbcService {
                 .query(Integer.class)
                 .single();
         return count > 0;
+    }
+
+    public Integer getSRID(String layername) {
+        return jdbcClient.sql("SELECT srid from public.geometry_columns where f_table_name = '" + layername + "'")
+                .query(Integer.class)
+                .optional()
+                .orElseThrow(() -> new CustomException("layer.by_layername.not_found", layername));
+    }
+
+    @Override
+    public String getTableExtent(String layername) {
+        Integer srid = getSRID(layername);
+        return jdbcClient.sql("SELECT ST_AsText(ST_SetSRID(ST_Extent(geom), " + srid + ")) as extent FROM " + LAYERS_SCHEMA + "." + layername)
+                .query(String.class)
+                .optional()
+                .orElseThrow(() -> new CustomException("layer.no_data", layername));
     }
 }

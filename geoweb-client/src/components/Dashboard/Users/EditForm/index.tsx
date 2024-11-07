@@ -21,7 +21,7 @@ import { UserDto, UserUpdateDto } from '../../../../api/types/user';
 import { useNotify } from '../../../../hooks/useNotify';
 import { userAPI } from '../../../../api/user';
 import { roleAPI } from '../../../../api/roles';
-import { RoleDto } from '../../../../api/types/role';
+import { EDIT_FORBIDDEN_USER_NAMES, RoleDto } from '../../../../api/types/role';
 
 type UserUpdateFormData = UserUpdateDto & { roles: string[] };
 
@@ -108,6 +108,8 @@ export const UserEditForm: FC<Props> = ({ id: idProp, goBackPath, onSuccess, onC
     return null;
   }
 
+  const isEditForbidden = EDIT_FORBIDDEN_USER_NAMES.includes(data.username);
+
   return (
     <Box onSubmit={handleSubmit(onSubmit)} noValidate component={'form'} sx={{ pt: 1 }}>
       <Box display="flex" gap={2} flexWrap={'wrap'} mb={2}>
@@ -157,6 +159,7 @@ export const UserEditForm: FC<Props> = ({ id: idProp, goBackPath, onSuccess, onC
                 .map((role) => role.name)
                 .join(', ')
             }
+            disabled={isEditForbidden}
           >
             {roles.map((role) => (
               <MenuItem key={role.id} value={role.id}>
@@ -170,7 +173,14 @@ export const UserEditForm: FC<Props> = ({ id: idProp, goBackPath, onSuccess, onC
 
       <Box display={'flex'} gap={2} alignItems={'flex-start'}>
         <FormControlLabel
-          control={<Checkbox {...methods.register('blocked')} checked={methods.watch('blocked')} color="primary" />}
+          control={
+            <Checkbox
+              {...methods.register('blocked')}
+              checked={methods.watch('blocked')}
+              color="primary"
+              disabled={isEditForbidden}
+            />
+          }
           label={t('users.blocked')}
           sx={{ mt: 1 }}
         />

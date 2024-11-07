@@ -58,7 +58,14 @@ export const RuleActionsMenu: FC<Props> = ({
       </IconButton>
       <Menu id="rule-menu" anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
         {rule.isDeleted ? (
-          <MenuItem onClick={() => onCancelDeletion(rule)}>
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              setTimeout(() => {
+                onCancelDeletion(rule);
+              }, 300); // чтобы не мигало
+            }}
+          >
             <RestoreFromTrash sx={iconSx} />
             {t('cancelDeletion')}
           </MenuItem>
@@ -74,8 +81,10 @@ export const RuleActionsMenu: FC<Props> = ({
             </MenuItem>
             <MenuItem
               onClick={() => {
-                onDelete(rule);
                 handleClose();
+                setTimeout(() => {
+                  onDelete(rule);
+                }, 300); // чтобы не мигало
               }}
             >
               <DeleteOutline sx={iconSx} />

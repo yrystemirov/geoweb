@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { LibraryAddCheck } from '@mui/icons-material';
 import CheckboxTree, { Node } from 'react-checkbox-tree';
 import { useTranslatedProp } from '../../../hooks/useTranslatedProp';
-import { uuidv4 } from '../../../utils/uidv4';
 import { icons } from './data';
-import { common } from '@mui/material/colors';
+import { common, grey } from '@mui/material/colors';
 import { usePublicMapStore } from '../../../hooks/usePublicMapStore';
 import { LayerActionsMenu } from './ActionsMenu';
+import { LegendImage } from './LegendImage';
 
 interface Props {
   color?: CSSProperties['background'];
@@ -24,20 +24,40 @@ export const LayerPanel: React.FC<Props> = ({ color = 'rgb(64 152 68 / 70%)', pu
   const [expanded, setExpanded] = useState<{ [mapId: string]: string[] }>({});
   const [checked, setChecked] = useState<{ [mapId: string]: string[] }>({});
   const [open, setOpen] = useState(false);
+  const [activeLegendLayers, setLegendLayerNames] = useState<string[]>([]);
 
   const recursiveConvertToTreeNode = (folder: FolderTreeDto): Node => {
     return {
       value: folder.id,
-      label: <Typography color={common.black}>{folder[nameProp]}</Typography>,
+      label: (
+        <Typography display={'flex'} alignItems={'center'} minHeight={36} color={common.black} noWrap>
+          {folder[nameProp]}
+        </Typography>
+      ),
       children: folder.children
         .map((child) => recursiveConvertToTreeNode(child))
         .concat(
-          folder.layers.map((layer) => ({
-            value: `${uuidv4()}.${layer.id}`, // NOTE: вынужденное решение, т.к. react-checkbox-tree не поддерживает дубликаты value, а у нас могут быть папки с одинаковыми слоями
+          folder.layers.map((layer, idx) => ({
+            value: `${folder.id}#${idx}.${layer.id}`, // NOTE: вынужденное решение, т.к. react-checkbox-tree не поддерживает дубликаты value, а у нас могут быть папки с одинаковыми слоями
             label: (
-              <Box display={'flex'} alignItems={'center'}>
-                <Typography color={common.black}>{layer[nameProp]}</Typography>
-                <LayerActionsMenu layer={layer} />
+              <Box display={'flex'} flexDirection={'column'} alignItems={'flex-start'}>
+                <Box display={'flex'} alignItems={'center'}>
+                  <Typography color={common.black} noWrap>{layer[nameProp]}</Typography>
+                  <LayerActionsMenu
+                    layer={layer}
+                    isLegendVisible={activeLegendLayers.includes(layer.layername)}
+                    onLegendClick={() =>
+                      setLegendLayerNames((prev) =>
+                        prev.includes(layer.layername)
+                          ? prev.filter((name) => name !== layer.layername)
+                          : [...prev, layer.layername],
+                      )
+                    }
+                  />
+                </Box>
+                {activeLegendLayers.includes(layer.layername) && (
+                  <LegendImage layer={layer} />
+                )}
               </Box>
             ),
           })),
@@ -45,14 +65,17 @@ export const LayerPanel: React.FC<Props> = ({ color = 'rgb(64 152 68 / 70%)', pu
     };
   };
 
-  const mapNodes = useMemo(() => publicMaps?.map((folder) => recursiveConvertToTreeNode(folder)), [publicMaps]);
+  const mapNodes = useMemo(
+    () => publicMaps?.map((folder) => recursiveConvertToTreeNode(folder)),
+    [publicMaps, activeLegendLayers, nameProp],
+  );
 
   const switchLayerVisibility = (checked: { [key: string]: string[] }) => {
     userLayers.forEach((layer) => {
       const layerId = layer.getProperties().systemLayerProps.id;
       const isVisible = Object.values(checked)
         .flat()
-        .map((id) => id.split('.')[1]) // очищаем от uuidv4
+        .map((id) => id.split('.')[1]) // очищаем от индекса и id папки
         .includes(layerId);
 
       layer.setVisible(isVisible);
@@ -93,7 +116,7 @@ export const LayerPanel: React.FC<Props> = ({ color = 'rgb(64 152 68 / 70%)', pu
           }}
         >
           {mapNodes?.map((mapNode) => (
-            <Box className="layers-tree" key={mapNode.value} sx={{ borderBottom: '1px solid #e0e0e0', p: 1, color }}>
+            <Box className="layers-tree" key={mapNode.value} sx={{ borderBottom: `1px solid ${grey[300]}`, p: 1, color }}>
               <CheckboxTree
                 nodes={[mapNode]}
                 checked={checked[mapNode.value] || []}

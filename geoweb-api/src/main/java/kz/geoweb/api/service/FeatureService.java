@@ -28,4 +28,6 @@ public interface FeatureService {
     FeatureFileResponseDto downloadFeatureFile(UUID id);
 
     FeatureFileResponseDto downloadFeatureFilePublic(UUID id);
+
+    ExtentDto getLayerExtent(UUID layerId);
 }

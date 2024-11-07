@@ -74,7 +74,6 @@ export const MapFolders: FC = () => {
       <Box>
         <DataGrid
           rows={data}
-          rowCount={data.length}
           columns={columns}
           localeText={dataGridLocale}
           loading={isLoading}

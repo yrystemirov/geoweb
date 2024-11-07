@@ -8,6 +8,10 @@ import { useForm, Controller } from 'react-hook-form';
 import { useLoading } from '../components/common/loadingBar/loadingContext';
 import { useAuth } from '../hooks/useAuth';
 import { dashboardUrl } from '../components/Dashboard/routes';
+import { useNotify } from '../hooks/useNotify';
+import { userAPI } from '../api/user';
+import { useUserStore } from '../hooks/useUserStore';
+import { SUPERADMIN_ROLE_CODE } from '../api/types/role';
 
 interface FormValues {
   username: string;
@@ -15,7 +19,9 @@ interface FormValues {
 }
 
 const Login: React.FC = () => {
-  const { setToken } = useAuth();
+  const { setUser } = useUserStore();
+  const { showSuccess, showError } = useNotify();
+  const { setToken, hasRole } = useAuth();
   const navigate = useNavigate();
   const { setLoading } = useLoading();
   const { t } = useTranslation();
@@ -23,11 +29,25 @@ const Login: React.FC = () => {
   const { mutate: getToken, isPending } = useMutation({
     mutationFn: (data: FormValues) => authAPI.getToken(data.username, data.password).then((res) => res.data),
     onSuccess: (tokenData) => {
-      navigate(dashboardUrl);
       setToken(tokenData);
+      getCurrentUserMutation.mutate();
     },
     onError: (error) => {
-      console.log('error', error);
+      showError({ error });
+    },
+  });
+
+  const getCurrentUserMutation = useMutation({
+    mutationFn: () => userAPI.getCurrentUser().then((res) => res.data),
+    onSuccess: (user) => {
+      showSuccess();
+      setUser(user);
+      const isAdmin = hasRole(SUPERADMIN_ROLE_CODE, user);
+      if (isAdmin) {
+        navigate(dashboardUrl);
+      } else {
+        navigate('/');
+      }
     },
   });
 
@@ -56,17 +76,10 @@ const Login: React.FC = () => {
       component="form"
       onSubmit={handleSubmit((data) => getToken(data))}
     >
-      <Typography
-        variant="h6"
-        gutterBottom
-      >
+      <Typography variant="h6" gutterBottom>
         {t('signInTitle')}
       </Typography>
-      <Box
-        display={'flex'}
-        flexDirection={'column'}
-        gap={2}
-      >
+      <Box display={'flex'} flexDirection={'column'} gap={2}>
         <Controller
           name="username"
           control={control}
@@ -98,12 +111,7 @@ const Login: React.FC = () => {
             />
           )}
         />
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          disabled={isPending}
-        >
+        <Button type="submit" variant="contained" color="primary" disabled={isPending}>
           {t('signIn')}
         </Button>
       </Box>

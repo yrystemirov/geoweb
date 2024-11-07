@@ -90,6 +90,7 @@ export const Layers: FC = () => {
           loading={isLoading}
           paginationModel={pagination}
           onPaginationModelChange={(newPagination) => setPagination(newPagination)}
+          paginationMode="server"
           rowSelection={false}
           disableColumnMenu
           disableColumnSorting

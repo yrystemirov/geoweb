@@ -9,4 +9,6 @@ public interface JdbcService {
     void createAttribute(String layername, String attrname, AttrType type);
     void deleteAttribute(String layername, String attrname);
     Boolean tableExists(String tableName);
+    Integer getSRID(String layername);
+    String getTableExtent(String layername);
 }

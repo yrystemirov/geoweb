@@ -24,10 +24,22 @@ const createStyle = (style: StyleRequestDto, layerId: string) => {
   });
 };
 
+const uploadIcon = (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  return instance.post<{ imgSrc: string; imgFormat: string }>(`${STYLE_URL}/icons/upload`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
 export const styleAPI = {
   createStyle,
   deleteStyle,
   getStyle,
   getStyles,
   updateStyle,
+  uploadIcon,
 };

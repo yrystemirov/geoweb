@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { SUPERADMIN_ROLE_CODE } from '../api/types/role';
 
 interface PrivateRouteProps {
   children: JSX.Element;
@@ -7,9 +8,10 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const { isAuthorized } = useAuth();
+  const { hasRole } = useAuth();
+  const isAdmin = hasRole(SUPERADMIN_ROLE_CODE)
 
-  return isAuthorized ? children : <Navigate to="/login" />;
+  return isAdmin ? children : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;

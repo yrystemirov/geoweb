@@ -4,6 +4,10 @@ import kz.geoweb.api.dto.WmsRequestDto;
 import kz.geoweb.api.dto.WmsResponseDto;
 
 public interface GeoserverService {
+    void createWorkspaceIfNotExists();
+
+    void createDatastoreIfNotExists();
+
     void reload();
 
     void deployLayer(String layername);

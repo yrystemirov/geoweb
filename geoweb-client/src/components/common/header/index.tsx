@@ -16,10 +16,14 @@ import Typography from '@mui/material/Typography';
 import { Person as UserIcon } from '@mui/icons-material';
 import { useAuth } from '../../../hooks/useAuth';
 import { dashboardUrl } from '../../Dashboard/routes';
+import { useUserStore } from '../../../hooks/useUserStore';
+import { SUPERADMIN_ROLE_CODE } from '../../../api/types/role';
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthorized, logout } = useAuth();
+  const { isAuthorized, logout, hasRole } = useAuth();
+  const { user } = useUserStore();
+  const isAdmin = hasRole(SUPERADMIN_ROLE_CODE);
 
   const { i18n, t } = useTranslation();
 
@@ -190,11 +194,12 @@ const Header: React.FC = () => {
                     </Button>
                   </Link>
                 ))}
-                {isAuthorized ? (
+                {user ? (
                   <>
-                    <IconButton onClick={handleOpenUserMenu}>
+                    <Button onClick={handleOpenUserMenu}>
                       <UserIcon />
-                    </IconButton>
+                      {user.name}
+                    </Button>
                     <Menu
                       id="user-menu"
                       anchorEl={anchorElUser}
@@ -210,11 +215,11 @@ const Header: React.FC = () => {
                       open={Boolean(anchorElUser)}
                       onClose={handleCloseUserMenu}
                     >
-                      <MenuItem>
+                      {isAdmin && <MenuItem>
                         <Link to={`${dashboardUrl}/maps`} style={{ color: 'inherit', textDecoration: 'none' }}>
                           <Typography textAlign="center">{t('dashboard')}</Typography>
                         </Link>
-                      </MenuItem>
+                      </MenuItem>}
                       <MenuItem
                         onClick={() => {
                           handleCloseUserMenu();

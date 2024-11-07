@@ -12,7 +12,6 @@ import TileLayer from 'ol/layer/Tile';
 import { BaseLayersTool } from './tools/baseLayers';
 import proj4 from 'proj4';
 import { toStringHDMS } from 'ol/coordinate';
-import { LeftPanel } from './leftPanel';
 import { mapOpenAPI } from '../../api/openApi';
 import LayerGroup from 'ol/layer/Group';
 import { IdentifyPanel } from './identifyPanel';
@@ -40,6 +39,12 @@ const MapComponent = () => {
   const [publicMaps, setPublicMaps] = useState<FolderTreeDto[]>([]);
 
   const [lyrTreeInited, setLyrTreeinIted] = useState<boolean>(false);
+
+  const identifyHandler = (event: any) => {
+    if (mapMode === MapMode.IDENTIFY) {
+      setIdentifyEventData(event);
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -115,18 +120,6 @@ const MapComponent = () => {
       let wgsCoords = proj4('EPSG:3857', 'EPSG:4326', evt.coordinate);
 
       setMapMouseOverCoord(toStringHDMS(wgsCoords, 0));
-    });
-
-    mapObj.on('singleclick', (event) => {
-      if (mapMode === MapMode.IDENTIFY) {
-        setIdentifyEventData(event);
-      }
-    });
-
-    mapObj.on('dblclick', (event) => {
-      if (mapMode === MapMode.IDENTIFY) {
-        setIdentifyEventData(event);
-      }
     });
 
     mapObj.setTarget(mapDivRef.current);
@@ -252,6 +245,23 @@ const MapComponent = () => {
     return res;
   };
 
+  useEffect(() => {
+    if (map) {
+      map.on('singleclick', identifyHandler);
+    }
+    return () => {
+      if (map) {
+        map.un('singleclick', identifyHandler);
+      }
+    };
+  }, [map, identifyHandler]);
+
+  useEffect(() => {
+    return () => {
+      setIdentifyEventData(null);
+    };
+  }, []);
+
   return (
     <div
       className="map gis"
@@ -269,7 +279,7 @@ const MapComponent = () => {
           transform: 'translateY(-50%)',
           borderRadius: '10px',
           alignItems: 'flex-end',
-          zIndex: 5000,
+          zIndex: 1010,
         }}
       >
         {map && <LayerPanel color={systemThemeColor} publicMaps={publicMaps} />}
@@ -285,7 +295,7 @@ const MapComponent = () => {
           transform: 'translateY(-50%)',
           borderRadius: '10px',
           alignItems: 'flex-end',
-          zIndex: 5000,
+          zIndex: 1010,
         }}
       >
         {map && (

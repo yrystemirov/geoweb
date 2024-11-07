@@ -92,7 +92,6 @@ export const LayerAttrs: FC = () => {
           hideFooterPagination
           hideFooter
           rows={attrs}
-          rowCount={attrs.length}
           columns={columns}
           localeText={dataGridLocale}
           loading={isLoading}

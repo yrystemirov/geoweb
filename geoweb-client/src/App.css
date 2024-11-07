@@ -71,23 +71,31 @@
 }
 
 .layers-tree {
+  .react-checkbox-tree {
+    overflow: auto;
+  }
+  
   .react-checkbox-tree label, .rct-node-icon, .rct-checkbox, .rct-collapse {
     display: flex;
-    align-items: center;
-  }
-
-  .rct-collapse {
-    padding: 0;
-    width: 20px;
-  }
-
-  .rct-checkbox {
-    padding-left: 0;
   }
   
   .rct-node-icon {
     color: inherit;
     padding: 0;
+  }
+
+  .rct-collapse {
+    padding: 0;
+  }
+
+  .rct-collapse, .rct-checkbox, .rct-node-icon {
+    padding-top: 8px;
+  }
+
+  .rct-node-leaf {
+    .rct-checkbox {
+      margin-left: 6px;
+    }
   }
 
   .rct-checkbox:empty {
