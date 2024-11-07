@@ -50,6 +50,7 @@ export const Roles: FC = () => {
           loading={isLoading}
           paginationModel={pagination}
           onPaginationModelChange={(newPagination) => setPagination(newPagination)}
+          paginationMode="server"
           rowSelection={false}
           disableColumnMenu
           disableColumnSorting

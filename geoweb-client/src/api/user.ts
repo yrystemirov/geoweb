@@ -26,7 +26,12 @@ const createUser = (user: UserCreateDto) => {
   return instance.post<UserDto>(USER_URL, user);
 }
 
+const getCurrentUser = () => {
+  return instance.get<UserDto>('/users/current');
+}
+
 export const userAPI = {
+  getCurrentUser,
   createUser,
   deleteUser,
   getUser,

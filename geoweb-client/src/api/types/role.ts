@@ -6,3 +6,4 @@ export type RoleDto = {
 };
 
 export const EDIT_FORBIDDEN_USER_NAMES = ['admin'];
+export const SUPERADMIN_ROLE_CODE = 'SUPERADMIN';
