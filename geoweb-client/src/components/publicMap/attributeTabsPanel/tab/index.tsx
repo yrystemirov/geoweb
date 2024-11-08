@@ -135,7 +135,7 @@ export const AttributeTableTab = (props: any) => {
           gid: false,
         }}
         slots={{
-          noRowsOverlay: CustomNoRowsOverlay,
+          noRowsOverlay: () => <CustomNoRowsOverlay />,
         }}
         slotProps={{
           loadingOverlay: {

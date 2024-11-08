@@ -105,7 +105,7 @@ export const LayerAttrs: FC = () => {
             minHeight: 200,
           }}
           slots={{
-            noRowsOverlay: CustomNoRowsOverlay,
+            noRowsOverlay: () => <CustomNoRowsOverlay />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Link to={`${dashboardUrl}/layers/${layerId}/attrs/add`}>

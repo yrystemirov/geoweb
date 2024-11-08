@@ -83,7 +83,7 @@ export const MapFolders: FC = () => {
           disableColumnMenu
           disableColumnSorting
           slots={{
-            noRowsOverlay: CustomNoRowsOverlay,
+            noRowsOverlay: () => <CustomNoRowsOverlay />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Link to={`${dashboardUrl}/maps/add`}>

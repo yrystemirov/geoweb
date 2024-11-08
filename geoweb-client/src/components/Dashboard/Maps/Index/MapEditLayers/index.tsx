@@ -20,6 +20,9 @@ import { layersAPI } from '../../../../../api/layer';
 import { uuidv4 } from '../../../../../utils/uidv4';
 import { useNotify } from '../../../../../hooks/useNotify';
 import { dashboardUrl } from '../../../routes';
+import { EntityPermissionDto, EntityType } from '../../../../../api/types/entityPermission';
+import { entityPermissionAPI } from '../../../../../api/entityPermission';
+import { EntityPermissionDialog } from '../../EntityPermissionDialog';
 
 enum DialogType {
   none = '',
@@ -31,6 +34,7 @@ enum DialogType {
   deleteLayer = 'deleteLayer',
   removeLayerFromFolder = 'removeLayerFromFolder',
   removeLayerFromAllFolders = 'removeLayerFromAllFolders',
+  editPermissions = 'editPermissions',
 }
 
 export const MapFolderEditLayers: FC = () => {
@@ -108,6 +112,15 @@ export const MapFolderEditLayers: FC = () => {
     onError,
   });
 
+  const entitiesMutation = useMutation({
+    mutationFn: (e: EntityPermissionDto[]) => entityPermissionAPI.setEntityPermissions(e).then((res) => res.data),
+    onSuccess: () => {
+      showSuccess();
+      closeDialogs();
+    },
+    onError: (error) => showError({ error }),
+  });
+
   const handleSuccess = (idToExpand?: string) => {
     closeDialogs();
     refetch();
@@ -125,6 +138,7 @@ export const MapFolderEditLayers: FC = () => {
             onDelete={() => setOpenDialog({ type: DialogType.deleteFolder, selectedItem: { folder } })}
             onEdit={() => setOpenDialog({ type: DialogType.editFolder, selectedItem: { folder } })}
             onAddLayer={() => setOpenDialog({ type: DialogType.addLayer, selectedItem: { folder } })}
+            onEditPermissions={() => setOpenDialog({ type: DialogType.editPermissions, selectedItem: { folder } })}
           />
         </Box>
       ),
@@ -146,6 +160,7 @@ export const MapFolderEditLayers: FC = () => {
                   onRemoveLayerFromAllFolders={() =>
                     setOpenDialog({ type: DialogType.removeLayerFromAllFolders, selectedItem: { layer } })
                   }
+                  onEditPermissions={() => setOpenDialog({ type: DialogType.editPermissions, selectedItem: { layer } })}
                 />
               </Box>
             ),
@@ -159,13 +174,14 @@ export const MapFolderEditLayers: FC = () => {
   const selectedItemName = useMemo(() => {
     if (openDialog.selectedItem) {
       return {
-        folder: openDialog.selectedItem.folder ? `"${openDialog.selectedItem.folder[nameProp]}"` : '',
-        layer: openDialog.selectedItem.layer ? `"${openDialog.selectedItem.layer[nameProp]}"` : '',
+        folder: openDialog.selectedItem.folder?.[nameProp] ? `"${openDialog.selectedItem.folder[nameProp]}"` : '',
+        layer: openDialog.selectedItem.layer?.[nameProp] ? `"${openDialog.selectedItem.layer[nameProp]}"` : '',
       };
     }
     return null;
   }, [openDialog.selectedItem, nameProp]);
 
+  console.log({ selectedItemName });
   const addExpand = (id?: string) => {
     if (id && !expanded.includes(id)) {
       setExpanded((prev) => [...prev, id]);
@@ -212,7 +228,11 @@ export const MapFolderEditLayers: FC = () => {
           onClose={closeDialogs}
           title={t('editProperties', { name: selectedItemName?.folder })}
         >
-          <MapFolderEditForm id={openDialog.selectedItem?.folder?.id} onSuccess={handleSuccess} onCancel={closeDialogs} />
+          <MapFolderEditForm
+            id={openDialog.selectedItem?.folder?.id}
+            onSuccess={handleSuccess}
+            onCancel={closeDialogs}
+          />
         </Dialog>
 
         <Dialog
@@ -232,7 +252,11 @@ export const MapFolderEditLayers: FC = () => {
           onClose={closeDialogs}
           title={t('maps.editLayer', { layer: selectedItemName?.layer })}
         >
-          <LayerForm editLayerId={openDialog.selectedItem?.layer?.id} onSuccess={handleSuccess} onCancel={closeDialogs} />
+          <LayerForm
+            editLayerId={openDialog.selectedItem?.layer?.id}
+            onSuccess={handleSuccess}
+            onCancel={closeDialogs}
+          />
         </Dialog>
 
         <ConfirmDialog
@@ -277,6 +301,22 @@ export const MapFolderEditLayers: FC = () => {
         >
           {t('deleteConfirmDescription')}
         </ConfirmDialog>
+
+        {openDialog.type === DialogType.editPermissions && (
+          <EntityPermissionDialog
+            title={
+              openDialog.selectedItem?.folder
+                ? t('access.FOLDER', { name: selectedItemName?.folder })
+                : t('access.LAYER', { name: selectedItemName?.layer })
+            }
+            open
+            onClose={() => closeDialogs()}
+            entityId={openDialog.selectedItem?.folder?.id || openDialog.selectedItem?.layer?.id!}
+            entityType={openDialog.selectedItem?.folder ? EntityType.FOLDER : EntityType.LAYER}
+            onSubmit={entitiesMutation.mutate}
+            isLoading={entitiesMutation.isPending}
+          />
+        )}
       </Box>
     </>
   );

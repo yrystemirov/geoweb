@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { clearStoredToken, getStoredToken } from '../utils/auth/tokenStorage';
 import { useUserStore } from './useUserStore';
 import { UserDto } from '../api/types/user';
+import { ADMIN_USERNAME, SUPERADMIN_ROLE_CODE } from '../api/types/role';
 
 export const useAuth = () => {
   const getToken = (): TokenResponse | null => {
@@ -36,11 +37,15 @@ export const useAuth = () => {
     return user?.roles.map(({ code }) => code).includes(role);
   };
 
+  const isAdmin = (user: UserDto | null = currentUser) => {
+    return hasRole(SUPERADMIN_ROLE_CODE, user) || user?.username === ADMIN_USERNAME;
+  };
+
   useEffect(() => {
     const tokenData = getToken();
     setIsAuthorized(Boolean(tokenData));
     setToken(tokenData!);
   }, [getStoredToken()]);
 
-  return { token, setToken: setStoredToken, logout, isAuthorized, hasRole };
+  return { token, setToken: setStoredToken, logout, isAuthorized, isAdmin };
 };

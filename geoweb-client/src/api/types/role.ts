@@ -5,5 +5,7 @@ export type RoleDto = {
   description?: string;
 };
 
-export const EDIT_FORBIDDEN_USER_NAMES = ['admin'];
-export const SUPERADMIN_ROLE_CODE = 'SUPERADMIN';
+
+export const SUPERADMIN_ROLE_CODE = 'SUPERADMIN'; // зарезервированный код роли суперадмина
+export const ADMIN_USERNAME = 'ADMIN'; // зарезервированное имя пользователя админа
+export const EDIT_FORBIDDEN_USER_NAMES = [ADMIN_USERNAME];

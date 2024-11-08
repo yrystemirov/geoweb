@@ -55,7 +55,7 @@ export const Roles: FC = () => {
           disableColumnMenu
           disableColumnSorting
           slots={{
-            noRowsOverlay: CustomNoRowsOverlay,
+            noRowsOverlay: () => <CustomNoRowsOverlay />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Button color="primary" startIcon={<AddIcon />} onClick={() => setCreateDialogOpen(true)}>

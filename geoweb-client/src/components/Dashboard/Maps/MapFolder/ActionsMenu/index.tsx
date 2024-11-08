@@ -12,6 +12,7 @@ type Props = {
   onRemoveLayerFromFolder?: () => void;
   onRemoveLayerFromAllFolders?: () => void;
   onDeleteLayer?: () => void;
+  onEditPermissions?: () => void;
 };
 
 export const MapFolderActionsMenu: FC<Props> = ({
@@ -23,6 +24,7 @@ export const MapFolderActionsMenu: FC<Props> = ({
   onRemoveLayerFromFolder,
   onRemoveLayerFromAllFolders,
   onDeleteLayer,
+  onEditPermissions,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,13 +45,20 @@ export const MapFolderActionsMenu: FC<Props> = ({
         <MoreVert sx={{ fontSize: 20 }} />
       </IconButton>
       <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleClose} closeAfterTransition>
+        {onEditPermissions && <MenuItem onClick={() => onEditPermissions()}>{t('editPermissions')}</MenuItem>}
         {onEdit && <MenuItem onClick={() => onEdit()}>{t('edit')}</MenuItem>}
         {onEditLayer && <MenuItem onClick={() => onEditLayer()}>{t('edit')}</MenuItem>}
         {onAdd && <MenuItem onClick={() => onAdd()}>{t('maps.addFolder')}</MenuItem>}
         {onAddLayer && <MenuItem onClick={() => onAddLayer()}>{t('maps.addLayer')}</MenuItem>}
         {onDelete && <MenuItem onClick={() => onDelete()}>{t('delete')}</MenuItem>}
-        {onRemoveLayerFromFolder && <MenuItem onClick={() => onRemoveLayerFromFolder()}>{t('maps.removeLayerFromFolder', { folder: ''})}</MenuItem>}
-        {onRemoveLayerFromAllFolders && <MenuItem onClick={() => onRemoveLayerFromAllFolders()}>{t('maps.removeLayerFromAllFolders')}</MenuItem>}
+        {onRemoveLayerFromFolder && (
+          <MenuItem onClick={() => onRemoveLayerFromFolder()}>
+            {t('maps.removeLayerFromFolder', { folder: '' })}
+          </MenuItem>
+        )}
+        {onRemoveLayerFromAllFolders && (
+          <MenuItem onClick={() => onRemoveLayerFromAllFolders()}>{t('maps.removeLayerFromAllFolders')}</MenuItem>
+        )}
         {onDeleteLayer && <MenuItem onClick={() => onDeleteLayer()}>{t('maps.deleteLayer')}</MenuItem>}
       </Menu>
     </div>
