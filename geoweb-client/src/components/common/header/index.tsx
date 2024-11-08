@@ -213,7 +213,7 @@ const Header: React.FC = () => {
                       open={Boolean(anchorElUser)}
                       onClose={handleCloseUserMenu}
                     >
-                      {isAdmin() && <MenuItem>
+                      {isAdmin() && <MenuItem onClick={handleCloseUserMenu}>
                         <Link to={`${dashboardUrl}/maps`} style={{ color: 'inherit', textDecoration: 'none' }}>
                           <Typography textAlign="center">{t('dashboard')}</Typography>
                         </Link>
