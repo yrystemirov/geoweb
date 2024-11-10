@@ -7,13 +7,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static kz.geoweb.api.utils.GisConstants.*;
 
@@ -182,6 +182,103 @@ public class OgrServiceImpl implements OgrService {
         }
     }
 
+    @Override
+    public void runOgr2OgrCommandUpload(MultipartFile file, String geometryType, String layername) {
+        String baseFolderPath = "/tmp/test_import_files";
+        File baseFolder = new File(baseFolderPath);
+
+        // Создать директорию, если она не существует
+        if (!baseFolder.exists()) {
+            baseFolder.mkdirs();
+        }
+
+        // Сохранить файл .zip
+        String zipFilePath = baseFolderPath + "/" + file.getOriginalFilename();
+        File zipFile = new File(zipFilePath);
+        try (OutputStream os = new FileOutputStream(zipFile)) {
+            os.write(file.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Разархивировать файл .zip
+        String extractFolderPath = baseFolderPath + "/" + zipFile.getName().replace(".zip", "");
+        File extractFolder = new File(extractFolderPath);
+        if (!extractFolder.exists()) {
+            extractFolder.mkdirs();
+        }
+
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
+            ZipEntry zipEntry;
+            while ((zipEntry = zis.getNextEntry()) != null) {
+                File newFile = new File(extractFolderPath, zipEntry.getName());
+                if (zipEntry.isDirectory()) {
+                    newFile.mkdirs();
+                } else {
+                    new File(newFile.getParent()).mkdirs();
+                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                        byte[] buffer = new byte[1024];
+                        int len;
+                        while ((len = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+                    }
+                }
+                zis.closeEntry();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Использовать разархивированную папку в команде ogr2ogr
+        try {
+            String[] parts = dbUrl.split("://")[1].split("/");
+            String hostPortPart = parts[0];
+            String[] hostPort = hostPortPart.split(":");
+            String dbHost = hostPort[0];
+            int dbPort = Integer.parseInt(hostPort[1]);
+            String dbName = parts[1];
+            String postgis = String.format("\"PG:host=%s port=%s dbname=%s user=%s password=%s\"", dbHost, dbPort, dbName, username, password);
+            log.info("Postgis: {}", postgis);
+
+            String[] cmdArr = new String[]{
+                    OGR_INFO,
+                    "-f", "PostgreSQL",
+                    postgis, extractFolderPath,
+                    "-lco", "GEOMETRY_NAME=" + GEOM,
+                    "-nlt", geometryType,
+                    "-lco", "FID=" + GID,
+                    "-lco", "SCHEMA=" + LAYERS_SCHEMA,
+                    "-lco", "PRECISION=NO",
+                    "-lco", "SPATIAL_INDEX=GIST",
+                    "-nln", layername
+            };
+            log.info("ogr2ogr command: {}", String.join(" ", cmdArr));
+
+            ProcessBuilder processBuilder = new ProcessBuilder(cmdArr);
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);  // или log.info(line);
+                }
+            }
+
+            int exitCode = process.waitFor();
+            System.out.println("ogr2ogr завершен с кодом: " + exitCode);
+            if (exitCode != 0) {
+                System.err.println("Ошибка выполнения команды ogr2ogr.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public String getOgr2ogrVersion() {
         StringBuilder result = new StringBuilder();
 
@@ -210,5 +307,19 @@ public class OgrServiceImpl implements OgrService {
         }
 
         return result.toString().trim();
+    }
+
+    public String getOgr2ogrVersion(String filePath) {
+        try {
+            String[] arr = {"ogrinfo", filePath};
+            log.info("ogrinfo command: {}", String.join(" ", arr));
+            ProcessBuilder processBuilder = new ProcessBuilder(arr);
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            return br.lines().collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            throw new CustomException("Ошибка при получении информации от ogrinfo. " + e.getMessage());
+        }
     }
 }

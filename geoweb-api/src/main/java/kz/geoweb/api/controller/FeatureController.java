@@ -81,8 +81,28 @@ public class FeatureController {
         ogrService.runOgr2OgrCommand(folder, geometryType, layername);
     }
 
+    @PostMapping("/upload")
+    public ResponseEntity<String> runOgr2OgrCommandUpload(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("geometryType") String geometryType,
+            @RequestParam("layername") String layername) {
+        log.info("Importing file upload");
+        try {
+            ogrService.runOgr2OgrCommandUpload(file, geometryType, layername);
+            return ResponseEntity.ok("Команда ogr2ogr успешно выполнена.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Ошибка при выполнении команды ogr2ogr.");
+        }
+    }
+
     @GetMapping("/testogrversion")
     public String testOgrVersion() {
         return ogrService.getOgr2ogrVersion();
+    }
+
+    @GetMapping("/testogrinfo")
+    public String testOgrInfo(@RequestParam String filePath) {
+        return ogrService.getOgr2ogrVersion(filePath);
     }
 }
