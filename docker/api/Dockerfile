@@ -6,12 +6,12 @@ RUN mvn clean package -DskipTests=true
 
 FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /opt/app
-RUN groupadd -r javauser && useradd --no-log-init -r -g javauser javauser
-COPY --from=build /app/target/*.jar app.jar
-RUN chown -R javauser:javauser .
-USER javauser
-EXPOSE 8080
+# RUN groupadd -r javauser && useradd --no-log-init -r -g javauser javauser
+# COPY --from=build /app/target/*.jar app.jar
+# RUN chown -R javauser:javauser .
 USER root
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
 RUN apt update
 RUN apt -y install software-properties-common
 #RUN add-apt-repository ppa:deadsnakes/ppa
