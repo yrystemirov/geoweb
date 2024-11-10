@@ -77,6 +77,7 @@ public class OgrServiceImpl implements OgrService {
 
             ProcessBuilder processBuilder = new ProcessBuilder(newCmdArr);
             processBuilder.redirectErrorStream(true);
+            processBuilder.directory(new File("/usr/bin"));
             Process process = processBuilder.start();
 //            process.waitFor(10, TimeUnit.SECONDS);
 //            if (!jdbcService.tableExists(layername)) {
@@ -161,6 +162,7 @@ public class OgrServiceImpl implements OgrService {
 
             ProcessBuilder processBuilder = new ProcessBuilder(cmdArr);
             processBuilder.redirectErrorStream(true);
+            processBuilder.directory(new File("/usr/bin"));
             Process process = processBuilder.start();
 
             // Чтение вывода
@@ -259,6 +261,7 @@ public class OgrServiceImpl implements OgrService {
 
             ProcessBuilder processBuilder = new ProcessBuilder(cmdArr);
             processBuilder.redirectErrorStream(true);
+            processBuilder.directory(new File("/usr/bin"));
             Process process = processBuilder.start();
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -286,6 +289,7 @@ public class OgrServiceImpl implements OgrService {
             // Создаем процесс для выполнения команды
             ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/ogr2ogr", "--version");
             processBuilder.redirectErrorStream(true);
+            processBuilder.directory(new File("/usr/bin"));
 
             Process process = processBuilder.start();
 
@@ -315,6 +319,7 @@ public class OgrServiceImpl implements OgrService {
             log.info("ogrinfo command: {}", String.join(" ", arr));
             ProcessBuilder processBuilder = new ProcessBuilder(arr);
             processBuilder.redirectErrorStream(true);
+            processBuilder.directory(new File("/usr/bin"));
             Process process = processBuilder.start();
             BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
             return br.lines().collect(Collectors.joining(System.lineSeparator()));
