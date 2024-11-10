@@ -9,10 +9,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static kz.geoweb.api.utils.GisConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +31,10 @@ public class OgrServiceImpl implements OgrService {
     @Value("${spring.datasource.password}")
     private String password;
 
-    private static final String OGR_INFO = "ogrinfo";
+//    @Value("${app.geoserver.import-files.path}")
+//    private String importFilesPath;
+
+    private static final String OGR_INFO = "/usr/bin/ogr2ogr";
     private static final String OGR2OGR = "C:\\OSGeo4W\\bin\\ogr2ogr.exe";
     private static final String F = "-f";
     private static final String POSTGRESQL = "PostgreSQL";
@@ -60,8 +66,9 @@ public class OgrServiceImpl implements OgrService {
                     LCO, FID, LCO, SCHEMA, LCO, PRECISION, LCO, INDEX, LCO, ORGANIZE_POLYGONS, NLN, layername};
 
             // /opt/geoserver/data_dir/gdb/Esilski_vodohoziaistvenn.gdb.zip
+
             String[] newCmdArr = new String[] {
-                    "ogr2ogr -f PostgreSQL PG:\"host=geoweb_db port=5432 dbname=geowebdb user=geoweb_admin password=geoweb123\" \"C:\\Users\\yerhat\\Downloads\\Telegram Desktop\\gdb\\Esilski_vodohoziaistvenn.gdb.zip\" " +
+                    "ogr2ogr -f PostgreSQL PG:\"host=geoweb_db port=5432 dbname=geowebdb user=geoweb_admin password=geoweb123\" \"" + filePath + "\" " +
                             "-lco GEOMETRY_NAME=geom -lco FID=gid -lco SCHEMA=layers -lco PRECISION=NO -lco SPATIAL_INDEX=GIST -lco OGR_ORGANIZE_POLYGONS=CCW_INNER_JUST_AFTER_CW_OUTER -nln imported_roads_2"
             };
 
@@ -79,6 +86,7 @@ public class OgrServiceImpl implements OgrService {
 //            }
 
             // Чтение вывода процесса
+            log.info("Чтение вывода процесса");
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -87,6 +95,7 @@ public class OgrServiceImpl implements OgrService {
             }
 
             // Ожидание завершения процесса
+            log.info("Ожидание завершения процесса");
             boolean finished = process.waitFor(10, TimeUnit.SECONDS);
 
             if (!finished) {
@@ -118,5 +127,88 @@ public class OgrServiceImpl implements OgrService {
         } catch (IOException e) {
             throw new CustomException("Ошибка при получении информации от ogrinfo. " + e.getMessage());
         }
+    }
+
+    public void runOgr2OgrCommand(String folder, String geometryType, String layername) {
+        try {
+
+            String[] parts = dbUrl.split("://")[1].split("/");
+            String hostPortPart = parts[0];
+            String[] hostPort = hostPortPart.split(":");
+            String dbHost = hostPort[0];
+            int dbPort = Integer.parseInt(hostPort[1]);
+            String dbName = parts[1];
+            String postgis = String.format("\"PG:host=%s port=%s dbname=%s user=%s password=%s\"", dbHost, dbPort, dbName, username, password);
+            log.info("Postgis: {}", postgis);
+
+//            String importFolder = String.format("\"%s/%s/%s\"", "/opt/geoserver_import_files", folder, folder);
+//            log.info("Import folder: {}", importFolder);
+            log.info("Import folder path: {}", folder);
+
+            String[] cmdArr = new String[] {
+                    OGR_INFO,
+                    "-f", "PostgreSQL",
+                    postgis, folder,
+                    "-lco", "GEOMETRY_NAME=" + GEOM,
+                    "-nlt", geometryType,
+                    "-lco", "FID=" + GID,
+                    "-lco", "SCHEMA=" + LAYERS_SCHEMA,
+                    "-lco", "PRECISION=NO",
+                    "-lco", "SPATIAL_INDEX=GIST",
+                    "-nln", layername
+            };
+            log.info("ogr2ogr command: {}", String.join(" ", cmdArr));
+
+            ProcessBuilder processBuilder = new ProcessBuilder(cmdArr);
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+
+            // Чтение вывода
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);  // или log.info(line);
+                }
+            }
+
+            int exitCode = process.waitFor();
+            System.out.println("ogr2ogr завершен с кодом: " + exitCode);
+            if (exitCode != 0) {
+                System.err.println("Ошибка выполнения команды ogr2ogr.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getOgr2ogrVersion() {
+        StringBuilder result = new StringBuilder();
+
+        try {
+            // Создаем процесс для выполнения команды
+            ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/ogr2ogr", "--version");
+            processBuilder.redirectErrorStream(true);
+
+            Process process = processBuilder.start();
+
+            // Чтение вывода команды
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line).append("\n");
+                }
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new RuntimeException("Ошибка выполнения команды ogr2ogr --version, код завершения: " + exitCode);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Ошибка: " + e.getMessage();
+        }
+
+        return result.toString().trim();
     }
 }

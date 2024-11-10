@@ -1,20 +1,20 @@
 version: '3.8'
 services:
-  frontend:
-   image: geoweb-frontend:0.0.1
-   container_name: ${FRONTEND_CONTAINER}
-   build:
-    context: .
-    dockerfile: ./docker/frontend/Dockerfile
-   restart: always
-   ports:
-     - '3000:3000'
-  nginx: 
-    build:
-      context: .
-      dockerfile: ./docker/nginx/Dockerfile
-    ports:
-      - 81:80
+  # frontend:
+  #  image: geoweb-frontend:0.0.1
+  #  container_name: ${FRONTEND_CONTAINER}
+  #  build:
+  #   context: .
+  #   dockerfile: ./docker/frontend/Dockerfile
+  #  restart: always
+  #  ports:
+  #    - '3000:3000'
+  # nginx: 
+  #   build:
+  #     context: .
+  #     dockerfile: ./docker/nginx/Dockerfile
+  #   ports:
+  #     - 81:80
   api:
     container_name: ${API_CONTAINER}
     image: geoweb-api:0.0.1
