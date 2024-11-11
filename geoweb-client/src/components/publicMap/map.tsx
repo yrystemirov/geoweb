@@ -143,11 +143,11 @@ const MapComponent = () => {
 
   const initLyrs = () => {
     console.log(mapDataLoaded);
-    let mainGeoserverWmsUrl = 'http://77.240.39.93:8082/geoserver/geoweb/wms';
+    let mainGeoserverWmsUrl = 'http://62.146.179.149/geoserver/geoweb/wms';
     let alLayerNames = getLayerNames(publicMaps);
     //context.updateLayers(lyrTree);
     //context.updateUserLayers(alLayerNames);
-    let layersToAddToMap_: any[] = [];
+    let layersToAddToMap_: TileLayer[] = [];
     alLayerNames.forEach((maplayer: any) => {
       if (
         layersToAddToMap_.filter((layerToAdd: any) => {

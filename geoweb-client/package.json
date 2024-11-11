@@ -62,7 +62,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://62.146.179.149:8787",
+  "proxy": "http://62.146.179.149",
   "devDependencies": {
     "@types/proj4": "^2.5.5"
   }

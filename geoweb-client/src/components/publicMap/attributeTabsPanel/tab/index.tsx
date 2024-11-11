@@ -24,7 +24,7 @@ export const AttributeTableTab = (props: any) => {
 
   const { data: attrs, isLoading: isAttrsLoading } = useQuery({
     queryKey: ['layerAttributes', layer.id],
-    queryFn: () => mapOpenAPI.getOpenApiLayerAttribtes(layer.id).then((res) => res.data),
+    queryFn: () => mapOpenAPI.getOpenApiLayerAttributes(layer.id).then((res) => res.data),
     enabled: !!layer.id,
     staleTime: 1000 * 60 * 60,
   });

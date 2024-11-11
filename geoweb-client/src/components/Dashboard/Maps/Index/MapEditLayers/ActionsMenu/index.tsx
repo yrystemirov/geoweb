@@ -13,9 +13,10 @@ type Props = {
   onRemoveLayerFromAllFolders?: () => void;
   onDeleteLayer?: () => void;
   onEditPermissions?: () => void;
+  onOpenLayerAttrs?: () => void;
 };
 
-export const MapFolderActionsMenu: FC<Props> = ({
+export const MapEditLayersActionsMenu: FC<Props> = ({
   onAdd,
   onDelete,
   onEdit,
@@ -25,6 +26,7 @@ export const MapFolderActionsMenu: FC<Props> = ({
   onRemoveLayerFromAllFolders,
   onDeleteLayer,
   onEditPermissions,
+  onOpenLayerAttrs,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -50,6 +52,7 @@ export const MapFolderActionsMenu: FC<Props> = ({
         {onEditLayer && <MenuItem onClick={() => onEditLayer()}>{t('edit')}</MenuItem>}
         {onAdd && <MenuItem onClick={() => onAdd()}>{t('maps.addFolder')}</MenuItem>}
         {onAddLayer && <MenuItem onClick={() => onAddLayer()}>{t('maps.addLayer')}</MenuItem>}
+        {onOpenLayerAttrs && <MenuItem onClick={() => onOpenLayerAttrs()}>{t('attrs.title', { name: '' })}</MenuItem>}
         {onDelete && <MenuItem onClick={() => onDelete()}>{t('delete')}</MenuItem>}
         {onRemoveLayerFromFolder && (
           <MenuItem onClick={() => onRemoveLayerFromFolder()}>

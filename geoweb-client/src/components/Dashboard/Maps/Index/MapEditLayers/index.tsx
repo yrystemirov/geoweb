@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import CheckboxTree, { Node } from 'react-checkbox-tree';
 import { Folder, FolderOpen, Image, KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material';
-import { MapFolderActionsMenu } from '../../MapFolder/ActionsMenu';
+import { MapEditLayersActionsMenu } from './ActionsMenu';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
 import { GoBackButton } from '../../../../common/GoBackButton';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
@@ -133,7 +133,7 @@ export const MapFolderEditLayers: FC = () => {
       label: (
         <Box display={'flex'} alignItems={'center'}>
           {folder[nameProp]}
-          <MapFolderActionsMenu
+          <MapEditLayersActionsMenu
             onAdd={() => setOpenDialog({ type: DialogType.createFolder, selectedItem: { folder } })}
             onDelete={() => setOpenDialog({ type: DialogType.deleteFolder, selectedItem: { folder } })}
             onEdit={() => setOpenDialog({ type: DialogType.editFolder, selectedItem: { folder } })}
@@ -151,7 +151,7 @@ export const MapFolderEditLayers: FC = () => {
             label: (
               <Box display={'flex'} alignItems={'center'}>
                 {layer[nameProp]}
-                <MapFolderActionsMenu
+                <MapEditLayersActionsMenu
                   onEditLayer={() => setOpenDialog({ type: DialogType.editLayer, selectedItem: { layer } })}
                   onDeleteLayer={() => setOpenDialog({ type: DialogType.deleteLayer, selectedItem: { layer } })}
                   onRemoveLayerFromFolder={() =>
@@ -161,6 +161,7 @@ export const MapFolderEditLayers: FC = () => {
                     setOpenDialog({ type: DialogType.removeLayerFromAllFolders, selectedItem: { layer } })
                   }
                   onEditPermissions={() => setOpenDialog({ type: DialogType.editPermissions, selectedItem: { layer } })}
+                  onOpenLayerAttrs={() => navigate(`${dashboardUrl}/layers/${layer.id}/attrs`)}
                 />
               </Box>
             ),
