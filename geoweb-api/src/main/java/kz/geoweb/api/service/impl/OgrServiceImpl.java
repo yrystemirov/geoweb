@@ -205,7 +205,8 @@ public class OgrServiceImpl implements OgrService {
         }
 
         // Разархивировать файл .zip
-        String extractFolderPath = baseFolderPath + "/" + zipFile.getName().replace(".zip", "");
+        String folderName = zipFile.getName().replace(".zip", "");
+        String extractFolderPath = baseFolderPath + "/" + folderName + "/" + folderName;
         File extractFolder = new File(extractFolderPath);
         if (!extractFolder.exists()) {
             extractFolder.mkdirs();
