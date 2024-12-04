@@ -186,7 +186,7 @@ public class OgrServiceImpl implements OgrService {
 
     @Override
     public void runOgr2OgrCommandUpload(MultipartFile file, String geometryType, String layername) {
-        String baseFolderPath = "/tmp/test_import_files";
+        String baseFolderPath = "/tmp";
         File baseFolder = new File(baseFolderPath);
 
         // Создать директорию, если она не существует
