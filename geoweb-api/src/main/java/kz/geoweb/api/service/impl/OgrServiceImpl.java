@@ -3,6 +3,7 @@ package kz.geoweb.api.service.impl;
 import kz.geoweb.api.dto.OgrInfoDto;
 import kz.geoweb.api.enums.LayerFormat;
 import kz.geoweb.api.exception.CustomException;
+import kz.geoweb.api.service.JdbcService;
 import kz.geoweb.api.service.OgrService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +20,14 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static kz.geoweb.api.utils.CommonConstants.LAYERNAME_IMPORTED_PREFIX;
 import static kz.geoweb.api.utils.GisConstants.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class OgrServiceImpl implements OgrService {
+    private final JdbcService jdbcService;
 
     @Value("${spring.datasource.url}")
     private String dbUrl;
@@ -94,7 +97,8 @@ public class OgrServiceImpl implements OgrService {
             throw new CustomException("No layers found in this file");
         }
         for (OgrInfoDto ogrInfoDto : ogrInfoDtoList) {
-            importLayer(extractFolderPath, ogrInfoDto.getGeomType(), ogrInfoDto.getLayername());
+            String layername = LAYERNAME_IMPORTED_PREFIX + jdbcService.generateOrdinalNumber();
+            importLayer(extractFolderPath, ogrInfoDto.getGeomType(), layername);
         }
     }
 
@@ -103,6 +107,7 @@ public class OgrServiceImpl implements OgrService {
 
         try {
             String[] cmdArr = getOgrInfoCmdArr(extractFolderPath, geometryType, layername);
+            log.info("ogr2ogr command: {}", String.join(" ", cmdArr));
             ProcessBuilder processBuilder = new ProcessBuilder(cmdArr);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
@@ -126,6 +131,8 @@ public class OgrServiceImpl implements OgrService {
         }
 
         log.info("IMPORTED SUCCESSFULLY: " + layername);
+
+        // todo add layer to tables layer/layer_attr
     }
 
     private String[] getOgrInfoCmdArr(String extractFolderPath, String geometryType, String layername) {
@@ -179,7 +186,7 @@ public class OgrServiceImpl implements OgrService {
         while (matcher.find()) {
             OgrInfoDto ogrInfoDto = new OgrInfoDto(
                     matcher.group(1).trim(),
-                    matcher.group(2).trim().toUpperCase()
+                    matcher.group(2).trim().replaceAll("\\s+","").toUpperCase()
             );
             ogrInfoDtoList.add(ogrInfoDto);
             log.info("ogrinfo: " + ogrInfoDto.getLayername() + ", " + ogrInfoDto.getGeomType());

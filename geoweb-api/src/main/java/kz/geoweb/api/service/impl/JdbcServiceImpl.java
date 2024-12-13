@@ -16,6 +16,13 @@ public class JdbcServiceImpl implements JdbcService {
     private final JdbcClient jdbcClient;
 
     @Override
+    public Long generateOrdinalNumber() {
+        return jdbcClient.sql("SELECT nextval('ordinal_number_seq')")
+                .query(Long.class)
+                .single();
+    }
+
+    @Override
     public void createTable(String layername, GeometryType geometryType) {
         jdbcClient.sql("CREATE SEQUENCE " + LAYERS_SCHEMA + "." + layername + LAYER_SEQUENCE_POSTFIX).update();
         jdbcClient.sql("CREATE TABLE " + LAYERS_SCHEMA + "." + layername

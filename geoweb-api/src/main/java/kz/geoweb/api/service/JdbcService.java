@@ -4,6 +4,7 @@ import kz.geoweb.api.enums.AttrType;
 import kz.geoweb.api.enums.GeometryType;
 
 public interface JdbcService {
+    Long generateOrdinalNumber();
     void createTable(String layername, GeometryType geometryType);
     void deleteTable(String layername);
     void createAttribute(String layername, String attrname, AttrType type);
