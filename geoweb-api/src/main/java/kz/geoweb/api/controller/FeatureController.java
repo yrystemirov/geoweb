@@ -1,6 +1,7 @@
 package kz.geoweb.api.controller;
 
 import kz.geoweb.api.dto.*;
+import kz.geoweb.api.enums.LayerFormat;
 import kz.geoweb.api.service.FeatureService;
 import kz.geoweb.api.service.JdbcService;
 import kz.geoweb.api.service.OgrService;
@@ -72,37 +73,10 @@ public class FeatureController {
         return jdbcService.tableExists(tableName);
     }
 
-    @GetMapping("/testogr")
-    public void testOgr(@RequestParam String folder,
-                        @RequestParam String geometryType,
-                        @RequestParam String layername) {
-        log.info("Importing file");
-//        ogrService.importFile("/opt/geoserver_import_files/Esilski_vodohoziaistvenn.gdb.zip", "rivers", "POINT");
-        ogrService.runOgr2OgrCommand(folder, geometryType, layername);
-    }
-
-    @PostMapping("/upload")
-    public ResponseEntity<String> runOgr2OgrCommandUpload(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("geometryType") String geometryType,
-            @RequestParam("layername") String layername) {
-        log.info("Importing file upload");
-        try {
-            ogrService.runOgr2OgrCommandUpload(file, geometryType, layername);
-            return ResponseEntity.ok("Команда ogr2ogr успешно выполнена.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Ошибка при выполнении команды ogr2ogr.");
-        }
-    }
-
-    @GetMapping("/testogrversion")
-    public String testOgrVersion() {
-        return ogrService.getOgr2ogrVersion();
-    }
-
-    @GetMapping("/testogrinfo")
-    public String testOgrInfo(@RequestParam String filePath) {
-        return ogrService.getOgr2ogrVersion(filePath);
+    @PostMapping("/import/layers")
+    public ResponseEntity<?> importLayersFile(@RequestParam MultipartFile file,
+                                              @RequestParam LayerFormat layerFormat) {
+        ogrService.importLayersFile(file, layerFormat);
+        return ResponseEntity.ok().build();
     }
 }
