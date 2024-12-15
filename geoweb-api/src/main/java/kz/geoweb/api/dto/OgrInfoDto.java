@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class OgrInfoDto {
-    private String layername;
+    private String name;
     private String geomType;
 }

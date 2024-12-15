@@ -1,5 +1,6 @@
 package kz.geoweb.api.service.impl;
 
+import kz.geoweb.api.dto.TableColumnDto;
 import kz.geoweb.api.enums.AttrType;
 import kz.geoweb.api.enums.GeometryType;
 import kz.geoweb.api.exception.CustomException;
@@ -7,6 +8,8 @@ import kz.geoweb.api.service.JdbcService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static kz.geoweb.api.utils.GisConstants.*;
 
@@ -75,5 +78,12 @@ public class JdbcServiceImpl implements JdbcService {
                 .query(String.class)
                 .optional()
                 .orElseThrow(() -> new CustomException("layer.no_data", layername));
+    }
+
+    @Override
+    public List<TableColumnDto> getTableColumns(String tableName) {
+        return jdbcClient.sql("SELECT * FROM information_schema.columns WHERE table_schema = '" + LAYERS_SCHEMA + "' AND table_name = '" + tableName + "'")
+                .query(TableColumnDto.class)
+                .list();
     }
 }

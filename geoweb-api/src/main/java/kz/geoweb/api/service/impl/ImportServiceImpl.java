@@ -1,10 +1,21 @@
 package kz.geoweb.api.service.impl;
 
 import kz.geoweb.api.dto.OgrInfoDto;
+import kz.geoweb.api.dto.TableColumnDto;
+import kz.geoweb.api.entity.Folder;
+import kz.geoweb.api.entity.Layer;
+import kz.geoweb.api.entity.LayerAttr;
+import kz.geoweb.api.enums.AttrType;
+import kz.geoweb.api.enums.GeometryType;
 import kz.geoweb.api.enums.LayerFormat;
+import kz.geoweb.api.enums.LayerType;
 import kz.geoweb.api.exception.CustomException;
+import kz.geoweb.api.repository.FolderRepository;
+import kz.geoweb.api.repository.LayerAttrRepository;
+import kz.geoweb.api.repository.LayerRepository;
+import kz.geoweb.api.service.ImportService;
 import kz.geoweb.api.service.JdbcService;
-import kz.geoweb.api.service.OgrService;
+import kz.geoweb.api.utils.PostgresUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -26,8 +39,11 @@ import static kz.geoweb.api.utils.GisConstants.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class OgrServiceImpl implements OgrService {
+public class ImportServiceImpl implements ImportService {
     private final JdbcService jdbcService;
+    private final LayerRepository layerRepository;
+    private final LayerAttrRepository layerAttrRepository;
+    private final FolderRepository folderRepository;
 
     @Value("${spring.datasource.url}")
     private String dbUrl;
@@ -40,7 +56,7 @@ public class OgrServiceImpl implements OgrService {
     private static final String OGR_INFO = "/usr/bin/ogrinfo";
 
     @Override
-    public void importLayersFile(MultipartFile file, LayerFormat layerFormat) {
+    public void importLayersFile(MultipartFile file, LayerFormat layerFormat, UUID folderId) {
         String baseFolderPath = "/tmp";
         File baseFolder = new File(baseFolderPath);
 
@@ -98,11 +114,11 @@ public class OgrServiceImpl implements OgrService {
         }
         for (OgrInfoDto ogrInfoDto : ogrInfoDtoList) {
             String layername = LAYERNAME_IMPORTED_PREFIX + jdbcService.generateOrdinalNumber();
-            importLayer(extractFolderPath, ogrInfoDto.getGeomType(), layername);
+            importLayer(extractFolderPath, layername, ogrInfoDto.getName(), ogrInfoDto.getGeomType(), folderId);
         }
     }
 
-    public void importLayer(String extractFolderPath, String geometryType, String layername) {
+    public void importLayer(String extractFolderPath, String layername, String name, String geometryType, UUID folderId) {
         log.info("START IMPORT LAYER: " + layername);
 
         try {
@@ -132,7 +148,7 @@ public class OgrServiceImpl implements OgrService {
 
         log.info("IMPORTED SUCCESSFULLY: " + layername);
 
-        // todo add layer to tables layer/layer_attr
+        saveImportedLayerMetadata(layername, name, geometryType, folderId);
     }
 
     private String[] getOgrInfoCmdArr(String extractFolderPath, String geometryType, String layername) {
@@ -186,11 +202,46 @@ public class OgrServiceImpl implements OgrService {
         while (matcher.find()) {
             OgrInfoDto ogrInfoDto = new OgrInfoDto(
                     matcher.group(1).trim(),
-                    matcher.group(2).trim().replaceAll("\\s+","").toUpperCase()
+                    matcher.group(2).trim().replaceAll("\\s+", "").toUpperCase()
             );
             ogrInfoDtoList.add(ogrInfoDto);
-            log.info("ogrinfo: " + ogrInfoDto.getLayername() + ", " + ogrInfoDto.getGeomType());
+            log.info("ogrinfo: " + ogrInfoDto.getName() + ", " + ogrInfoDto.getGeomType());
         }
         return ogrInfoDtoList;
+    }
+
+    private void saveImportedLayerMetadata(String layername, String name, String geom, UUID folderId) {
+        GeometryType geometryType = GeometryType.valueOf(geom);
+        Layer layer = new Layer();
+        // todo check all fields
+        layer.setLayername(layername);
+        layer.setLayerType(LayerType.SIMPLE);
+        if (folderId != null) {
+            Folder folder = folderRepository.findById(folderId).orElseThrow();
+            layer.setFolders(Set.of(folder));
+        }
+        layer.setGeometryType(geometryType);
+        layer.setIsPublic(false);
+        layer.setNameKk(name);
+        layer.setNameRu(name);
+        layer.setNameEn(name);
+        Layer created = layerRepository.save(layer);
+        List<TableColumnDto> columns = jdbcService.getTableColumns(layername);
+        columns.stream()
+                .filter(c -> !GID.equals(c.getColumnName()) && !GEOM.equals(c.getColumnName()))
+                .forEach(c -> saveImportedLayerAttrMetadata(created, c.getColumnName(), c.getDataType()));
+    }
+
+    private void saveImportedLayerAttrMetadata(Layer layer, String attrname, String postgresType) {
+        LayerAttr layerAttr = new LayerAttr();
+        layerAttr.setAttrname(attrname);
+        AttrType attrType = PostgresUtils.getAttrTypeFromPostgresType(postgresType);
+        layerAttr.setAttrType(attrType);
+        layerAttr.setLayer(layer);
+        layerAttr.setNameKk(attrname);
+        layerAttr.setNameRu(attrname);
+        layerAttr.setNameEn(attrname);
+        layerAttr.setRank(0);
+        layerAttrRepository.save(layerAttr);
     }
 }

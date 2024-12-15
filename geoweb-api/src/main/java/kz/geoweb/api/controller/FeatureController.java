@@ -1,10 +1,9 @@
 package kz.geoweb.api.controller;
 
 import kz.geoweb.api.dto.*;
-import kz.geoweb.api.enums.LayerFormat;
 import kz.geoweb.api.service.FeatureService;
+import kz.geoweb.api.service.ImportService;
 import kz.geoweb.api.service.JdbcService;
-import kz.geoweb.api.service.OgrService;
 import kz.geoweb.api.utils.HttpUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,7 @@ import java.util.UUID;
 public class FeatureController {
     private final FeatureService featureService;
     private final JdbcService jdbcService;
-    private final OgrService ogrService;
+    private final ImportService importService;
 
     @PostMapping
     public void save(@RequestParam String layername,
@@ -66,17 +65,5 @@ public class FeatureController {
         HttpHeaders headers = HttpUtils.getDownloadHeaders(featureFileResponseDto.getFilename(),
                 featureFileResponseDto.getContentType(), featureFileResponseDto.getSize());
         return new ResponseEntity<>(featureFileResponseDto.getFile(), headers, HttpStatus.OK);
-    }
-
-    @GetMapping("/test")
-    public Boolean test(@RequestParam String tableName) {
-        return jdbcService.tableExists(tableName);
-    }
-
-    @PostMapping("/import/layers")
-    public ResponseEntity<?> importLayersFile(@RequestParam MultipartFile file,
-                                              @RequestParam LayerFormat layerFormat) {
-        ogrService.importLayersFile(file, layerFormat);
-        return ResponseEntity.ok().build();
     }
 }
