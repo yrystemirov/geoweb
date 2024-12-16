@@ -1,7 +1,13 @@
+FROM maven:3.8.3-openjdk-17 AS build
+WORKDIR /app
+COPY geoweb-api/src /app/src
+COPY geoweb-api/pom.xml /app
+RUN mvn clean package -DskipTests=true
+
 FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /opt/app
 RUN groupadd -r javauser && useradd --no-log-init -r -g javauser javauser
-COPY ../../geoweb-api/target/*.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 RUN chown -R javauser:javauser .
 USER javauser
 EXPOSE 8080
