@@ -19,6 +19,12 @@ export const LayerAttrs: FC = () => {
   const { layerId } = useParams();
   const nameProp = useTranslatedProp('name');
 
+  const { data: layer } = useQuery({
+    queryKey: ['layer', layerId],
+    queryFn: () => layersAPI.getLayer(layerId!).then((res) => res.data),
+    enabled: !!layerId,
+  });
+
   const {
     data: attrs = [],
     isLoading,
@@ -29,7 +35,6 @@ export const LayerAttrs: FC = () => {
     enabled: !!layerId,
   });
 
-  const layer = attrs[0]?.layer;
   const layerName = layer?.[nameProp] ? `"${layer?.[nameProp]}"` : '';
   const columns: GridColDef<LayerAttrDto>[] = [
     { field: 'rank', headerName: '№', width: 50 },
@@ -105,7 +110,7 @@ export const LayerAttrs: FC = () => {
             minHeight: 200,
           }}
           slots={{
-            noRowsOverlay: CustomNoRowsOverlay,
+            noRowsOverlay: () => <CustomNoRowsOverlay />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Link to={`${dashboardUrl}/layers/${layerId}/attrs/add`}>

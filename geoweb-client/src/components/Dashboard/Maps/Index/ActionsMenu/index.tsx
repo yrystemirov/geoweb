@@ -2,12 +2,17 @@ import { FC, useState } from 'react';
 import { FolderDto } from '../../../../../api/types/mapFolders';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
-import { AccountTreeOutlined, DeleteOutline, EditOutlined, MoreVert } from '@mui/icons-material';
+import { AccountTreeOutlined, DeleteOutline, EditOutlined, LockOpen, MoreVert } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../../../common/Confirm';
 import { useMutation } from '@tanstack/react-query';
 import { mapFoldersAPI } from '../../../../../api/mapFolders';
 import { dashboardUrl } from '../../../routes';
+import { EntityPermissionDto, EntityType } from '../../../../../api/types/entityPermission';
+import { entityPermissionAPI } from '../../../../../api/entityPermission';
+import { useNotify } from '../../../../../hooks/useNotify';
+import { EntityPermissionDialog } from '../../EntityPermissionDialog';
+import { useTranslatedProp } from '../../../../../hooks/useTranslatedProp';
 
 type Props = {
   data: FolderDto;
@@ -15,6 +20,9 @@ type Props = {
 };
 
 export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
+  const nameProp = useTranslatedProp('name');
+  const { showError, showSuccess } = useNotify();
+  const [accessDialogOpen, setAccessDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { t } = useTranslation();
@@ -23,6 +31,7 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
   const onSuccess = () => {
     onRefresh();
     handleClose();
+    showSuccess();
   };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -39,6 +48,15 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
   const deleteMutation = useMutation({
     mutationFn: () => mapFoldersAPI.deleteFolder(data.id).then((res) => res.data),
     onSuccess,
+  });
+
+  const entitiesMutation = useMutation({
+    mutationFn: (e: EntityPermissionDto[]) => entityPermissionAPI.setEntityPermissions(e).then((res) => res.data),
+    onSuccess: () => {
+      onSuccess();
+      setAccessDialogOpen(false);
+    },
+    onError: (error) => showError({ error }),
   });
 
   return (
@@ -61,6 +79,15 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           horizontal: 'left',
         }}
       >
+        <MenuItem
+          onClick={() => {
+            setAccessDialogOpen(true);
+            handleClose();
+          }}
+        >
+          <LockOpen sx={{ marginRight: 1 }} /> {t('access.title', { name: '' })}
+        </MenuItem>
+
         <MenuItem onClick={() => navigate(`${dashboardUrl}/maps/${data.id}/edit`)}>
           <EditOutlined sx={{ marginRight: 1 }} /> {t('editProperties', { name: '' })}
         </MenuItem>
@@ -69,10 +96,12 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           <AccountTreeOutlined sx={{ marginRight: 1 }} /> {t('maps.editStructure')}
         </MenuItem>
 
-        <MenuItem onClick={() => {
-          setDeleteDialogOpen(true);
-          handleClose();
-        }}>
+        <MenuItem
+          onClick={() => {
+            setDeleteDialogOpen(true);
+            handleClose();
+          }}
+        >
           <DeleteOutline sx={{ marginRight: 1 }} /> {t('delete')}
         </MenuItem>
       </Menu>
@@ -86,6 +115,18 @@ export const MapActionsMenu: FC<Props> = ({ data, onRefresh }) => {
       >
         {t('deleteConfirmDescription')}
       </ConfirmDialog>
+
+      {accessDialogOpen && (
+        <EntityPermissionDialog
+          title={t('access.MAP', { name: data[nameProp] ? `"${data[nameProp]}"` : '' })}
+          open
+          onClose={() => setAccessDialogOpen(false)}
+          entityId={data.id}
+          entityType={EntityType.FOLDER}
+          onSubmit={entitiesMutation.mutate}
+          isLoading={entitiesMutation.isPending}
+        />
+      )}
     </Box>
   );
 };

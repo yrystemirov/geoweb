@@ -18,8 +18,11 @@ import { IdentifyPanel } from './identifyPanel';
 import { AttributeTabsPanel } from './attributeTabsPanel';
 import { FolderTreeDto } from '../../api/types/mapFolders';
 import { LayerPanel } from './LayerPanel';
+import { useAuth } from '../../hooks/useAuth';
+import { mapFoldersAPI } from '../../api/mapFolders';
 
 const MapComponent = () => {
+  const { isAuthorized } = useAuth();
   const mapDivRef = useRef<HTMLDivElement | null>(null);
   const {
     map,
@@ -29,6 +32,7 @@ const MapComponent = () => {
     setUserLayers,
     identifyEventData,
     setIdentifyEventData,
+    setAttributeTables,
     attributeTables,
     systemThemeColor,
   } = usePublicMapStore();
@@ -51,21 +55,26 @@ const MapComponent = () => {
   }, []);
   useEffect(() => {
     if (!mounted) return;
-
-    mapOpenAPI.getOpenApiRootFolders().then((res) => {
-      for (const lyrGroup of res.data) {
-        mapOpenAPI.getOpenApiRootFoldertreeById(lyrGroup.id).then((response) => {
-          publicMaps.push(response.data);
-          setPublicMaps(publicMaps);
-          if (publicMaps.length === res.data.length) {
-            setMapDataLoaded(true);
-          }
-        });
-      }
-      if (!res.data || res.data.length === 0) {
-        setMapDataLoaded(true);
-      }
-    });
+    (isAuthorized ? mapFoldersAPI.getRootFolders : mapOpenAPI.getOpenApiRootFolders)()
+      .then((res) => {
+        for (const lyrGroup of res.data) {
+          (isAuthorized ? mapFoldersAPI.getFolderTree : mapOpenAPI.getOpenApiRootFoldertreeById)(lyrGroup.id).then(
+            (response) => {
+              publicMaps.push(response.data);
+              setPublicMaps(publicMaps);
+              if (publicMaps.length === res.data.length) {
+                setMapDataLoaded(true);
+              }
+            },
+          );
+        }
+        if (!res.data || res.data.length === 0) {
+          setMapDataLoaded(true);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, [mounted]);
 
   useEffect(() => {
@@ -134,7 +143,7 @@ const MapComponent = () => {
 
   const initLyrs = () => {
     console.log(mapDataLoaded);
-    let mainGeoserverWmsUrl = 'http://77.240.39.93:8082/geoserver/geoweb/wms';
+    let mainGeoserverWmsUrl = '/geoserver/geoweb/wms';
     let alLayerNames = getLayerNames(publicMaps);
     //context.updateLayers(lyrTree);
     //context.updateUserLayers(alLayerNames);
@@ -259,6 +268,7 @@ const MapComponent = () => {
   useEffect(() => {
     return () => {
       setIdentifyEventData(null);
+      setAttributeTables([]);
     };
   }, []);
 

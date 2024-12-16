@@ -64,7 +64,7 @@ export const Layers: FC = () => {
     },
     {
       field: 'isPublic',
-      headerName: t('maps.isPublic'),
+      headerName: t('maps.isPublic2'),
       valueFormatter: (value) => (value ? t('yes') : t('no')),
       minWidth: 100,
     },
@@ -95,7 +95,7 @@ export const Layers: FC = () => {
           disableColumnMenu
           disableColumnSorting
           slots={{
-            noRowsOverlay: CustomNoRowsOverlay,
+            noRowsOverlay: () => <CustomNoRowsOverlay />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Link to={`${dashboardUrl}/layers/add`}>

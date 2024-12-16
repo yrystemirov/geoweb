@@ -81,7 +81,7 @@ export const Users: FC = () => {
             id: false,
           }}
           slots={{
-            noRowsOverlay: CustomNoRowsOverlay,
+            noRowsOverlay: () => <CustomNoRowsOverlay />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Link to={`${dashboardUrl}/users/add`}>

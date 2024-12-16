@@ -224,7 +224,7 @@ export const DictionaryEntries = () => {
           onRowEditStop={handleRowEditStop}
           processRowUpdate={processRowUpdate}
           slots={{
-            noRowsOverlay: CustomNoRowsOverlay,
+            noRowsOverlay: () => <CustomNoRowsOverlay />,
             toolbar: () => (
               <GridToolbarContainer>
                 <Button

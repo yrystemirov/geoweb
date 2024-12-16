@@ -309,7 +309,7 @@ export const LayerForm: FC<Props> = ({
         <TextField {...register('url')} label={t('maps.url')} fullWidth />
         <FormControlLabel
           control={<Checkbox checked={methods.watch('isPublic')} {...register('isPublic')} />}
-          label={t('maps.isPublic')}
+          label={t('maps.isPublic2')}
         />
         <Box display="flex" gap={2} sx={{ width: '100%' }} justifyContent="flex-end">
           <Button

@@ -1,6 +1,6 @@
 import { FC, MouseEvent, useEffect, useState } from 'react';
-import { Box, IconButton, Menu, MenuItem, Slider } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
+import { Badge, Box, IconButton, Menu, MenuItem, Slider } from '@mui/material';
+import { FilterAlt, MoreVert } from '@mui/icons-material';
 import { t } from 'i18next';
 import { LayerDto, LayerType } from '../../../../api/types/mapFolders';
 import { usePublicMapStore } from '../../../../hooks/usePublicMapStore';
@@ -8,10 +8,12 @@ import { useMutation } from '@tanstack/react-query';
 import { mapOpenAPI } from '../../../../api/openApi';
 import { convertWktToGeometry, fitExtentToGeometryWithAnimation } from '../../../../utils/openlayers/utils';
 import { useNotify } from '../../../../hooks/useNotify';
+import { TileWMS } from 'ol/source';
+import TileLayer from 'ol/layer/Tile';
+import { CqlFilterDialog } from './CqlFilterDialog';
 
 type Props = {
   layer: LayerDto;
-  onFilter?: () => void;
   onLegendClick?: () => void;
   isLegendVisible?: boolean;
 };
@@ -22,15 +24,16 @@ type Props = {
 // - фильтрация слоя (диалоговое окно) ⏳
 // - отображение легенды ✅
 // - приближение к слою ✅
-export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, onFilter, onLegendClick }) => {
+export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, onLegendClick }) => {
   const { showError } = useNotify();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { map, userLayers, attributeTables, setAttributeTables, setCurrentAttributeTable } = usePublicMapStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [opacity, setOpacity] = useState<number>(1);
   const [isOpacityOpen, setIsOpacityOpen] = useState(false);
+  const [filterDialogState, setFilterDialogState] = useState(false);
 
-  const getExtentMutation = useMutation({
+  const getAndZoomExtentMutation = useMutation({
     mutationFn: () => mapOpenAPI.getExtentByLayerId(layer.id).then((res) => res.data.extent),
     onSuccess: (data) => {
       try {
@@ -72,13 +75,15 @@ export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, on
   };
 
   const handleZoomToLayer = () => {
-    getExtentMutation.mutate();
+    getAndZoomExtentMutation.mutate();
     handleClose();
   };
 
+  const tileLayer = userLayers.find((l) => l.getProperties().systemLayerProps.id === layer.id) as TileLayer<TileWMS>;
   const isSimpleLayer = layer.layerType === LayerType.SIMPLE;
-  const isVisible = userLayers.some((l) => l.getProperties().systemLayerProps.id === layer.id && l.getVisible());
+  const isVisible = tileLayer?.getVisible();
   const isAttrTableOpen = attributeTables.some((at) => at.id === layer.id);
+  const cqlFilterIsActivated = !!tileLayer?.getSource()?.getParams().CQL_FILTER;
 
   useEffect(() => {
     userLayers.forEach((l) => {
@@ -92,9 +97,27 @@ export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, on
   return (
     <Box>
       <IconButton onClick={handleClick}>
-        <MoreVert sx={{ fontSize: 20 }} />
+        <Badge
+          badgeContent={<FilterAlt sx={{ fontSize: 12 }} />}
+          color="primary"
+          invisible={!cqlFilterIsActivated}
+          sx={{ p: 0 }}
+        >
+          <MoreVert sx={{ fontSize: 20 }} />
+        </Badge>
       </IconButton>
       <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleClose} closeAfterTransition sx={{ zIndex: 5001 }}>
+        {tileLayer && (
+          <MenuItem
+            hidden={isOpacityOpen}
+            onClick={() => {
+              setFilterDialogState(true);
+              handleClose();
+            }}
+          >
+            {t('layerPanel.filter')}
+          </MenuItem>
+        )}
         {onLegendClick && (
           <MenuItem hidden={isOpacityOpen} onClick={onLegendClick}>
             {t(`layerPanel.${isLegendVisible ? 'hideLegend' : 'showLegend'}`)}
@@ -103,11 +126,6 @@ export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, on
         <MenuItem hidden={isOpacityOpen} onClick={handleZoomToLayer}>
           {t('layerPanel.zoomToLayer')}
         </MenuItem>
-        {isSimpleLayer && onFilter && (
-          <MenuItem hidden={isOpacityOpen} onClick={() => onFilter()}>
-            {t('layerPanel.filter')}
-          </MenuItem>
-        )}
         {isSimpleLayer && (
           <MenuItem hidden={isOpacityOpen} onClick={handleAttrTable}>
             {t('layerPanel.openAttrTable')} {isAttrTableOpen && t('layerPanel.attrTableIsOpen')}
@@ -128,6 +146,7 @@ export const LayerActionsMenu: FC<Props> = ({ isLegendVisible = false, layer, on
           {t('layerPanel.setOpacity')}
         </MenuItem>
       </Menu>
+      {filterDialogState && <CqlFilterDialog layer={tileLayer} onClose={() => setFilterDialogState(false)} />}
     </Box>
   );
 };

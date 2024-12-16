@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Typography } from '@mui/material';
 
 const legendUrlPrefix =
-  'http://77.240.39.93:8082/geoserver/geoweb/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=geoweb:';
+  'http://62.146.179.149/geoserver/geoweb/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=geoweb:';
 
 export const LegendImage: FC<{ layer: LayerDto }> = ({ layer }) => {
   const nameProp = useTranslatedProp('name');

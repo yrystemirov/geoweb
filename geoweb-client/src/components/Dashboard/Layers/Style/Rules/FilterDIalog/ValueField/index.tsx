@@ -1,28 +1,28 @@
 import { FC, useEffect, useRef, useState } from 'react';
-import { Controller, UseFormReturn } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { MenuItem, Radio, RadioGroup, TextField, FormControlLabel, FormControl, FormLabel } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { dictionariesAPI } from '../../../../../../../api/dictioanries';
 import { AttrType, LayerAttrDto } from '../../../../../../../api/types/mapFolders';
-import { StyleFilterForm } from '..';
 import { useTranslatedProp } from '../../../../../../../hooks/useTranslatedProp';
 import dayjs from 'dayjs';
 
 type Props = {
-  methods: UseFormReturn<StyleFilterForm>;
   selectedAttr?: LayerAttrDto;
+  required?: boolean;
 };
 
 const nonNumberSymbols = ['-', '+', 'e', 'E'];
 const nonIntegerSymbols = ['.', ','];
 
-export const ValueField: FC<Props> = ({ methods, selectedAttr }) => {
+export const ValueField: FC<Props> = ({ required, selectedAttr }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const entryNameProp = useTranslatedProp('', true);
   const [attr, setAttr] = useState<LayerAttrDto>(); // NOTE: this state is used to check if the selected attribute has changed for resetting the value
   const { t } = useTranslation();
+  const methods = useFormContext<{ value: string }>();
   const {
     control,
     formState: { errors },
@@ -89,6 +89,7 @@ export const ValueField: FC<Props> = ({ methods, selectedAttr }) => {
           variant="outlined"
           error={!!errors.value}
           helperText={errors.value?.message}
+          required={required}
         />
       );
     case AttrType.BIGINT:
@@ -104,6 +105,7 @@ export const ValueField: FC<Props> = ({ methods, selectedAttr }) => {
           type="number"
           slotProps={{ htmlInput: { step: 1 } }}
           inputRef={inputRef}
+          required={required}
         />
       );
     case AttrType.NUMERIC:
@@ -119,6 +121,7 @@ export const ValueField: FC<Props> = ({ methods, selectedAttr }) => {
           type="number"
           slotProps={{ htmlInput: { step: 0.001 } }}
           inputRef={inputRef}
+          required={required}
         />
       );
     case AttrType.TIMESTAMP:
@@ -132,7 +135,7 @@ export const ValueField: FC<Props> = ({ methods, selectedAttr }) => {
                 {...field}
                 label={t('styleRules.dateValue')}
                 value={value ? dayjs(value as string) : null}
-                slotProps={{ textField: { fullWidth: true } }}
+                slotProps={{ textField: { fullWidth: true, required } }}
                 format="DD.MM.YYYY"
                 sx={{ mt: 1 }}
               />
@@ -143,7 +146,9 @@ export const ValueField: FC<Props> = ({ methods, selectedAttr }) => {
     case AttrType.BOOLEAN:
       return (
         <FormControl component="fieldset">
-          <FormLabel component="legend">{t('styleRules.value')}</FormLabel>
+          <FormLabel component="legend" required={required}>
+            {t('styleRules.value')}
+          </FormLabel>
           <Controller
             name="value"
             control={control}
@@ -151,7 +156,7 @@ export const ValueField: FC<Props> = ({ methods, selectedAttr }) => {
               <RadioGroup {...field}>
                 <FormControlLabel value={true} control={<Radio />} label={t('yes')} />
                 <FormControlLabel value={false} control={<Radio />} label={t('no')} />
-                <FormControlLabel value={""} control={<Radio />} label={t('isNotSelected')} />
+                {!required && <FormControlLabel value={''} control={<Radio />} label={t('isNotSelected')} />}
               </RadioGroup>
             )}
           />
@@ -170,6 +175,7 @@ export const ValueField: FC<Props> = ({ methods, selectedAttr }) => {
           select
           value={formValues.value}
           disabled={isEntriesLoading}
+          required={required}
         >
           {entries?.length ? (
             <MenuItem value="">

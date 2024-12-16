@@ -73,7 +73,7 @@ export const RulesTable: FC<Props> = ({ rules = [], onAdd, onEdit, onDelete, onC
         rows={rules}
         columns={columns}
         slots={{
-          noRowsOverlay: CustomNoRowsOverlay,
+          noRowsOverlay: () => <CustomNoRowsOverlay />,
           toolbar: () => (
             <GridToolbarContainer>
               <Button color="primary" startIcon={<Add />} onClick={onAdd}>

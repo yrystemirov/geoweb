@@ -11,7 +11,6 @@ import { dashboardUrl } from '../components/Dashboard/routes';
 import { useNotify } from '../hooks/useNotify';
 import { userAPI } from '../api/user';
 import { useUserStore } from '../hooks/useUserStore';
-import { SUPERADMIN_ROLE_CODE } from '../api/types/role';
 
 interface FormValues {
   username: string;
@@ -21,7 +20,7 @@ interface FormValues {
 const Login: React.FC = () => {
   const { setUser } = useUserStore();
   const { showSuccess, showError } = useNotify();
-  const { setToken, hasRole } = useAuth();
+  const { setToken, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { setLoading } = useLoading();
   const { t } = useTranslation();
@@ -42,8 +41,7 @@ const Login: React.FC = () => {
     onSuccess: (user) => {
       showSuccess();
       setUser(user);
-      const isAdmin = hasRole(SUPERADMIN_ROLE_CODE, user);
-      if (isAdmin) {
+      if (isAdmin(user)) {
         navigate(dashboardUrl);
       } else {
         navigate('/');

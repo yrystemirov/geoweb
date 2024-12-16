@@ -17,13 +17,11 @@ import { Person as UserIcon } from '@mui/icons-material';
 import { useAuth } from '../../../hooks/useAuth';
 import { dashboardUrl } from '../../Dashboard/routes';
 import { useUserStore } from '../../../hooks/useUserStore';
-import { SUPERADMIN_ROLE_CODE } from '../../../api/types/role';
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthorized, logout, hasRole } = useAuth();
+  const { isAuthorized, logout, isAdmin } = useAuth();
   const { user } = useUserStore();
-  const isAdmin = hasRole(SUPERADMIN_ROLE_CODE);
 
   const { i18n, t } = useTranslation();
 
@@ -215,7 +213,7 @@ const Header: React.FC = () => {
                       open={Boolean(anchorElUser)}
                       onClose={handleCloseUserMenu}
                     >
-                      {isAdmin && <MenuItem>
+                      {isAdmin() && <MenuItem onClick={handleCloseUserMenu}>
                         <Link to={`${dashboardUrl}/maps`} style={{ color: 'inherit', textDecoration: 'none' }}>
                           <Typography textAlign="center">{t('dashboard')}</Typography>
                         </Link>

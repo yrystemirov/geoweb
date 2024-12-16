@@ -16,7 +16,7 @@ const getOpenApiIdentify = (params: IdentifyParams) => {
   return instance.post<any>(`${OPEN_API_URL}/features/identify`, params);
 };
 
-const getOpenApiLayerAttribtes = (layerId: string) => {
+const getOpenApiLayerAttributes = (layerId: string) => {
   return instance.get<LayerAttrDto[]>(`${OPEN_API_URL}/layers/${layerId}/attrs`);
 };
 
@@ -31,7 +31,7 @@ const getExtentByLayerId = (id: string) => {
 export const mapOpenAPI = {
   getExtentByLayerId,
   getOpenApiIdentify,
-  getOpenApiLayerAttribtes,
+  getOpenApiLayerAttributes,
   getOpenApiLayerFeatures,
   getOpenApiRootFolders,
   getOpenApiRootFoldertreeById,

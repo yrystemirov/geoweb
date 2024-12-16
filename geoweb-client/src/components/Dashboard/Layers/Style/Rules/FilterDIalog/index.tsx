@@ -1,7 +1,7 @@
 import { FC, useEffect, useMemo } from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from '@mui/material';
 import { OperatorType, StyleFilterDto, StyleRule } from '../../../../../../api/types/style';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { layersAPI } from '../../../../../../api/layer';
@@ -132,67 +132,69 @@ export const FilterDialog: FC<Props> = ({ open, onClose, onSubmit, rule }) => {
   return (
     <Dialog open={!!open} onClose={onClose}>
       <DialogTitle>{t(isEdit ? 'styleRules.editFilter' : 'styleRules.addFilter')}</DialogTitle>
-      <form onSubmit={onSubmitHandler} noValidate id="filterForm">
-        <DialogContent>
-          <Box>
-            <TextField
-              {...register('column')}
-              label={t('styleRules.filterName')}
-              fullWidth
-              margin="dense"
-              variant="outlined"
-              error={!!errors.column}
-              helperText={errors.column?.message}
-              select
-              value={formValues.column}
-              required
-              disabled={isAttrsLoading}
+      <FormProvider {...methods}>
+        <form onSubmit={onSubmitHandler} noValidate id="filterForm">
+          <DialogContent>
+            <Box>
+              <TextField
+                {...register('column')}
+                label={t('styleRules.filterName')}
+                fullWidth
+                margin="dense"
+                variant="outlined"
+                error={!!errors.column}
+                helperText={errors.column?.message}
+                select
+                value={formValues.column}
+                required
+                disabled={isAttrsLoading}
+              >
+                {attrs.map((attr) => (
+                  <MenuItem key={attr.id} value={attr.attrname}>
+                    {attr[nameProp]}
+                  </MenuItem>
+                ))}
+                {attrs.length === 0 && <MenuItem disabled>{t('noData')}</MenuItem>}
+              </TextField>
+              <TextField
+                {...register('operator')}
+                label={t('styleRules.operator')}
+                fullWidth
+                margin="dense"
+                variant="outlined"
+                error={!!errors.operator}
+                helperText={errors.operator?.message}
+                select
+                value={formValues.operator}
+                required
+              >
+                {Object.values(OperatorType).map((operator) => (
+                  <MenuItem key={operator} value={operator}>
+                    {t(`styleRules.filterOperators.${operator}`)}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <ValueField selectedAttr={selectedAttr} />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={onClose}>{t('cancel')}</Button>
+            <Button
+              type="submit"
+              form="filterForm"
+              color="primary"
+              variant="contained"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onSubmitHandler();
+              }}
             >
-              {attrs.map((attr) => (
-                <MenuItem key={attr.id} value={attr.attrname}>
-                  {attr[nameProp]}
-                </MenuItem>
-              ))}
-              {attrs.length === 0 && <MenuItem disabled>{t('noData')}</MenuItem>}
-            </TextField>
-            <TextField
-              {...register('operator')}
-              label={t('styleRules.operator')}
-              fullWidth
-              margin="dense"
-              variant="outlined"
-              error={!!errors.operator}
-              helperText={errors.operator?.message}
-              select
-              value={formValues.operator}
-              required
-            >
-              {Object.values(OperatorType).map((operator) => (
-                <MenuItem key={operator} value={operator}>
-                  {t(`styleRules.filterOperators.${operator}`)}
-                </MenuItem>
-              ))}
-            </TextField>
-            <ValueField selectedAttr={selectedAttr} methods={methods} />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>{t('cancel')}</Button>
-          <Button
-            type="submit"
-            form="filterForm"
-            color="primary"
-            variant="contained"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              onSubmitHandler();
-            }}
-          >
-            {t('save')}
-          </Button>
-        </DialogActions>
-      </form>
+              {t('save')}
+            </Button>
+          </DialogActions>
+        </form>
+      </FormProvider>
     </Dialog>
   );
 };
