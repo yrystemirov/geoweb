@@ -24,4 +24,6 @@ public interface JdbcService {
     String getTableExtent(String layername);
 
     List<TableColumnDto> getTableColumns(String tableName);
+
+    void renameColumn(String tableName, String from, String to);
 }

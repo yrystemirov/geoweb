@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class TableColumnDto {
-    private String columnName;
     private String dataType;
+    private String columnName;
+    private String transliteratedColumnName;
 }

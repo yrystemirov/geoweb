@@ -86,4 +86,10 @@ public class JdbcServiceImpl implements JdbcService {
                 .query(TableColumnDto.class)
                 .list();
     }
+
+    @Override
+    public void renameColumn(String tableName, String from, String to) {
+        jdbcClient.sql("ALTER TABLE " + LAYERS_SCHEMA + "." + tableName + " RENAME " + from + " to " + to)
+                .update();
+    }
 }

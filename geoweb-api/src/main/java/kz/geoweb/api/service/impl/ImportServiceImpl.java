@@ -16,6 +16,7 @@ import kz.geoweb.api.repository.LayerRepository;
 import kz.geoweb.api.service.ImportService;
 import kz.geoweb.api.service.JdbcService;
 import kz.geoweb.api.utils.PostgresUtils;
+import kz.geoweb.api.utils.TextUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -148,7 +149,13 @@ public class ImportServiceImpl implements ImportService {
 
         log.info("IMPORTED SUCCESSFULLY: " + layername);
 
-        saveImportedLayerMetadata(layername, name, geometryType, folderId);
+        List<TableColumnDto> columns = jdbcService.getTableColumns(layername);
+
+        renameCyrillicLayerColumns(layername, columns);
+        log.info("RENAMED COLUMNS SUCCESSFULLY");
+
+        saveImportedLayerMetadata(layername, name, geometryType, folderId, columns);
+        log.info("SAVED LAYER METADATA SUCCESSFULLY");
     }
 
     private String[] getOgrInfoCmdArr(String extractFolderPath, String geometryType, String layername) {
@@ -210,7 +217,7 @@ public class ImportServiceImpl implements ImportService {
         return ogrInfoDtoList;
     }
 
-    private void saveImportedLayerMetadata(String layername, String name, String geom, UUID folderId) {
+    private void saveImportedLayerMetadata(String layername, String name, String geom, UUID folderId, List<TableColumnDto> columns) {
         GeometryType geometryType = GeometryType.valueOf(geom);
         Layer layer = new Layer();
         // todo check all fields
@@ -226,22 +233,34 @@ public class ImportServiceImpl implements ImportService {
         layer.setNameRu(name);
         layer.setNameEn(name);
         Layer created = layerRepository.save(layer);
-        List<TableColumnDto> columns = jdbcService.getTableColumns(layername);
         columns.stream()
                 .filter(c -> !GID.equals(c.getColumnName()) && !GEOM.equals(c.getColumnName()))
-                .forEach(c -> saveImportedLayerAttrMetadata(created, c.getColumnName(), c.getDataType()));
+                .forEach(c -> saveImportedLayerAttrMetadata(created, c.getTransliteratedColumnName(), c.getColumnName(), c.getDataType()));
     }
 
-    private void saveImportedLayerAttrMetadata(Layer layer, String attrname, String postgresType) {
+    private void saveImportedLayerAttrMetadata(Layer layer, String attrname, String name, String postgresType) {
         LayerAttr layerAttr = new LayerAttr();
         layerAttr.setAttrname(attrname);
         AttrType attrType = PostgresUtils.getAttrTypeFromPostgresType(postgresType);
         layerAttr.setAttrType(attrType);
         layerAttr.setLayer(layer);
-        layerAttr.setNameKk(attrname);
-        layerAttr.setNameRu(attrname);
-        layerAttr.setNameEn(attrname);
+        layerAttr.setNameKk(name);
+        layerAttr.setNameRu(name);
+        layerAttr.setNameEn(name);
         layerAttr.setRank(0);
         layerAttrRepository.save(layerAttr);
+    }
+
+    private void renameCyrillicLayerColumns(String layername, List<TableColumnDto> columns) {
+        for (TableColumnDto column : columns) {
+            String columnName = column.getColumnName();
+            if (TextUtils.isCyrillic(columnName)) {
+                String transliteratedColumnName = TextUtils.transliterate(columnName.toLowerCase());
+                column.setTransliteratedColumnName(transliteratedColumnName);
+                jdbcService.renameColumn(layername, columnName, transliteratedColumnName);
+            } else {
+                column.setTransliteratedColumnName(columnName.toLowerCase());
+            }
+        }
     }
 }
