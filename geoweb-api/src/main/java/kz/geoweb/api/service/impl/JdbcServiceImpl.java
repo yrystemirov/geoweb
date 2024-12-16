@@ -1,5 +1,6 @@
 package kz.geoweb.api.service.impl;
 
+import kz.geoweb.api.dto.TableColumnDto;
 import kz.geoweb.api.enums.AttrType;
 import kz.geoweb.api.enums.GeometryType;
 import kz.geoweb.api.exception.CustomException;
@@ -8,12 +9,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static kz.geoweb.api.utils.GisConstants.*;
 
 @Service
 @RequiredArgsConstructor
 public class JdbcServiceImpl implements JdbcService {
     private final JdbcClient jdbcClient;
+
+    @Override
+    public Long generateOrdinalNumber() {
+        return jdbcClient.sql("SELECT nextval('ordinal_number_seq')")
+                .query(Long.class)
+                .single();
+    }
 
     @Override
     public void createTable(String layername, GeometryType geometryType) {
@@ -43,6 +53,17 @@ public class JdbcServiceImpl implements JdbcService {
     }
 
     @Override
+    public Boolean tableExists(String tableName) {
+        tableName = tableName.toLowerCase();
+        String sql = "SELECT count(*) FROM information_schema.tables " +
+                "WHERE table_schema='" + LAYERS_SCHEMA + "' AND lower(table_name) = ?";
+        Integer count = jdbcClient.sql(sql)
+                .param(tableName)
+                .query(Integer.class)
+                .single();
+        return count > 0;
+    }
+
     public Integer getSRID(String layername) {
         return jdbcClient.sql("SELECT srid from public.geometry_columns where f_table_name = '" + layername + "'")
                 .query(Integer.class)
@@ -57,5 +78,18 @@ public class JdbcServiceImpl implements JdbcService {
                 .query(String.class)
                 .optional()
                 .orElseThrow(() -> new CustomException("layer.no_data", layername));
+    }
+
+    @Override
+    public List<TableColumnDto> getTableColumns(String tableName) {
+        return jdbcClient.sql("SELECT * FROM information_schema.columns WHERE table_schema = '" + LAYERS_SCHEMA + "' AND table_name = '" + tableName + "'")
+                .query(TableColumnDto.class)
+                .list();
+    }
+
+    @Override
+    public void renameColumn(String tableName, String from, String to) {
+        jdbcClient.sql("ALTER TABLE " + LAYERS_SCHEMA + "." + tableName + " RENAME " + from + " to " + to)
+                .update();
     }
 }

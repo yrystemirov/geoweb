@@ -68,7 +68,6 @@ public class OpenApiController {
         return layerAttrService.getLayerAttrsPublic(id);
     }
 
-
     @GetMapping("/entries")
     public List<EntryDto> getEntriesByDictionaryCode(@RequestParam String dictionaryCode,
                                                      @RequestParam(required = false) String search) {

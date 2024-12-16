@@ -1,20 +1,20 @@
 version: '3.8'
 services:
-  frontend:
-   image: geoweb-frontend:0.0.1
-   container_name: ${FRONTEND_CONTAINER}
-   build:
-    context: .
-    dockerfile: ./docker/frontend/Dockerfile
-   restart: always
-   ports:
-     - '3000:3000'
-  nginx: 
-    build:
-      context: .
-      dockerfile: ./docker/nginx/Dockerfile
-    ports:
-      - 81:80
+  # frontend:
+  #  image: geoweb-frontend:0.0.1
+  #  container_name: ${FRONTEND_CONTAINER}
+  #  build:
+  #   context: .
+  #   dockerfile: ./docker/frontend/Dockerfile
+  #  restart: always
+  #  ports:
+  #    - '3000:3000'
+  # nginx: 
+  #   build:
+  #     context: .
+  #     dockerfile: ./docker/nginx/Dockerfile
+  #   ports:
+  #     - 81:80
   api:
     container_name: ${API_CONTAINER}
     image: geoweb-api:0.0.1
@@ -65,17 +65,17 @@ services:
       - ./infrastructure/db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
       - ./docker-data/postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
-  pgadmin:
-    container_name: ${PGADMIN_CONTAINER}
-    image: dpage/pgadmin4:7
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - "5151:80"
-    volumes:
-      - ./docker-data/pgadmin-data:/var/lib/pgadmin
+  # pgadmin:
+  #   container_name: ${PGADMIN_CONTAINER}
+  #   image: dpage/pgadmin4:7
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #   ports:
+  #     - "5151:80"
+  #   volumes:
+  #     - ./docker-data/pgadmin-data:/var/lib/pgadmin
   minio:
     container_name: ${MINIO_CONTAINER}
     image: minio/minio

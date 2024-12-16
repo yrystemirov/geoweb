@@ -2,8 +2,11 @@ package kz.geoweb.api.controller;
 
 import kz.geoweb.api.dto.*;
 import kz.geoweb.api.service.FeatureService;
+import kz.geoweb.api.service.ImportService;
+import kz.geoweb.api.service.JdbcService;
 import kz.geoweb.api.utils.HttpUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -20,8 +23,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/features")
 @RequiredArgsConstructor
+@Slf4j
 public class FeatureController {
     private final FeatureService featureService;
+    private final JdbcService jdbcService;
+    private final ImportService importService;
 
     @PostMapping
     public void save(@RequestParam String layername,
