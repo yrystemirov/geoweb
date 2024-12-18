@@ -12,6 +12,7 @@ import { dashboardUrl } from '../../routes';
 import { EntityPermissionDialog } from '../../Maps/EntityPermissionDialog';
 import { EntityPermissionDto, EntityType } from '../../../../api/types/entityPermission';
 import { entityPermissionAPI } from '../../../../api/entityPermission';
+import { useTranslatedProp } from '../../../../hooks/useTranslatedProp';
 
 type Props = {
   data: LayerDto;
@@ -19,6 +20,7 @@ type Props = {
 };
 
 export const LayerActionsMenu: FC<Props> = ({ data, onRefresh }) => {
+  const nameProp = useTranslatedProp('name');
   const { showSuccess, showError } = useNotify();
   const [accessDialogOpen, setAccessDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -110,6 +112,7 @@ export const LayerActionsMenu: FC<Props> = ({ data, onRefresh }) => {
           open
           onClose={() => setAccessDialogOpen(false)}
           entityId={data.id}
+          title={t(`access.${EntityType.LAYER}`, { name: data[nameProp] ? `"${data[nameProp]}"` : '' })}
           entityType={EntityType.LAYER}
           onSubmit={entitiesMutation.mutate}
           isLoading={entitiesMutation.isPending}

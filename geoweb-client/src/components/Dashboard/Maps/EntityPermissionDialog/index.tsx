@@ -41,7 +41,7 @@ type Props = {
   entityType: EntityType;
   onSubmit: (entities: EntityPermissionDto[]) => void;
   isLoading: boolean;
-  title?: string;
+  title: string;
 };
 
 export const EntityPermissionDialog: FC<Props> = ({
@@ -216,7 +216,7 @@ export const EntityPermissionDialog: FC<Props> = ({
     <Dialog open={open} onClose={onClose}>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(prepareAndSubmit)} style={{ display: 'contents' }} noValidate>
-          <DialogTitle>{title || t(`access.${entityType}`)}</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
           <DialogContent>
             <DataGrid
               rows={formValues.tableData}
