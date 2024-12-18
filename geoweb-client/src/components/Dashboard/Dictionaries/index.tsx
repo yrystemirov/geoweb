@@ -12,13 +12,14 @@ import {
   GridToolbarContainer,
 } from '@mui/x-data-grid';
 import { Button, CardHeader, Box, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import { dictionariesAPI } from '../../../api/dictioanries';
 import CustomNoRowsOverlay from '../../common/NoRows/DataGrid';
 import { fieldIsRequiredProps } from './Entries/utils';
@@ -38,6 +39,7 @@ export type DictionaryRow = {
 };
 
 export const Dictionaries: FC = () => {
+  const navigate = useNavigate();
   const { showSuccess, showError } = useNotify();
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
   const [rows, setRows] = useState<DictionaryRow[]>([]);
@@ -153,7 +155,7 @@ export const Dictionaries: FC = () => {
     field: 'actions',
     headerName: t('actions'),
     type: 'actions',
-    width: 100,
+    width: 120,
     getActions: ({ id }) => {
       const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
 
@@ -182,6 +184,13 @@ export const Dictionaries: FC = () => {
           label="Delete"
           onClick={handleDeleteClick(id)}
           disabled={deleteMutation.isPending}
+        />,
+        <GridActionsCellItem
+          icon={<FormatListBulletedIcon />}
+          label="List"
+          onClick={() => {
+            navigate(`${dashboardUrl}/dictionaries/${id}`);
+          }}
         />,
       ];
     },

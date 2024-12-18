@@ -108,7 +108,7 @@
   }
 }
 
-.MuiDataGrid-cell:empty::after, .empty-placeholder:empty::after {
+.MuiDataGrid-cell:not(.MuiDataGrid-cellEmpty):empty::after, .empty-placeholder:empty::after {
   content: "—";
   opacity: 0.5;
 }
