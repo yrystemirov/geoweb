@@ -47,13 +47,58 @@ export const MapEditLayersActionsMenu: FC<Props> = ({
         <MoreVert sx={{ fontSize: 20 }} />
       </IconButton>
       <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleClose} closeAfterTransition>
-        {onEditPermissions && <MenuItem onClick={() => onEditPermissions()}>{t('editPermissions')}</MenuItem>}
-        {onEdit && <MenuItem onClick={() => onEdit()}>{t('edit')}</MenuItem>}
+        {onEditPermissions && (
+          <MenuItem
+            onClick={() => {
+              onEditPermissions();
+              handleClose();
+            }}
+          >
+            {t('editPermissions')}
+          </MenuItem>
+        )}
+        {onEdit && (
+          <MenuItem
+            onClick={() => {
+              onEdit();
+              handleClose();
+            }}
+          >
+            {t('edit')}
+          </MenuItem>
+        )}
         {onEditLayer && <MenuItem onClick={() => onEditLayer()}>{t('edit')}</MenuItem>}
-        {onAdd && <MenuItem onClick={() => onAdd()}>{t('maps.addFolder')}</MenuItem>}
-        {onAddLayer && <MenuItem onClick={() => onAddLayer()}>{t('maps.addLayer')}</MenuItem>}
+        {onAdd && (
+          <MenuItem
+            onClick={() => {
+              onAdd();
+              handleClose();
+            }}
+          >
+            {t('maps.addFolder')}
+          </MenuItem>
+        )}
+        {onAddLayer && (
+          <MenuItem
+            onClick={() => {
+              onAddLayer();
+              handleClose();
+            }}
+          >
+            {t('maps.addLayer')}
+          </MenuItem>
+        )}
         {onOpenLayerAttrs && <MenuItem onClick={() => onOpenLayerAttrs()}>{t('attrs.title', { name: '' })}</MenuItem>}
-        {onDelete && <MenuItem onClick={() => onDelete()}>{t('delete')}</MenuItem>}
+        {onDelete && (
+          <MenuItem
+            onClick={() => {
+              onDelete();
+              handleClose();
+            }}
+          >
+            {t('delete')}
+          </MenuItem>
+        )}
         {onRemoveLayerFromFolder && (
           <MenuItem onClick={() => onRemoveLayerFromFolder()}>
             {t('maps.removeLayerFromFolder', { folder: '' })}
