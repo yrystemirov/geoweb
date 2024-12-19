@@ -89,26 +89,26 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server --console-address ":9001" /data
   geoserver:
-      image: kartoza/geoserver:${GEOSERVER_VERSION}
-      container_name: ${GEOSERVER_CONTAINER}
-      volumes:
-        - ./docker-data/geoserver-data:/opt/geoserver/data_dir
-        - geoserver_icons:${GEOSERVER_DATA_DIR}${GEOSERVER_ICONS_PATH}
-      ports:
-        - ${GEOSERVER_PORT}:8080
-      restart: on-failure
-      environment:
-        - GEOSERVER_DATA_DIR=${GEOSERVER_DATA_DIR} #/opt/geoserver/data_dir
-        - GEOWEBCACHE_CACHE_DIR=${GEOWEBCACHE_CACHE_DIR} #/opt/geoserver/data_dir/gwc
-        - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD}
-        - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER}
-        - INITIAL_MEMORY=${INITIAL_MEMORY}
-        - MAXIMUM_MEMORY=${MAXIMUM_MEMORY}
-        - STABLE_EXTENSIONS=${STABLE_EXTENSIONS}
-        - COMMUNITY_EXTENSIONS=${COMMUNITY_EXTENSIONS}
-        - GEOSERVER_CONTEXT_ROOT=${GEOSERVER_CONTEXT_ROOT}
-      depends_on:
-        - db
+    image: kartoza/geoserver:${GEOSERVER_VERSION}
+    container_name: ${GEOSERVER_CONTAINER}
+    volumes:
+      - ./docker-data/geoserver-data:/opt/geoserver/data_dir
+      - geoserver_icons:${GEOSERVER_DATA_DIR}${GEOSERVER_ICONS_PATH}
+    ports:
+      - ${GEOSERVER_PORT}:8080
+    restart: on-failure
+    environment:
+      - GEOSERVER_DATA_DIR=${GEOSERVER_DATA_DIR} #/opt/geoserver/data_dir
+      - GEOWEBCACHE_CACHE_DIR=${GEOWEBCACHE_CACHE_DIR} #/opt/geoserver/data_dir/gwc
+      - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD}
+      - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER}
+      - INITIAL_MEMORY=${INITIAL_MEMORY}
+      - MAXIMUM_MEMORY=${MAXIMUM_MEMORY}
+      - STABLE_EXTENSIONS=${STABLE_EXTENSIONS}
+      - COMMUNITY_EXTENSIONS=${COMMUNITY_EXTENSIONS}
+      - GEOSERVER_CONTEXT_ROOT=${GEOSERVER_CONTEXT_ROOT}
+    depends_on:
+      - db
 networks:
   default:
     name: ${DOCKER_NETWORK_NAME}

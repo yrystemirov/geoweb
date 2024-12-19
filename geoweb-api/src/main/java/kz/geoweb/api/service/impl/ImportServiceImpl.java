@@ -13,6 +13,7 @@ import kz.geoweb.api.exception.CustomException;
 import kz.geoweb.api.repository.FolderRepository;
 import kz.geoweb.api.repository.LayerAttrRepository;
 import kz.geoweb.api.repository.LayerRepository;
+import kz.geoweb.api.service.GeoserverService;
 import kz.geoweb.api.service.ImportService;
 import kz.geoweb.api.service.JdbcService;
 import kz.geoweb.api.utils.PostgresUtils;
@@ -42,6 +43,7 @@ import static kz.geoweb.api.utils.GisConstants.*;
 @Slf4j
 public class ImportServiceImpl implements ImportService {
     private final JdbcService jdbcService;
+    private final GeoserverService geoserverService;
     private final LayerRepository layerRepository;
     private final LayerAttrRepository layerAttrRepository;
     private final FolderRepository folderRepository;
@@ -156,6 +158,9 @@ public class ImportServiceImpl implements ImportService {
 
         saveImportedLayerMetadata(layername, name, geometryType, folderId, columns);
         log.info("SAVED LAYER METADATA SUCCESSFULLY");
+
+        geoserverService.deployLayer(layername);
+        log.info("DEPLOYED LAYER SUCCESSFULLY");
     }
 
     private String[] getOgrInfoCmdArr(String extractFolderPath, String geometryType, String layername) {
@@ -220,7 +225,6 @@ public class ImportServiceImpl implements ImportService {
     private void saveImportedLayerMetadata(String layername, String name, String geom, UUID folderId, List<TableColumnDto> columns) {
         GeometryType geometryType = GeometryType.valueOf(geom);
         Layer layer = new Layer();
-        // todo check all fields
         layer.setLayername(layername);
         layer.setLayerType(LayerType.SIMPLE);
         if (folderId != null) {
