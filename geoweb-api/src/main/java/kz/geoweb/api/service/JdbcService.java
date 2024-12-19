@@ -26,4 +26,6 @@ public interface JdbcService {
     List<TableColumnDto> getTableColumns(String tableName);
 
     void renameColumn(String tableName, String from, String to);
+
+    void transformGeometry(String tableName);
 }

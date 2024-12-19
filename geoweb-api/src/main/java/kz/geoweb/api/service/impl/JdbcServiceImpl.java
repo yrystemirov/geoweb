@@ -92,4 +92,44 @@ public class JdbcServiceImpl implements JdbcService {
         jdbcClient.sql("ALTER TABLE " + LAYERS_SCHEMA + "." + tableName + " RENAME " + from + " to " + to)
                 .update();
     }
+
+    @Override
+    public void transformGeometry(String tableName) {
+        String sql = "DO $$"
+                + " DECLARE"
+                + " recData RECORD;"
+                + " query varchar(200);"
+                + " srid integer;"
+                + " geomType varchar(50);"
+                + " BEGIN"
+                + " execute 'select coalesce(st_srid(geom), 0) from " + LAYERS_SCHEMA + "." + tableName + " where geom is not null limit 1' into srid;"
+                + " execute 'select GeometryType(geom) from " + LAYERS_SCHEMA + "." + tableName + " where geom is not null limit 1' into geomType;"
+                + " RAISE NOTICE 'Current SRID: %, Geometry Type: %', srid, geomType;"
+                + " if srid <> 3857 then"
+                + " execute 'alter table " + LAYERS_SCHEMA + "." + tableName + " alter column geom type geometry(' || geomType || ', 3857) using st_setsrid(geom, 3857)';"
+                + " COMMIT;"
+                + " begin"
+                + " execute 'update " + LAYERS_SCHEMA + "." + tableName + " set geom = st_transform(geom, 3857)';"
+                + " exception"
+                + " when others then"
+                + " RAISE NOTICE 'Error during bulk transformation. Proceeding with row-by-row transformation.';"
+                + " query := 'select gid from " + LAYERS_SCHEMA + "." + tableName + "';"
+                + " for recData in execute query loop"
+                + " begin"
+                + " execute 'update " + LAYERS_SCHEMA + "." + tableName + " set geom = st_transform(geom, 3857) where gid = ' || recData.gid;"
+                + " exception"
+                + " when others then"
+                + " RAISE NOTICE 'Error transforming geometry for gid: %. Deleting record.', recData.gid;"
+                + " execute 'delete from " + LAYERS_SCHEMA + "." + tableName + " where gid = ' || recData.gid;"
+                + " end;"
+                + " end loop;"
+                + " end;"
+                + " else"
+                + " RAISE NOTICE 'SRID is already 3857. No transformation required.';"
+                + " end if;"
+                + " COMMIT;"
+                + " END $$";
+
+        jdbcClient.sql(sql).update();
+    }
 }

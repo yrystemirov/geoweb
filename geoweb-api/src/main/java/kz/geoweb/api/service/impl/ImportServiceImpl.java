@@ -159,6 +159,9 @@ public class ImportServiceImpl implements ImportService {
         saveImportedLayerMetadata(layername, name, geometryType, folderId, columns);
         log.info("SAVED LAYER METADATA SUCCESSFULLY");
 
+        jdbcService.transformGeometry(layername);
+        log.info("TRANSFORMED GEOMETRY TO 3857");
+
         geoserverService.deployLayer(layername);
         log.info("DEPLOYED LAYER SUCCESSFULLY");
     }
