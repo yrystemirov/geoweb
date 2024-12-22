@@ -121,11 +121,11 @@ public class ImportServiceImpl implements ImportService {
         }
     }
 
-    public void importLayer(String extractFolderPath, String layername, String name, String geometryType, UUID folderId) {
+    public void importLayer(String extractFolderPath, String layername, String ogrinfoName, String geometryType, UUID folderId) {
         log.info("START IMPORT LAYER: " + layername);
 
         try {
-            String[] cmdArr = getOgrInfoCmdArr(extractFolderPath, geometryType, layername);
+            String[] cmdArr = getOgrInfoCmdArr(extractFolderPath, ogrinfoName, geometryType, layername);
             log.info("ogr2ogr command: {}", String.join(" ", cmdArr));
             ProcessBuilder processBuilder = new ProcessBuilder(cmdArr);
             processBuilder.redirectErrorStream(true);
@@ -156,7 +156,7 @@ public class ImportServiceImpl implements ImportService {
         renameCyrillicLayerColumns(layername, columns);
         log.info("RENAMED COLUMNS SUCCESSFULLY");
 
-        saveImportedLayerMetadata(layername, name, geometryType, folderId, columns);
+        saveImportedLayerMetadata(layername, ogrinfoName, geometryType, folderId, columns);
         log.info("SAVED LAYER METADATA SUCCESSFULLY");
 
         jdbcService.transformGeometry(layername);
@@ -166,7 +166,7 @@ public class ImportServiceImpl implements ImportService {
         log.info("DEPLOYED LAYER SUCCESSFULLY");
     }
 
-    private String[] getOgrInfoCmdArr(String extractFolderPath, String geometryType, String layername) {
+    private String[] getOgrInfoCmdArr(String extractFolderPath, String ogrinfoName, String geometryType, String layername) {
         String[] parts = dbUrl.split("://")[1].split("/");
         String hostPortPart = parts[0];
         String[] hostPort = hostPortPart.split(":");
@@ -177,7 +177,7 @@ public class ImportServiceImpl implements ImportService {
         return new String[]{
                 OGR_2_OGR,
                 "-f", "PostgreSQL",
-                postgis, extractFolderPath,
+                postgis, extractFolderPath, ogrinfoName,
                 "-lco", "GEOMETRY_NAME=" + GEOM,
                 "-nlt", geometryType,
                 "-lco", "FID=" + GID,
@@ -225,7 +225,7 @@ public class ImportServiceImpl implements ImportService {
         return ogrInfoDtoList;
     }
 
-    private void saveImportedLayerMetadata(String layername, String name, String geom, UUID folderId, List<TableColumnDto> columns) {
+    private void saveImportedLayerMetadata(String layername, String ogrinfoName, String geom, UUID folderId, List<TableColumnDto> columns) {
         GeometryType geometryType = GeometryType.valueOf(geom);
         Layer layer = new Layer();
         layer.setLayername(layername);
@@ -236,9 +236,9 @@ public class ImportServiceImpl implements ImportService {
         }
         layer.setGeometryType(geometryType);
         layer.setIsPublic(false);
-        layer.setNameKk(name);
-        layer.setNameRu(name);
-        layer.setNameEn(name);
+        layer.setNameKk(ogrinfoName);
+        layer.setNameRu(ogrinfoName);
+        layer.setNameEn(ogrinfoName);
         Layer created = layerRepository.save(layer);
         columns.stream()
                 .filter(c -> !GID.equals(c.getColumnName()) && !GEOM.equals(c.getColumnName()))
