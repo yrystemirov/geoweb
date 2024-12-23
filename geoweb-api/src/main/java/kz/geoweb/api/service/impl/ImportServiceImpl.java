@@ -60,6 +60,23 @@ public class ImportServiceImpl implements ImportService {
 
     @Override
     public void importLayersFile(MultipartFile file, LayerFormat layerFormat, UUID folderId) {
+        String extractFolderPath = unzip(file);
+        log.info("UNZIPPED SUCESSFULLY");
+
+        String ogrInfo = getOgrInfo(extractFolderPath);
+        log.info("OGR INFO: " + ogrInfo);
+        List<OgrInfoDto> ogrInfoDtoList = parseOgrInfo(layerFormat, ogrInfo);
+        log.info("OGR INFO DTO COUNT: " + ogrInfoDtoList.size());
+        if (ogrInfoDtoList.isEmpty()) {
+            throw new CustomException("No layers found in this file");
+        }
+        for (OgrInfoDto ogrInfoDto : ogrInfoDtoList) {
+            String layername = LAYERNAME_IMPORTED_PREFIX + jdbcService.generateOrdinalNumber();
+            importLayer(extractFolderPath, layername, ogrInfoDto.getName(), ogrInfoDto.getGeomType(), folderId);
+        }
+    }
+
+    private String unzip(MultipartFile file) {
         String baseFolderPath = "/tmp";
         File baseFolder = new File(baseFolderPath);
 
@@ -77,7 +94,7 @@ public class ImportServiceImpl implements ImportService {
         }
 
         String folderName = zipFile.getName().replace(".zip", "");
-        String extractFolderPath = baseFolderPath + "/" + folderName + "/" + folderName;
+        String extractFolderPath = baseFolderPath + "/" + folderName;
         File extractFolder = new File(extractFolderPath);
         if (!extractFolder.exists()) {
             extractFolder.mkdirs();
@@ -105,23 +122,10 @@ public class ImportServiceImpl implements ImportService {
             log.error("Error while unzipping: " + e);
             throw new CustomException("Error while unzipping: " + e.getMessage());
         }
-
-        log.info("UNZIPPED SUCESSFULLY");
-
-        String ogrInfo = getOgrInfo(extractFolderPath);
-        log.info("OGR INFO: " + ogrInfo);
-        List<OgrInfoDto> ogrInfoDtoList = parseOgrInfo(layerFormat, ogrInfo);
-        log.info("OGR INFO DTO COUNT: " + ogrInfoDtoList.size());
-        if (ogrInfoDtoList.isEmpty()) {
-            throw new CustomException("No layers found in this file");
-        }
-        for (OgrInfoDto ogrInfoDto : ogrInfoDtoList) {
-            String layername = LAYERNAME_IMPORTED_PREFIX + jdbcService.generateOrdinalNumber();
-            importLayer(extractFolderPath, layername, ogrInfoDto.getName(), ogrInfoDto.getGeomType(), folderId);
-        }
+        return extractFolderPath;
     }
 
-    public void importLayer(String extractFolderPath, String layername, String ogrinfoName, String geometryType, UUID folderId) {
+    private void importLayer(String extractFolderPath, String layername, String ogrinfoName, String geometryType, UUID folderId) {
         log.info("START IMPORT LAYER: " + layername);
 
         try {
