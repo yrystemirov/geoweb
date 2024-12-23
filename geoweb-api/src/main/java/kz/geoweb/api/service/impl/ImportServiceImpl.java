@@ -215,10 +215,10 @@ public class ImportServiceImpl implements ImportService {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(text);
         while (matcher.find()) {
-            OgrInfoDto ogrInfoDto = new OgrInfoDto(
-                    matcher.group(1).trim(),
-                    matcher.group(2).trim().replaceAll("\\s+", "").toUpperCase()
-            );
+            String name = matcher.group(1).trim();
+            String geomType = matcher.group(2).trim().toUpperCase()
+                    .replaceAll("\\s|2D|3D|MEASURED", "");
+            OgrInfoDto ogrInfoDto = new OgrInfoDto(name, geomType);
             ogrInfoDtoList.add(ogrInfoDto);
             log.info("ogrinfo: " + ogrInfoDto.getName() + ", " + ogrInfoDto.getGeomType());
         }
