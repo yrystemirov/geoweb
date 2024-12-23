@@ -122,7 +122,7 @@ public class ImportServiceImpl implements ImportService {
             log.error("Error while unzipping: " + e);
             throw new CustomException("Error while unzipping: " + e.getMessage());
         }
-        return extractFolderPath + folderName;
+        return extractFolderPath + "/" + folderName;
     }
 
     private void importLayer(String extractFolderPath, String layername, String ogrinfoName, String geometryType, UUID folderId) {
